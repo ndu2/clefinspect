@@ -2,14 +2,9 @@
 {
     public partial class MainViewModel
     {
-        public class OpenCommand : AbstractCanAlwaysExecuteCommand
+        public class OpenCommand(MainViewModel mainViewModel) : AbstractCanAlwaysExecuteCommand
         {
-            private readonly MainViewModel mainViewModel;
-
-            public OpenCommand(MainViewModel mainViewModel)
-            {
-                this.mainViewModel = mainViewModel;
-            }
+            private readonly MainViewModel mainViewModel = mainViewModel;
 
             public override void Execute(object? parameter)
             {

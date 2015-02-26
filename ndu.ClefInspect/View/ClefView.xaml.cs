@@ -16,7 +16,7 @@ namespace ndu.ClefInspect.View
     /// </summary>
     public partial class ClefView : UserControl
     {
-        private readonly Dictionary<string, GridViewColumn> _customColumns = new();
+        private readonly Dictionary<string, GridViewColumn> _customColumns = [];
         private ScrollViewer? _listViewLogEntriesScrollViewer = null;
 
         public ClefView()
@@ -31,7 +31,7 @@ namespace ndu.ClefInspect.View
             if (DataContext is ClefViewModel viewModel)
             {
                 // remove all colums not vailable in viewModel
-                List<string> surplusCols = new();
+                List<string> surplusCols = [];
                 foreach (var cc in _customColumns)
                 {
                     if (!viewModel.DataColumns.Any(col => col.Header == cc.Key))
@@ -215,7 +215,7 @@ namespace ndu.ClefInspect.View
 
         private void CopySelected()
         {
-            List<string> columns = _customColumns.Keys.ToList();
+            List<string> columns = [.. _customColumns.Keys];
             StringBuilder sb = new();
             IList<ClefLineViewModel> sel = GetSelectedInOrder();
             foreach (ClefLineViewModel line in sel)

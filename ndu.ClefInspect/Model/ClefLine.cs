@@ -3,17 +3,9 @@ using System.Text.Json.Nodes;
 
 namespace ndu.ClefInspect.Model
 {
-    public class ClefLine
+    public class ClefLine(long sort, JsonObject? line)
     {
-        private readonly JsonObject? _line;
-
-        public ClefLine(long sort, JsonObject? line)
-        {
-            Sort = sort;
-            _line = line;
-            Message = Render(line);
-            Time = GetTime(line);
-        }
+        private readonly JsonObject? _line = line;
 
         private static string? Render(JsonObject? line)
         {
@@ -78,7 +70,7 @@ namespace ndu.ClefInspect.Model
         }
 
 
-        public long Sort { get; }
+        public long Sort { get; } = sort;
 
         public string? Level
         {
@@ -87,9 +79,9 @@ namespace ndu.ClefInspect.Model
                 return _line?[Clef.LEVEL_KEY]?.ToString() ?? Clef.LEVEL_EMPTY;
             }
         }
-        public DateTime? Time { get; }
+        public DateTime? Time { get; } = GetTime(line);
 
-        public string? Message { get; }
+        public string? Message { get; } = Render(line);
 
         public JsonObject? JsonObject
         {

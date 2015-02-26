@@ -11,7 +11,7 @@ namespace ndu.ClefInspect.ViewModel.MainView
             Settings = new MainViewSettings();
 
             var args = Environment.GetCommandLineArgs();
-            ClefTabs = new ObservableCollection<ClefTab>();
+            ClefTabs = [];
 
             for (int i = 1; i < args.Length; i++)
             {

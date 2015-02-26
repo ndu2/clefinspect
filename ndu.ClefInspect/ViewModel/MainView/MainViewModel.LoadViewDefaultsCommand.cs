@@ -4,13 +4,8 @@ namespace ndu.ClefInspect.ViewModel.MainView
 {
     public partial class MainViewModel
     {
-        private class ApplyViewDefaultsCommand : AbstractRunExecuteWhenActiveTabSetCommand
+        private class ApplyViewDefaultsCommand(MainViewModel mainViewModel) : AbstractRunExecuteWhenActiveTabSetCommand(mainViewModel)
         {
-            public ApplyViewDefaultsCommand(MainViewModel mainViewModel)
-                : base(mainViewModel)
-            {
-            }
-
             public override void Execute(object? parameter)
             {
                 ClefTab? tab = _mainViewModel.ActiveTab;

@@ -19,8 +19,8 @@ namespace ndu.ClefInspect.ViewModel.ClefView
         public ClefViewModel(string fileName, MainViewSettings settings)
         {
             _settings = new ClefViewSettings(settings);
-            _filters = new Dictionary<string, Filter>();
-            _dataColumns = new ObservableCollection<DataColumnView>();
+            _filters = [];
+            _dataColumns = [];
             _filterTaskManager = new FilterTaskManager(this, _settings);
             _calculationRunning = false;
             PropertyChangedEventManager.AddHandler(_settings.SessionSettings, OnSessionSettingsLocalTimeChanged, nameof(_settings.SessionSettings.LocalTime));
@@ -28,7 +28,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             PropertyChangedEventManager.AddHandler(_settings, OnViewSettingsRefTimeStampChanged, nameof(_settings.RefTimeStamp));
             Clef = new Clef(new FileInfo(fileName));
             ClefLines = new FilteredClef(_settings);
-            Filters = new ObservableCollection<ClefFilterViewModel>();
+            Filters = [];
             ClearTextFilter = new ClearTextFilterCommand(this);
             ApplyTextFilter = new ApplyTextFilterCommand(this);
             FiltersMenu = new FiltersMenuCommand(this);
@@ -177,7 +177,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
 
         private List<IMatcher> CreateMatchers()
         {
-            List<IMatcher> matchers = new();
+            List<IMatcher> matchers = [];
             foreach (IFilter v in _filters.Values)
             {
                 if (!v.AcceptsAll)

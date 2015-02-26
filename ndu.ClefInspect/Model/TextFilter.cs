@@ -1,26 +1,15 @@
 ﻿namespace ndu.ClefInspect.Model
 {
-    public class TextFilter : IFilter
+    public class TextFilter(string? filterString) : IFilter
     {
-        private readonly List<string> _textFilters;
-        private readonly string? _filterString;
+        private readonly List<string> _textFilters = TextFilterParser.Parse(filterString);
+        private readonly string? _filterString = filterString;
 
-        public TextFilter(string? filterString)
-        {
-            _textFilters = TextFilterParser.Parse(filterString);
-            _filterString = filterString;
-        }
         public string? FilterString => _filterString;
 
-        public class Matcher : IMatcher
+        public class Matcher(List<string> textFilters) : IMatcher
         {
-            private readonly List<string> _textFilters;
-
-            public Matcher(List<string> textFilters)
-            {
-                _textFilters = textFilters;
-            }
-
+            private readonly List<string> _textFilters = textFilters;
 
             public bool Accept(ClefLine line)
             {

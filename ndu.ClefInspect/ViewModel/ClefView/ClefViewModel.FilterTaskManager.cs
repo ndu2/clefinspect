@@ -7,21 +7,14 @@ namespace ndu.ClefInspect.ViewModel.ClefView
 {
     public partial class ClefViewModel
     {
-        public class FilterTaskManager
+        public class FilterTaskManager(ClefViewModel clefViewModel, ClefViewSettings settings)
         {
             private Task? _filterTask;
             private CancellationTokenSource? _cancelFilterTask;
-            private readonly ClefViewModel _clefViewModel;
-            private LinesChangedEventArgsAction _filterAction;
-            private readonly ClefViewSettings _settings;
-            private int _nextItemFromSource;
-            public FilterTaskManager(ClefViewModel clefViewModel, ClefViewSettings settings)
-            {
-                _clefViewModel = clefViewModel;
-                _filterAction = LinesChangedEventArgsAction.None;
-                _settings = settings;
-                _nextItemFromSource = 0;
-            }
+            private readonly ClefViewModel _clefViewModel = clefViewModel;
+            private LinesChangedEventArgsAction _filterAction = LinesChangedEventArgsAction.None;
+            private readonly ClefViewSettings _settings = settings;
+            private int _nextItemFromSource = 0;
 
             public void Filter(List<IMatcher> matchers, LinesChangedEventArgsAction action, Action<int> onChanged)
             {

@@ -7,7 +7,7 @@ namespace ndu.ClefInspect.Model
     public class Configuration
     {
         private const string DEFAULT_JSON = "ClefInspect.defaults.json";
-        private string DEFAULT_JSON_PATH = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DEFAULT_JSON);
+        private readonly string DEFAULT_JSON_PATH = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DEFAULT_JSON);
 
         public class ClefFeaturesOptions
         {
@@ -19,14 +19,14 @@ namespace ndu.ClefInspect.Model
             public const string ViewSettings = "viewSettings";
             public bool LocalTime { get; set; } = true;
             public bool OneLineOnly { get; set; }
-            public HashSet<string> DefaultFilterVisibility { get; set; } = new();
-            public HashSet<string> DefaultColumnVisibility { get; set; } = new();
+            public HashSet<string> DefaultFilterVisibility { get; set; } = [];
+            public HashSet<string> DefaultColumnVisibility { get; set; } = [];
         }
 
         public class SessionOptions
         {
             public const string Session = "session";
-            public ObservableCollection<string> Files { get; set; } = new();
+            public ObservableCollection<string> Files { get; set; } = [];
         }
 
         public Configuration()

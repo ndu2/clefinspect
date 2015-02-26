@@ -2,14 +2,9 @@
 {
     public partial class MainViewModel
     {
-        public class LoadSessionCommand : AbstractCanAlwaysExecuteCommand
+        public class LoadSessionCommand(MainViewModel mainViewModel) : AbstractCanAlwaysExecuteCommand
         {
-            private MainViewModel _mainViewModel;
-
-            public LoadSessionCommand(MainViewModel mainViewModel)
-            {
-                _mainViewModel = mainViewModel;
-            }
+            private readonly MainViewModel _mainViewModel = mainViewModel;
 
             public override void Execute(object? parameter)
             {
@@ -19,7 +14,7 @@
                     c.Close.Execute(null);
                 }
                 IList<string> files = _mainViewModel.Settings.GetSessionFiles();
-                _mainViewModel.OpenFiles(files.ToArray());
+                _mainViewModel.OpenFiles([.. files]);
             }
         }
     }

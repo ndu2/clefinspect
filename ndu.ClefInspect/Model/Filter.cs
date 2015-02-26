@@ -15,7 +15,7 @@ namespace ndu.ClefInspect.Model
         {
             _disableNotifyFilterChanged = false;
             _key = key;
-            List<FilterValue> values = new();
+            List<FilterValue> values = [];
             foreach ((string value, int amount) in filter)
             {
                 FilterValue fi = new(value, amount, true, UiWhenEmpty());
@@ -45,16 +45,10 @@ namespace ndu.ClefInspect.Model
             }
         }
 
-        public class Matcher : IMatcher
+        public class Matcher(string key, HashSet<string> enabledValues) : IMatcher
         {
-            private readonly string _key;
-            private readonly HashSet<string> _enabledValues;
-
-            public Matcher(string key, HashSet<string> enabledValues)
-            {
-                _key = key;
-                _enabledValues = enabledValues;
-            }
+            private readonly string _key = key;
+            private readonly HashSet<string> _enabledValues = enabledValues;
 
             public bool Accept(ClefLine line)
             {
@@ -68,7 +62,7 @@ namespace ndu.ClefInspect.Model
         public IMatcher Create()
         {
             bool allEnabled = true;
-            HashSet<string> enabledValues = new();
+            HashSet<string> enabledValues = [];
             foreach (FilterValue fi in Values)
             {
                 if (fi.Enabled)

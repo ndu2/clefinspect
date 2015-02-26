@@ -1,17 +1,14 @@
 ﻿namespace ndu.ClefInspect.Model
 {
 
-    public class LinesChangedEventArgs : EventArgs
+    public class LinesChangedEventArgs(LinesChangedEventArgs.LinesChangedEventArgsAction change) : EventArgs
     {
         public enum LinesChangedEventArgsAction
         {
             None, Add, Reset
         }
-        public LinesChangedEventArgs(LinesChangedEventArgsAction change)
-        {
-            Action = change;
-        }
-        public LinesChangedEventArgsAction Action { get; }
+
+        public LinesChangedEventArgsAction Action { get; } = change;
 
         public static LinesChangedEventArgsAction Union(LinesChangedEventArgsAction a, LinesChangedEventArgsAction b)
         {

@@ -2,15 +2,10 @@
 
 namespace ndu.ClefInspect.ViewModel.ClefView
 {
-    public class ClefViewSettings : INotifyPropertyChanged
+    public class ClefViewSettings(MainViewSettings settings) : INotifyPropertyChanged
     {
-        private readonly MainViewSettings _settings;
+        private readonly MainViewSettings _settings = settings;
         private DateTime? _refTimeStamp;
-
-        public ClefViewSettings(MainViewSettings settings)
-        {
-            _settings = settings;
-        }
 
         public MainViewSettings SessionSettings => _settings;
 

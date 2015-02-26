@@ -2,13 +2,8 @@
 {
     public partial class MainViewModel
     {
-        public class CloseTabCommand : AbstractRunExecuteWhenActiveTabSetCommand
+        public class CloseTabCommand(MainViewModel mainViewModel) : AbstractRunExecuteWhenActiveTabSetCommand(mainViewModel)
         {
-            public CloseTabCommand(MainViewModel mainViewModel)
-                : base(mainViewModel)
-            {
-            }
-
             public override void Execute(object? parameter)
             {
                 _mainViewModel?.ActiveTab?.Close.Execute(parameter);

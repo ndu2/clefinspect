@@ -48,7 +48,7 @@ namespace ndu.ClefInspect
                                     pipeServer.WaitForConnection();
                                     StreamReader r = new(pipeServer);
                                     string? dat = r.ReadLine();
-                                    string[] files = dat?.Split('\u0002') ?? Array.Empty<string>();
+                                    string[] files = dat?.Split('\u0002') ?? [];
                                     Application.Current?.Dispatcher?.Invoke(() =>
                                     {
                                         if (app.MainWindow.WindowState == WindowState.Minimized)

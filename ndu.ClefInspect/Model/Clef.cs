@@ -72,8 +72,8 @@ namespace ndu.ClefInspect.Model
                 _lines.Clear();
                 _properties.Clear();
                 _data.Clear();
-                bytes = Array.Empty<byte>();
-                temp = Array.Empty<byte>();
+                bytes = [];
+                temp = [];
                 _disposedValue = true;
             }
         }
@@ -148,21 +148,14 @@ namespace ndu.ClefInspect.Model
             }
         }
 
-        public class TimedUiUpdate
+        public class TimedUiUpdate(int ms, Action<LinesChangedEventArgs> uiUpdate)
         {
-            private readonly int _ms;
-            private readonly Action<LinesChangedEventArgs> _uiUpdate;
-            DateTime _time;
-            private bool _updateRunning;
-            private LinesChangedEventArgsAction _uiUpdateAction;
-            public TimedUiUpdate(int ms, Action<LinesChangedEventArgs> uiUpdate)
-            {
-                _uiUpdateAction = LinesChangedEventArgsAction.None;
-                _ms = ms;
-                _uiUpdate = uiUpdate;
-                _time = DateTime.Now;
-                _updateRunning = false;
-            }
+            private readonly int _ms = ms;
+            private readonly Action<LinesChangedEventArgs> _uiUpdate = uiUpdate;
+            DateTime _time = DateTime.Now;
+            private bool _updateRunning = false;
+            private LinesChangedEventArgsAction _uiUpdateAction = LinesChangedEventArgsAction.None;
+
             public void ForceUpdate(Action preAction)
             {
                 preAction();
@@ -316,7 +309,7 @@ namespace ndu.ClefInspect.Model
             }
             catch (Exception e)
             {
-                _lines.Add(new ClefLine(long.MaxValue, new JsonObject { new KeyValuePair<string, JsonNode?>("@m", JsonValue.Create(e.ToString())) }));
+                _lines.Add(new ClefLine(long.MaxValue, [new KeyValuePair<string, JsonNode?>("@m", JsonValue.Create(e.ToString()))]));
                 uiUpdateTimer.Notify(LinesChangedEventArgsAction.Reset);
             }
             finally
@@ -356,10 +349,10 @@ namespace ndu.ClefInspect.Model
                 string line = Encoding.UTF8.GetString(bytes, start, endline - start);
                 if (!(line[0] == '{') && line[^1] == '}')
                 {
-                    return new JsonObject
-                    {
+                    return
+                    [
                         new KeyValuePair<string, JsonNode?>("@m", JsonValue.Create(line))
-                    };
+                    ];
                 }
                 JsonObject? logline = JsonNode.Parse(line) as JsonObject;
 
@@ -397,10 +390,10 @@ namespace ndu.ClefInspect.Model
             }
             catch (Exception ex)
             {
-                return new JsonObject
-                {
+                return
+                [
                     new KeyValuePair<string, JsonNode?>("@m", JsonValue.Create(ex.Message))
-                };
+                ];
             }
         }
     }

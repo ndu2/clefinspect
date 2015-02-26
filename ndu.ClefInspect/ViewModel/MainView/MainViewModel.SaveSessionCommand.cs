@@ -4,18 +4,13 @@ namespace ndu.ClefInspect.ViewModel.MainView
 {
     public partial class MainViewModel
     {
-        private class SaveSessionCommand : AbstractCanAlwaysExecuteCommand
+        private class SaveSessionCommand(MainViewModel mainViewModel) : AbstractCanAlwaysExecuteCommand
         {
-            private readonly MainViewModel _mainViewModel;
-
-            public SaveSessionCommand(MainViewModel mainViewModel)
-            {
-                _mainViewModel = mainViewModel;
-            }
+            private readonly MainViewModel _mainViewModel = mainViewModel;
 
             public override void Execute(object? parameter)
             {
-                List<string> openFiles = new();
+                List<string> openFiles = [];
                 foreach (ClefTab c in _mainViewModel.ClefTabs)
                 {
                     openFiles.Add(c.ClefViewModel.FilePath);

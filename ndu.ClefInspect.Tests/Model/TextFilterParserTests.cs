@@ -122,16 +122,14 @@ namespace ndu.ClefInspect.Tests.Model
             Assert.AreEqual("as,df ", result[0]);
         }
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
         public void Parse_InvalidQuote_ThrowsException()
         {
-            List<string> result = TextFilterParser.Parse("\"");
+            Assert.ThrowsException<ArgumentException>(() => TextFilterParser.Parse("\""));
         }
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
         public void Parse_InvalidQuote2_ThrowsException()
         {
-            List<string> result = TextFilterParser.Parse("\"2132\",\"");
+            Assert.ThrowsException<ArgumentException>(() => TextFilterParser.Parse("\"2132\",\""));
         }
     }
 }
