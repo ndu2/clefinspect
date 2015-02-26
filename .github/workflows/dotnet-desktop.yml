@@ -107,7 +107,7 @@ jobs:
       with:
         name: ClefInspect-${{ github.ref_name }}-Windows
         path: |
-          ndu.ClefInspect/bin/Release/net6.0-windows
+          ndu.ClefInspect/bin/Release/net8.0-windows
 
 #    # Decode the base 64 encoded pfx and save the Signing_Certificate
 #    - name: Decode the pfx
