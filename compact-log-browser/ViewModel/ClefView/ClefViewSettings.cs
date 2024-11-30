@@ -1,0 +1,41 @@
+﻿using compact_log_browser.Model;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace compact_log_browser.ViewModel.ClefView
+{
+    public class ClefViewSettings : INotifyPropertyChanged
+    {
+        private Settings _settings;
+        private DateTime? _refTimeStamp;
+
+        public ClefViewSettings(Settings settings)
+        {
+            _settings = settings;
+            _settings.PropertyChanged += (s, e) => { PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Settings))); };
+        }
+
+        public Settings Settings => _settings;
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        public string FormatDelta(DateTime? dt)
+        {
+            if (_refTimeStamp == null || dt == null)
+            {
+                return "";
+            }
+            return (dt - _refTimeStamp).Value.TotalMilliseconds.ToString("0.0");
+        }
+
+        public void SetRefTimeStamp(ClefLine? value)
+        {
+            _refTimeStamp = value?.GetTime();
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Settings)));
+        }
+    }
+}
