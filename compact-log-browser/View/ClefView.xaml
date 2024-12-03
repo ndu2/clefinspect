@@ -31,8 +31,8 @@
                    Text="{Binding FilePath}" />
         <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="5"
                     Orientation="Horizontal" >
-            <TextBlock Padding="2,2,0,10" Text="{Binding DateInfo}" />
-            <TextBlock Padding="10,2,0,10" Text="{Binding FileInfo}" />
+            <TextBlock Padding="2,2,0,10" Text="{Binding FileInfo}" />
+            <TextBlock Padding="10,2,0,10" Text="{Binding DateInfo}" />
         </StackPanel>
 
         <ItemsControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="5"
@@ -50,14 +50,14 @@
         </ItemsControl>
 
         <Button Grid.Row="3" Grid.Column="0" Padding="2,0,0,0"
-                FontFamily="Segoe UI Symbol" Content="&#xE16E;" Command="{Binding ApplyTextFilter}" Margin="5,0,5,0" />
+                FontFamily="Segoe UI Symbol" Content="&#xE11A;" Command="{Binding ApplyTextFilter}" Margin="5,0,5,0" />
         <TextBox Grid.Row="3" Grid.Column="1" 
                  Text="{Binding TextFilter, UpdateSourceTrigger=PropertyChanged}" KeyDown="TextFilter_KeyDown" ></TextBox>
         <Button Grid.Row="3" Grid.Column="2" Padding="0,0,2,0"
                 FontFamily="Segoe UI Symbol" Content="&#xE10A;" Command="{Binding ClearTextFilter}" Margin="5,0,5,0" />
 
-        <TextBox IsReadOnly="True" Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="2"  Margin="2,2,2,2"
-                 Text="{Binding DatePosition}" Width="{Binding ElementName=clefView, Path=DateWidth}" />
+        <TextBox Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="2" Margin="2,2,2,2" Width="{Binding ElementName=clefView, Path=DateWidth}"
+                 Text="{Binding DatePosition, ValidatesOnExceptions=True, UpdateSourceTrigger=PropertyChanged}" />
 
         <ListView Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="5"
                   ScrollViewer.VerticalScrollBarVisibility="Visible" 
@@ -90,7 +90,7 @@
                     <GridViewColumn Header="Level" Width="{Binding ElementName=clefView, Path=LevelWidth}">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Level}" />
+                                <TextBlock Text="{Binding Level}" Background="{Binding LevelBackground}" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

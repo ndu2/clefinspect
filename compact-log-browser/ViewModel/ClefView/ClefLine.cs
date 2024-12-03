@@ -2,6 +2,8 @@
 using System.ComponentModel;
 using System.Text;
 using System.Text.Json.Nodes;
+using System.Windows;
+using System.Windows.Media;
 
 namespace compact_log_browser.ViewModel.ClefView
 {
@@ -114,7 +116,25 @@ namespace compact_log_browser.ViewModel.ClefView
         {
             get
             {
-                return _line?["@l"]?.ToString();
+                return _line?["@l"]?.ToString() ?? "Info";
+            }
+        }
+
+        public Brush LevelBackground
+        {
+            get
+            {
+                string? l = Level;
+                if (l != null)
+                {
+                    if (l.StartsWith('e') || l.StartsWith('E'))
+                        return Brushes.Red;
+                    if (l.StartsWith('w') || l.StartsWith('W'))
+                        return Brushes.Yellow;
+                    if (l.StartsWith('i') || l.StartsWith('I') || l.Length == 0)
+                        return Brushes.LightSkyBlue;
+                }
+                return SystemColors.WindowBrush;
             }
         }
 

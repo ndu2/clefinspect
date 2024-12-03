@@ -1,21 +1,28 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.IO;
 using System.Text;
 using System.Text.Json.Nodes;
+using System.Windows;
 
 namespace compact_log_browser.Model
 {
     public class Clef : IDisposable, INotifyPropertyChanged
     {
+        private const int FileRefreshDelayMs = 1000;
+        private const int BufferSize = 10 * 1024 * 1024;
         private bool _disposedValue;
-        private FileStream? _fileStream;
-        // we can load the whole file in mem, perf issue is about gui <=> model binding (max logfile size is typically 20mb)
-        //private List<(int, int)> _lineStartEnd = new List<(int, int)>();
-        private List<JsonObject?> _lines = new List<JsonObject?>();
-        private Dictionary<string, (string, HashSet<string>)> _properties = new Dictionary<string, (string, HashSet<string>)>();
-        private Dictionary<string, HashSet<string>> _data = new Dictionary<string, HashSet<string>>();
+        private ConcurrentStack<JsonObject?> _lines = new ConcurrentStack<JsonObject?>();
+        private ConcurrentDictionary<string, (string, ConcurrentDictionary<string, byte>)> _properties = new ConcurrentDictionary<string, (string, ConcurrentDictionary<string, byte>)>();
+        private ConcurrentDictionary<string, ConcurrentDictionary<string, byte>> _data = new ConcurrentDictionary<string, ConcurrentDictionary<string, byte>>();
+        private long _seekPos;
+        private Timer _timer;
+        private bool _autoUpdate;
 
+        private byte[] bytes = new byte[BufferSize];
+        private byte[] temp = new byte[BufferSize];
+        private int bytesAvail = 0;
 
         private Dictionary<string, string> _indexableProperties = new Dictionary<string, string> {
             {"@l","Level"},
@@ -24,22 +31,22 @@ namespace compact_log_browser.Model
 
         public Clef(FileInfo file)
         {
-            FileName = file.Name;
-            if (file.Exists)
-            {
-                _fileStream = File.Open(file.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                _fileStream.Seek(0, SeekOrigin.Begin);
-            }
-            FilePath = file.FullName;
-            Scan();
+            this.File = file;
+            _seekPos = 0;
+            _autoUpdate = true;
+            _timer = new Timer(Scan, this, 0, Timeout.Infinite);
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public string FilePath { get; }
-        public string FileName { get; }
+        public FileInfo File { get; }
 
-        public List<JsonObject?> Lines => _lines;
+        public string FilePath { get => File.FullName; }
+
+        public string FileName { get => File.Name; }
+
+        public long SeekPos { get => _seekPos; }
+        public ConcurrentStack<JsonObject?> Lines => _lines;
 
 
 
@@ -49,12 +56,12 @@ namespace compact_log_browser.Model
             {
                 if (disposing)
                 {
-                    _fileStream?.Close();
-                    _fileStream?.Dispose();
+                    _timer.Change(Timeout.Infinite, Timeout.Infinite);
                 }
-                _disposedValue = true;
-                //_lineStartEnd.Clear();
                 _lines.Clear();
+                _properties.Clear();
+                _data.Clear();
+                _disposedValue = true;
             }
         }
 
@@ -71,74 +78,153 @@ namespace compact_log_browser.Model
             GC.SuppressFinalize(this);
         }
 
-        public Dictionary<string, (string, HashSet<string>)> Properties { get => _properties; }
-        public Dictionary<string, HashSet<string>> Data { get => _data; }
-
-
-        private void Scan()
+        public ConcurrentDictionary<string, (string, ConcurrentDictionary<string, byte>)> Properties { get => _properties; }
+        public ConcurrentDictionary<string, ConcurrentDictionary<string, byte>> Data { get => _data; }
+        public bool AutoUpdate
         {
-            if (_fileStream == null)
+            get => _autoUpdate;
+            set
             {
-                return;
-            }
-            byte[] bytes = new byte[1024 * 1024];
-            byte[] temp = new byte[1024 * 1024];
-            int bytesAvail = 0;
-            int bytesRead;
-            int start = 0;
-            while ((bytesRead = _fileStream.Read(bytes, bytesAvail, bytes.Length - bytesAvail)) > 0)
-            {
-                start = 0;
-                bytesAvail += bytesRead;
-                for (int i = 0; i < bytesAvail; ++i)
+                if (_autoUpdate != value)
                 {
-                    if (bytes[i] == '\n')
+                    _autoUpdate = value;
+                    if (AutoUpdate)
                     {
-                        int endline = i;
-                        if (i > 0 && bytes[i - 1] == '\r')
+                        _timer.Change(FileRefreshDelayMs, Timeout.Infinite);
+                    }
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AutoUpdate)));
+                }
+            }
+        }
+
+        private void Scan(object? state)
+        {
+            bool tracking = Scan(
+                () => {
+                    Application.Current.Dispatcher.Invoke(() => { PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Lines))); });
+                });
+            if (!tracking)
+            {
+                Application.Current.Dispatcher.Invoke(() => { AutoUpdate = false; });
+            }
+            _timer.Change(AutoUpdate? FileRefreshDelayMs:Timeout.Infinite, Timeout.Infinite);
+        }
+
+        private bool Scan(Action uiUpdate)
+        {
+            File.Refresh();
+            if (File.Exists)
+            {
+                if(_seekPos == 0)
+                {
+                    _lines.Clear();
+                }
+                if (File.Length == _seekPos)
+                {
+                    return true;
+                }
+                if(File.Length < _seekPos)
+                {
+                    _seekPos = 0;
+                    return false;
+                }
+                int bytesAvailPref = bytesAvail;
+                try
+                {
+                    using (FileStream fileStream = System.IO.File.Open(File.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                    {
+                        fileStream.Seek(_seekPos, SeekOrigin.Begin);
+                        int bytesRead;
+                        int start = 0;
+                        while ((bytesRead = fileStream.Read(bytes, bytesAvail, bytes.Length - bytesAvail)) > 0)
                         {
-                            endline--;
+                            start = 0;
+                            bytesAvail += bytesRead;
+                            for (int i = 0; i < bytesAvail; ++i)
+                            {
+                                if (bytes[i] == '\n')
+                                {
+                                    int endline = i;
+                                    if (i > 0 && bytes[i - 1] == '\r')
+                                    {
+                                        endline--;
+                                    }
+                                    if (bytesAvailPref > 0)
+                                    {
+                                        if (bytesAvailPref != endline)
+                                        {
+                                            // replace last entry
+                                            _lines.TryPop(out _);
+                                            JsonObject? logline = Scan(bytes, start, endline);
+                                            _lines.Push(logline);
+                                        }
+                                        bytesAvailPref = 0;
+                                    }
+                                    else
+                                    {
+                                        JsonObject? logline = Scan(bytes, start, endline);
+                                        _lines.Push(logline);
+                                    }
+                                    start = i + 1;
+                                }
+                            }
+                            if (start == 0)
+                            {
+                                // EOF or buffer full (log line too long).
+                                int dat;
+                                do
+                                {
+                                    // eat the rest of a possibly too long line
+                                    dat = fileStream.ReadByte();
+                                } while (dat > 0 && dat != '\n');
+                                if (dat == '\n')
+                                {
+                                    // clear buffer and scan to the next line
+                                    bytesAvail = 0;
+                                    dat = fileStream.ReadByte();
+                                    if (dat != '\r')
+                                    {
+                                        bytes[0] = (byte)dat;
+                                        bytesAvail = 1;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                bytesAvail = bytesAvail - start;
+                                Array.Copy(bytes, start, temp, 0, bytesAvail);
+                                Array.Copy(temp, bytes, bytesAvail);
+                            }
+                            _seekPos = fileStream.Position;
+                            uiUpdate();
                         }
-                        JsonObject? logline = Scan(bytes, start, endline);
-                        _lines.Add(logline);
-                        //_lineStartEnd.Add((start, endline));
-                        start = i + 1;
+                        _seekPos = fileStream.Position;
+                        if (bytesAvail > 0)
+                        {
+
+                            if (bytesAvailPref > 0)
+                            {
+                                // replace last entry
+                                _lines.TryPop(out _);
+                                bytesAvailPref = 0;
+                            }
+                            // end of file. add rest in case there is no newline at the end
+                            _lines.Push(Scan(bytes, start, start + bytesAvail));
+                            Array.Copy(bytes, start, temp, 0, bytesAvail);
+                            Array.Copy(temp, bytes, bytesAvail);
+                        }
                     }
                 }
-                if (start == 0)
+                catch (Exception e)
                 {
-                    // EOF or buffer full (log line too long).
-                    int dat;
-                    do
+                    _lines.Push(new JsonObject
                     {
-                        // eat the rest of a possibly too long line
-                        dat = _fileStream.ReadByte();
-                    } while (dat > 0 && dat != '\n');
-                    if (dat == '\n')
-                    {
-                        // clear buffer and scan to the next line
-                        bytesAvail = 0;
-                        dat = _fileStream.ReadByte();
-                        if (dat != '\r')
-                        {
-                            bytes[0] = (byte)dat;
-                            bytesAvail = 1;
-                        }
-                    }
-                }
-                else
-                {
-                    bytesAvail = bytesAvail - start;
-                    Array.Copy(bytes, start, temp, 0, bytesAvail);
-                    Array.Copy(temp, bytes, bytesAvail);
+                        new KeyValuePair<string, JsonNode?>("@m", JsonValue.Create(e.ToString()))
+                    });
                 }
             }
-            if (bytesAvail > 0)
-            {
-                // end of file. add rest in case there is no newline at the end
-                _lines.Add(Scan(bytes, start, start + bytesAvail));
-                //_lineStartEnd.Add((start, start + bytesAvail));
-            }
+            uiUpdate();
+            return true;
         }
 
         private JsonObject? Scan(byte[] bytes, int start, int endline)
@@ -162,27 +248,27 @@ namespace compact_log_browser.Model
                         {
                             if (_indexableProperties.ContainsKey(kv.Key) && kv.Value is JsonValue value)
                             {
-                                (string, HashSet<string>) values;
-                                if (!_properties.TryGetValue(kv.Key, out values))
+                                (string, ConcurrentDictionary<string, byte>) values = _properties.GetOrAdd(kv.Key, (k) =>
                                 {
-                                    values = (_indexableProperties[kv.Key], new HashSet<string>());
-                                    _properties.Add(kv.Key, values);
-                                    values.Item2.Add("");
-                                }
-                                values.Item2.Add(value.ToString());
+                                    ConcurrentDictionary<string, byte> newSet = new ConcurrentDictionary<string, byte>();
+                                    newSet.TryAdd("", (byte)0);
+                                    return (_indexableProperties[k], newSet);
+
+
+                                });
+                                values.Item2.TryAdd(value.ToString(), (byte)0);
                             }
                         }
                         {
                             if (!kv.Key.StartsWith("@") && kv.Value is JsonValue value)
                             {
-                                HashSet<string>? values;
-                                if (!_data.TryGetValue(kv.Key, out values))
+                                ConcurrentDictionary<string, byte> values = _data.GetOrAdd(kv.Key, (k) =>
                                 {
-                                    values = new HashSet<string>();
-                                    _data.Add(kv.Key, values);
-                                    values.Add("");
-                                }
-                                values.Add(value.ToString());
+                                    ConcurrentDictionary<string, byte> newSet = new ConcurrentDictionary<string, byte>();
+                                    newSet.TryAdd("", (byte)0);
+                                    return newSet;
+                                });
+                                values.TryAdd(value.ToString(), (byte)0);
                             }
                         }
                     }

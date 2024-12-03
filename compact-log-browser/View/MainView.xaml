@@ -18,7 +18,8 @@
                 <!--https://adamdawes.com/windows8/win8_segoeuisymbol.html-->
                 <TextBlock  
                     Text="{Binding Name}" />
-                <Button FontFamily="Segoe UI Symbol" Content="&#xE10A;" Command="{Binding Close}" Margin="5,0,5,0" />
+                <ToggleButton FontFamily="Segoe UI Symbol" Content="&#xE117;" IsChecked="{Binding AutoUpdate, Mode=TwoWay}" Margin="5,0,2,0" />
+                <Button FontFamily="Segoe UI Symbol" Content="&#xE10A;" Command="{Binding Close}" Margin="2,0,5,0" />
             </StackPanel>
         </DataTemplate>
 

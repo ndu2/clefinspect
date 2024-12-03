@@ -28,7 +28,7 @@ namespace compact_log_browser.View
             {
                 viewModel.Reloaded += () =>
                 {
-                    ListViewLogEntries.ScrollIntoView(viewModel.SelectedIndex);
+                    ListViewLogEntries.ScrollIntoView(viewModel.SelectedItem);
                 };
             }
         }

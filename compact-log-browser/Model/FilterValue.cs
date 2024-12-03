@@ -1,22 +1,20 @@
 ﻿using System.ComponentModel;
-using System.Text.Json.Nodes;
-using System.Windows.Navigation;
 
 namespace compact_log_browser.Model
 {
-    public class FilterValue : INotifyPropertyChanged
+    public class FilterValue : INotifyPropertyChanged, IComparable<FilterValue>
     {
         private bool _enabled;
-        private bool _defaultFilter;
         public FilterValue(string value, bool enabled)
         {
-            _defaultFilter = value == "";
-            Value = _defaultFilter ? "<N/A>" : value;
+            Value = value.Length ==0? "(empty)" : value;
+            ValueMatcher = value;
             Enabled = enabled;
         }
         public event PropertyChangedEventHandler? PropertyChanged;
 
         public string Value { get; }
+        public string ValueMatcher { get; }
         public bool Enabled
         {
             get
@@ -33,16 +31,9 @@ namespace compact_log_browser.Model
             }
         }
 
-        public bool Accepts(JsonNode? val)
+        public int CompareTo(FilterValue? other)
         {
-            if (!_enabled)
-                return false;
-
-            string? value = val?.ToString();
-            if (_defaultFilter && (value == null || value.Length == 0))
-                return true;
-            if (value == null) return false;
-            return value == Value;
+            return Value.CompareTo(other?.Value);
         }
     }
 }

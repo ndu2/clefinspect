@@ -22,7 +22,7 @@ namespace compact_log_browser.ViewModel.MainView
 
             public void Execute(object? parameter)
             {
-                clefTab.Closing?.Invoke();
+                clefTab.DoClose();
             }
         }
     }

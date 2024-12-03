@@ -47,14 +47,11 @@ namespace compact_log_browser.ViewModel.MainView
 
         public void OpenFile(string fileName)
         {
-            Clef clef = new Clef(new FileInfo(fileName));
-
-            ClefTab tab = new ClefTab(clef, Settings);
+            ClefTab tab = new ClefTab(fileName, Settings);
             ClefTabs.Add(tab);
             tab.Closing += () =>
             {
                 ClefTabs.Remove(tab);
-                clef.Dispose();
             };
             ActiveTab = tab;
         }

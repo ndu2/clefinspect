@@ -32,10 +32,30 @@ namespace compact_log_browser.ViewModel.ClefView
             return (dt - _refTimeStamp).Value.TotalMilliseconds.ToString("0.0");
         }
 
-        public void SetRefTimeStamp(ClefLine? value)
+        public string FormatFileSize(long seekPos)
         {
-            _refTimeStamp = value?.GetTime();
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Settings)));
+            if (seekPos < 1024)
+            {
+                return $"{seekPos} B";
+            }
+            if (seekPos < 1024 * 1024)
+            {
+                return $"{seekPos / 1024} KiB";
+            }
+            return $"{seekPos / (1024 * 1024)} MiB";
+        }
+
+        public DateTime? RefTimeStamp
+        {
+            get
+            {
+                return _refTimeStamp;
+            }
+            set
+            {
+                _refTimeStamp = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Settings)));
+            }
         }
     }
 }
