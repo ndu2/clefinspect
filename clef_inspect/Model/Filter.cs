@@ -5,19 +5,26 @@ using System.Text.Json.Nodes;
 
 namespace clef_inspect.Model
 {
-    public class Filter : INotifyPropertyChanged
+    public class Filter
     {
         private string _key;
         private HashSet<string>? _enabledValues;
-        public Filter(string key, IEnumerable<string> filter)
+        private bool _holdBackUpdateFilterSet;
+        public Filter(string key, IEnumerable<KeyValuePair<string, int>> filter)
         {
+            _holdBackUpdateFilterSet = false;
             _key = key;
             List<FilterValue> values = new List<FilterValue>();
-            foreach (string value in filter)
+            foreach ((string value, int amount) in filter)
             {
-                FilterValue fi = new FilterValue(value, true);
-                fi.PropertyChanged += (sender, e) => UpdateFilterSet();
-                fi.PropertyChanged += (sender, e) => { PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Values))); };
+                FilterValue fi = new FilterValue(value, amount, true);
+                fi.PropertyChanged += (sender, e) =>
+                {
+                    if (e.PropertyName == nameof(fi.Enabled))
+                    {
+                        UpdateFilterSet();
+                    }
+                };
                 values.Add(fi);
             }
             values.Sort();
@@ -26,6 +33,10 @@ namespace clef_inspect.Model
 
         private void UpdateFilterSet()
         {
+            if (_holdBackUpdateFilterSet)
+            {
+                return;
+            }
             bool allEnabled = true;
             if(_enabledValues == null)
             {
@@ -47,14 +58,30 @@ namespace clef_inspect.Model
             {
                 _enabledValues = null;
             }
+            FilterChanged?.Invoke();
         }
-        public void Update(ICollection<string> values)
+        public void Update(IEnumerable<KeyValuePair<string, int>> values)
         {
-            foreach(string value in values)
+            foreach ((string value, int amount) in values)
             {
-                if(!Values.Any(e=> e.ValueMatcher == value))
+                FilterValue? filterValue = Values.FirstOrDefault((f) => (f.ValueMatcher == value));
+                if (filterValue == null)
                 {
-                    Values.Add(new FilterValue(value, true));
+                    FilterValue newFilterValue = new FilterValue(value, amount, true);
+                    int pos = 0;
+                    foreach (FilterValue fi in Values)
+                    {
+                        if (fi.CompareTo(newFilterValue) > 0)
+                        {
+                            break;
+                        }
+                        pos++;
+                    }
+                    Values.Insert(pos, newFilterValue);
+                }
+                else
+                {
+                    filterValue.Amount = amount;
                 }
             }
         }
@@ -69,10 +96,43 @@ namespace clef_inspect.Model
             return _enabledValues.Contains(val);
         }
 
+        public void CheckAll()
+        {
+            _holdBackUpdateFilterSet = true;
+            try
+            {
+                foreach (var item in Values)
+                {
+                    item.Enabled = true;
+                }
+            }
+            finally
+            {
+                _holdBackUpdateFilterSet = false;
+                UpdateFilterSet();
+            }
+        }
+
+        public void UncheckAll()
+        {
+            _holdBackUpdateFilterSet = true;
+            try
+            {
+                foreach (var item in Values)
+                {
+                    item.Enabled = false;
+                }
+            }
+            finally
+            {
+                _holdBackUpdateFilterSet = false;
+                UpdateFilterSet();
+            }
+        }
 
         public ObservableCollection<FilterValue> Values { get; }
 
-        public event PropertyChangedEventHandler? PropertyChanged;
+        public event Action? FilterChanged;
     }
 
 }

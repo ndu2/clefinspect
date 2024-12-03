@@ -54,28 +54,28 @@ namespace clef_inspect.ViewModel.ClefView
             {
                 if (!_filters.ContainsKey(p.Key))
                 {
-                    Filter filter = new Filter(p.Key, p.Value.Item2.Keys);
-                    filter.PropertyChanged += (sender, e) => { Reload(); };
+                    Filter filter = new Filter(p.Key, p.Value.Item2);
+                    filter.FilterChanged += Reload;
                     _filters.Add(p.Key, filter);
                     Filters.Add(new ClefFilterViewModel(p.Value.Item1, filter));
                 }
                 else
                 {
-                    _filters[p.Key].Update(p.Value.Item2.Keys);
+                    _filters[p.Key].Update(p.Value.Item2);
                 }
             }
             foreach (var p in Clef.Data)
             {
                 if (!_filters.ContainsKey(p.Key))
                 {
-                    Filter filter = new Filter(p.Key, p.Value.Keys);
-                    filter.PropertyChanged += (sender, e) => { Reload(); };
+                    Filter filter = new Filter(p.Key, p.Value);
+                    filter.FilterChanged += Reload;
                     _filters.Add(p.Key, filter);
                     Filters.Add(new ClefFilterViewModel(p.Key, filter));
                 }
                 else
                 {
-                    _filters[p.Key].Update(p.Value.Keys);
+                    _filters[p.Key].Update(p.Value);
                 }
             }
 

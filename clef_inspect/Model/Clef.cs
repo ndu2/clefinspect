@@ -14,19 +14,20 @@ namespace clef_inspect.Model
         private const int BufferSize = 10 * 1024 * 1024;
         private bool _disposedValue;
         private ConcurrentStack<JsonObject?> _lines = new ConcurrentStack<JsonObject?>();
-        private ConcurrentDictionary<string, (string, ConcurrentDictionary<string, byte>)> _properties = new ConcurrentDictionary<string, (string, ConcurrentDictionary<string, byte>)>();
-        private ConcurrentDictionary<string, ConcurrentDictionary<string, byte>> _data = new ConcurrentDictionary<string, ConcurrentDictionary<string, byte>>();
+        private ConcurrentDictionary<string, (string, ConcurrentDictionary<string, int>)> _properties = new ConcurrentDictionary<string, (string, ConcurrentDictionary<string, int>)>();
+        private ConcurrentDictionary<string, ConcurrentDictionary<string, int>> _data = new ConcurrentDictionary<string, ConcurrentDictionary<string, int>>();
         private long _seekPos;
         private Timer _timer;
         private bool _autoUpdate;
+        private bool _fileOk;
 
         private byte[] bytes = new byte[BufferSize];
         private byte[] temp = new byte[BufferSize];
-        private int bytesAvail = 0;
+        private int _bytesAvail = 0;
 
         private Dictionary<string, string> _indexableProperties = new Dictionary<string, string> {
             {"@l","Level"},
-            {"@i","Event Id"}
+            //{"@i","Event Id"}
         };
 
         public Clef(FileInfo file)
@@ -34,6 +35,7 @@ namespace clef_inspect.Model
             this.File = file;
             _seekPos = 0;
             _autoUpdate = true;
+            _fileOk = true;
             _timer = new Timer(Scan, this, 0, Timeout.Infinite);
         }
 
@@ -78,8 +80,8 @@ namespace clef_inspect.Model
             GC.SuppressFinalize(this);
         }
 
-        public ConcurrentDictionary<string, (string, ConcurrentDictionary<string, byte>)> Properties { get => _properties; }
-        public ConcurrentDictionary<string, ConcurrentDictionary<string, byte>> Data { get => _data; }
+        public ConcurrentDictionary<string, (string, ConcurrentDictionary<string, int>)> Properties { get => _properties; }
+        public ConcurrentDictionary<string, ConcurrentDictionary<string, int>> Data { get => _data; }
         public bool AutoUpdate
         {
             get => _autoUpdate;
@@ -96,51 +98,104 @@ namespace clef_inspect.Model
                 }
             }
         }
+        public bool FileOk
+        {
+            get => _fileOk;
+            set
+            {
+                if (_fileOk != value)
+                {
+                    _fileOk = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FileOk)));
+                }
+            }
+        }
 
         private void Scan(object? state)
         {
-            bool tracking = Scan(
-                () => {
-                    Application.Current.Dispatcher.Invoke(() => { PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Lines))); });
-                });
+            (bool fileok, bool tracking) = Scan( () => { PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Lines))); });
             if (!tracking)
             {
                 Application.Current.Dispatcher.Invoke(() => { AutoUpdate = false; });
             }
+            if (fileok != FileOk)
+            {
+                Application.Current.Dispatcher.Invoke(() => { FileOk = fileok; });
+            }
             _timer.Change(AutoUpdate? FileRefreshDelayMs:Timeout.Infinite, Timeout.Infinite);
         }
 
-        private bool Scan(Action uiUpdate)
+        public class TimedUiUpdate
         {
-            File.Refresh();
-            if (File.Exists)
+            private int _ms;
+            private Action _uiUpdate;
+            DateTime _time;
+            private bool _updateRunning;
+            public TimedUiUpdate(int ms, Action uiUpdate)
             {
-                if(_seekPos == 0)
+                _ms = ms;
+                _uiUpdate = uiUpdate;
+                _time = DateTime.Now;
+                _updateRunning = false;
+            }
+            public void ForceUpdate(Action preAction)
+            {
+                preAction();
+                Application.Current.Dispatcher.Invoke(_uiUpdate);
+            }
+            public void CheckAndUpdate(Action preAction)
+            {
+                DateTime now = DateTime.Now;
+                if (!_updateRunning && (now - _time).TotalMilliseconds > _ms)
                 {
-                    _lines.Clear();
+                    _time = now;
+                    preAction();
+                    _updateRunning = true;
+                    Application.Current.Dispatcher.BeginInvoke(() =>
+                    {
+                        _uiUpdate();
+                        _updateRunning = false;
+                    });
                 }
-                if (File.Length == _seekPos)
+            }
+        }
+
+        private (bool, bool) Scan(Action uiUpdate)
+        {
+            bool changed = false;
+            TimedUiUpdate uiUpdateTimer = new TimedUiUpdate(250, uiUpdate);
+            try
+            {
+                File.Refresh();
+                if (File.Exists)
                 {
-                    return true;
-                }
-                if(File.Length < _seekPos)
-                {
-                    _seekPos = 0;
-                    return false;
-                }
-                int bytesAvailPref = bytesAvail;
-                try
-                {
+                    if (_seekPos == 0)
+                    {
+                        _lines.Clear();
+                        changed = true;
+                    }
+                    if (File.Length == _seekPos)
+                    {
+                        return (true, true);
+                    }
+                    if (File.Length < _seekPos)
+                    {
+                        _seekPos = 0;
+                        _bytesAvail = 0;
+                        return (true, false);
+                    }
+                    int bytesAvailPref = _bytesAvail;
+
                     using (FileStream fileStream = System.IO.File.Open(File.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                     {
                         fileStream.Seek(_seekPos, SeekOrigin.Begin);
                         int bytesRead;
                         int start = 0;
-                        while ((bytesRead = fileStream.Read(bytes, bytesAvail, bytes.Length - bytesAvail)) > 0)
+                        while ((bytesRead = fileStream.Read(bytes, _bytesAvail, bytes.Length - _bytesAvail)) > 0)
                         {
                             start = 0;
-                            bytesAvail += bytesRead;
-                            for (int i = 0; i < bytesAvail; ++i)
+                            _bytesAvail += bytesRead;
+                            for (int i = 0; i < _bytesAvail; ++i)
                             {
                                 if (bytes[i] == '\n')
                                 {
@@ -157,6 +212,7 @@ namespace clef_inspect.Model
                                             _lines.TryPop(out _);
                                             JsonObject? logline = Scan(bytes, start, endline);
                                             _lines.Push(logline);
+                                            changed = true;
                                         }
                                         bytesAvailPref = 0;
                                     }
@@ -164,6 +220,7 @@ namespace clef_inspect.Model
                                     {
                                         JsonObject? logline = Scan(bytes, start, endline);
                                         _lines.Push(logline);
+                                        changed = true;
                                     }
                                     start = i + 1;
                                 }
@@ -180,26 +237,25 @@ namespace clef_inspect.Model
                                 if (dat == '\n')
                                 {
                                     // clear buffer and scan to the next line
-                                    bytesAvail = 0;
+                                    _bytesAvail = 0;
                                     dat = fileStream.ReadByte();
                                     if (dat != '\r')
                                     {
                                         bytes[0] = (byte)dat;
-                                        bytesAvail = 1;
+                                        _bytesAvail = 1;
                                     }
                                 }
                             }
                             else
                             {
-                                bytesAvail = bytesAvail - start;
-                                Array.Copy(bytes, start, temp, 0, bytesAvail);
-                                Array.Copy(temp, bytes, bytesAvail);
+                                _bytesAvail = _bytesAvail - start;
+                                Array.Copy(bytes, start, temp, 0, _bytesAvail);
+                                Array.Copy(temp, bytes, _bytesAvail);
                             }
                             _seekPos = fileStream.Position;
-                            uiUpdate();
+                            uiUpdateTimer.CheckAndUpdate(fillDefaultFilterStats);
                         }
-                        _seekPos = fileStream.Position;
-                        if (bytesAvail > 0)
+                        if (_bytesAvail > 0)
                         {
 
                             if (bytesAvailPref > 0)
@@ -209,22 +265,57 @@ namespace clef_inspect.Model
                                 bytesAvailPref = 0;
                             }
                             // end of file. add rest in case there is no newline at the end
-                            _lines.Push(Scan(bytes, start, start + bytesAvail));
-                            Array.Copy(bytes, start, temp, 0, bytesAvail);
-                            Array.Copy(temp, bytes, bytesAvail);
+                            _lines.Push(Scan(bytes, start, start + _bytesAvail));
+                            changed = true;
+                            Array.Copy(bytes, start, temp, 0, _bytesAvail);
+                            Array.Copy(temp, bytes, _bytesAvail);
                         }
                     }
                 }
-                catch (Exception e)
+                else
                 {
-                    _lines.Push(new JsonObject
+                    return (false, false);
+                }
+            }
+            catch (Exception e)
+            {
+                _lines.Push(new JsonObject
                     {
                         new KeyValuePair<string, JsonNode?>("@m", JsonValue.Create(e.ToString()))
                     });
+                changed = true;
+            }
+            finally
+            {
+                if (changed)
+                {
+                    uiUpdateTimer.ForceUpdate(fillDefaultFilterStats);
                 }
             }
-            uiUpdate();
-            return true;
+            return (true, true);
+        }
+
+        private void fillDefaultFilterStats()
+        {
+            int anz = Lines.Count;
+            foreach (var filter in Properties)
+            {
+                int tot = filter.Value.Item2.Aggregate(0, (i, j) => (i + j.Value), x => x);
+                int missing = anz - tot;
+                if (missing > 0)
+                {
+                    filter.Value.Item2.AddOrUpdate("", missing, (s, i) => { return (i + missing); });
+                }
+            }
+            foreach (var filter in Data)
+            {
+                int tot = filter.Value.Aggregate(0, (i, j) => (i + j.Value), x => x);
+                int missing = anz - tot;
+                if (missing > 0)
+                {
+                    filter.Value.AddOrUpdate("", missing, (s, i) => { return (i + missing); });
+                }
+            }
         }
 
         private JsonObject? Scan(byte[] bytes, int start, int endline)
@@ -248,27 +339,27 @@ namespace clef_inspect.Model
                         {
                             if (_indexableProperties.ContainsKey(kv.Key) && kv.Value is JsonValue value)
                             {
-                                (string, ConcurrentDictionary<string, byte>) values = _properties.GetOrAdd(kv.Key, (k) =>
+                                (string, ConcurrentDictionary<string, int>) values = _properties.GetOrAdd(kv.Key, (k) =>
                                 {
-                                    ConcurrentDictionary<string, byte> newSet = new ConcurrentDictionary<string, byte>();
-                                    newSet.TryAdd("", (byte)0);
+                                    ConcurrentDictionary<string, int> newSet = new ConcurrentDictionary<string, int>();
                                     return (_indexableProperties[k], newSet);
 
 
                                 });
-                                values.Item2.TryAdd(value.ToString(), (byte)0);
+                                values.Item2.AddOrUpdate(value.ToString(), 1, (s, c) => c + 1);
+//                                values.Item2.TryAdd(value.ToString(), (byte)0);
                             }
                         }
                         {
                             if (!kv.Key.StartsWith("@") && kv.Value is JsonValue value)
                             {
-                                ConcurrentDictionary<string, byte> values = _data.GetOrAdd(kv.Key, (k) =>
+                                ConcurrentDictionary<string, int> values = _data.GetOrAdd(kv.Key, (k) =>
                                 {
-                                    ConcurrentDictionary<string, byte> newSet = new ConcurrentDictionary<string, byte>();
-                                    newSet.TryAdd("", (byte)0);
+                                    ConcurrentDictionary<string, int> newSet = new ConcurrentDictionary<string, int>();
                                     return newSet;
                                 });
-                                values.TryAdd(value.ToString(), (byte)0);
+                                values.AddOrUpdate(value.ToString(), 1, (s, c) => c + 1);
+                                //values.TryAdd(value.ToString(), (byte)0);
                             }
                         }
                     }

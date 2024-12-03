@@ -87,6 +87,7 @@ namespace clef_inspect.View
         {
             if (e.Key == Key.Enter)
             {
+                TextFilter.GetBindingExpression(TextBox.TextProperty).UpdateSource();
                 (DataContext as ClefViewModel)?.ApplyTextFilter.Execute(this);
             }
         }

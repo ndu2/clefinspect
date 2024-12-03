@@ -5,16 +5,29 @@ namespace clef_inspect.Model
     public class FilterValue : INotifyPropertyChanged, IComparable<FilterValue>
     {
         private bool _enabled;
-        public FilterValue(string value, bool enabled)
+        private int _amount;
+        public FilterValue(string value, int amount, bool enabled)
         {
             Value = value.Length ==0? "(empty)" : value;
             ValueMatcher = value;
+            _amount = amount;
             Enabled = enabled;
         }
         public event PropertyChangedEventHandler? PropertyChanged;
-
         public string Value { get; }
         public string ValueMatcher { get; }
+        public int Amount
+        {
+            get => _amount;
+            set
+            {
+                if (_amount != value)
+                {
+                    _amount = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Amount)));
+                }
+            }
+        }
         public bool Enabled
         {
             get
@@ -33,7 +46,7 @@ namespace clef_inspect.Model
 
         public int CompareTo(FilterValue? other)
         {
-            return Value.CompareTo(other?.Value);
+            return ValueMatcher.CompareTo(other?.ValueMatcher);
         }
     }
 }

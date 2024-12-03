@@ -12,7 +12,7 @@ namespace clef_inspect.ViewModel.ClefView
             public CheckNoneCommand(Filter filter)
             {
                 _filter = filter;
-                _filter.PropertyChanged += (src, e) => { CanExecuteChanged?.Invoke(this, EventArgs.Empty); };
+                _filter.FilterChanged += () => { CanExecuteChanged?.Invoke(this, EventArgs.Empty); };
             }
             public event EventHandler? CanExecuteChanged;
 
@@ -23,10 +23,7 @@ namespace clef_inspect.ViewModel.ClefView
 
             public void Execute(object? parameter)
             {
-                foreach (var item in _filter.Values)
-                {
-                    item.Enabled = false;
-                }
+                _filter.UncheckAll();
             }
         }
     }

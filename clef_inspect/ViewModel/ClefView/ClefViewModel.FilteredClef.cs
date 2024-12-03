@@ -29,8 +29,7 @@ namespace clef_inspect.ViewModel.ClefView
                 selectedIndex = -1;
                 int selectedIndexExact = -1;
                 int idx = 0;
-                (object?, int) removed = (null, 0);
-                List<(object, int)> adds = new List<(object, int)>();
+                (object?, int) added = (null, 0);
                 bool changedAlot = false;
                 foreach (var line in clef.Lines.Reverse())
                 {
@@ -42,23 +41,16 @@ namespace clef_inspect.ViewModel.ClefView
                         {
                             if (this[idx].JsonObject != item.JsonObject)
                             {
-                                if (removed.Item1 == null)
-                                {
-                                    removed = (this[idx], idx);
-                                }
-                                else
-                                {
-                                    changedAlot = true;
-                                }
+                                changedAlot = true;
                                 this[idx] = item;
                             }
                         }
                         else
                         {
                             this.Add(item);
-                            if (adds.Count < 50)
+                            if (added.Item1 == null)
                             {
-                                adds.Add((item, idx));
+                                added = (this[idx], idx);
                             }
                             else
                             {
@@ -85,19 +77,16 @@ namespace clef_inspect.ViewModel.ClefView
                 {
                     selectedIndex = selectedIndexExact;
                 }
+
                 if (changedAlot)
                 {
                     CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
                 }
                 else
                 {
-                    if (removed.Item1 != null)
+                    if (added.Item1 != null)
                     {
-                        CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, removed.Item1, removed.Item2));
-                    }
-                    foreach ((object, int) add in adds)
-                    {
-                        CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, add.Item1, add.Item2));
+                        CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, added.Item1, added.Item2));
                     }
                 }
             }

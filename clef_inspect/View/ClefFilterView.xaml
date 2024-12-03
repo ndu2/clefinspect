@@ -24,14 +24,23 @@
             FontWeight="Bold" Text="{Binding Name}" />
         <Button Grid.Row="0" Grid.Column="1" Command="{Binding CheckAll}" >All</Button>
         <Button Grid.Row="0" Grid.Column="2" Command="{Binding CheckNone}" >None</Button>
-        <ListBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
-            ItemsSource="{Binding FilterValues}">
+        <ListBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" HorizontalContentAlignment="Stretch"
+            ItemsSource="{Binding FilterValues}" >
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
-                        <CheckBox IsChecked="{Binding Enabled}" Width="20" VerticalAlignment="Center" />
-                        <TextBlock Text="{Binding Value}" VerticalAlignment="Center" />
-                    </StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <CheckBox Grid.Row="0" Grid.Column="0" IsChecked="{Binding Enabled}" Width="20" />
+                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Value}"  />
+                        <TextBlock Grid.Row="0" Grid.Column="2" Margin="2,0,0,0" Text="{Binding Amount}" HorizontalAlignment="Right" />
+                    </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>

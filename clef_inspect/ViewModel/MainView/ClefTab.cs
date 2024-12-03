@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Windows;
 using System.Windows.Input;
 using clef_inspect.ViewModel.ClefView;
 using clef_inspect.Model;
@@ -18,6 +19,10 @@ namespace clef_inspect.ViewModel.MainView
                 if(e.PropertyName == nameof(Clef.AutoUpdate))
                 {
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AutoUpdate)));
+                }
+                if (e.PropertyName == nameof(Clef.FileOk))
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FileError)));
                 }
             };
         }
@@ -42,6 +47,10 @@ namespace clef_inspect.ViewModel.MainView
         {
             get => ClefViewModel.Clef.AutoUpdate;
             set => ClefViewModel.Clef.AutoUpdate = value;
+        }
+        public Visibility FileError
+        {
+            get => ClefViewModel.Clef.FileOk ? Visibility.Hidden: Visibility.Visible;
         }
 
     }
