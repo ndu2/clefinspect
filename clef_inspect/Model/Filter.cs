@@ -85,14 +85,15 @@ namespace clef_inspect.Model
                 }
             }
         }
+        public bool AllEnabled => (_enabledValues == null);
 
-        public bool Accept(JsonObject? line)
+        public bool Accept(ClefLine line)
         {
             if(_enabledValues == null)
             {
                 return true;
             }
-            string val = line?[_key]?.ToString() ?? "";
+            string val = line.JsonObject?[_key]?.ToString() ?? "";
             return _enabledValues.Contains(val);
         }
 

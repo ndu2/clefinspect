@@ -30,7 +30,7 @@ namespace clef_inspect.ViewModel.ClefView
             Filters = new ObservableCollection<ClefFilterViewModel>();
             ClearTextFilter = new ClearTextFilterCommand(this);
             ApplyTextFilter = new ApplyTextFilterCommand(this);
-            Clef.PropertyChanged += Reload;
+            Clef.LinesChanged += Reload;
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -39,16 +39,26 @@ namespace clef_inspect.ViewModel.ClefView
         public void DoClose()
         {
             Clef.Dispose();
-            Clef.PropertyChanged -= Reload;
+            Clef.LinesChanged -= Reload;
         }
 
-        private void Reload(object? sender, PropertyChangedEventArgs e)
+        private void Reload(object? sender, LinesChangedEventArgs e)
         {
-            Reload();
+            if(e.Action != LinesChangedEventArgs.LinesChangedEventArgsAction.None)
+            {
+                Reload(e);
+            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DateInfo)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FileInfo)));
         }
 
 
         private void Reload()
+        {
+            Reload(new LinesChangedEventArgs(LinesChangedEventArgs.LinesChangedEventArgsAction.Reset));
+        }
+
+        private void Reload(LinesChangedEventArgs e)
         {
             foreach (var p in Clef.Properties)
             {
@@ -83,15 +93,13 @@ namespace clef_inspect.ViewModel.ClefView
             // Unfortunately ObservableCollection supports only adding one line at a
             // time (triggering a lot of layouting stuff)
             int selectedIndex = SelectedIndex;
-            ClefLines.Reload(Clef, _filters.Values, TextFilterOk, ref selectedIndex);
+            ClefLines.Reload(Clef, _filters.Values.Where((f) => !f.AllEnabled), TextFilterOk, ref selectedIndex, e.Action);
             SelectedIndex = selectedIndex;
             Reloaded?.Invoke();
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ClefLines)));
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DateInfo)));
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FileInfo)));
         }
 
-        private bool TextFilterOk(JsonObject? line)
+        private bool TextFilterOk(ClefLine line)
         {
             if (_textFilter == null)
             {
@@ -105,8 +113,12 @@ namespace clef_inspect.ViewModel.ClefView
             {
                 return false;
             }
+            if(line.JsonObject == null)
+            {
+                return false;
+            }
             string[] textFilters = _textFilter.Split(",");
-            foreach (var dat in line)
+            foreach (var dat in line.JsonObject)
             {
                 foreach (string textFilter in textFilters)
                 {
@@ -125,7 +137,7 @@ namespace clef_inspect.ViewModel.ClefView
         {
             get
             {
-                return $"Log Entries displayed: {ClefLines.Count} (Total {Clef.Lines.Count}, Size {_settings.FormatFileSize(Clef.SeekPos)})";
+                return $"Log Entries displayed: {ClefLines.Count} (Total {Clef.Count}, Size {_settings.FormatFileSize(Clef.SeekPos)})";
             }
         }
         public string DateInfo
@@ -166,7 +178,7 @@ namespace clef_inspect.ViewModel.ClefView
 
         public ICommand ApplyTextFilter { get; set; }
 
-        public ClefLine? SelectedItem
+        public ClefLineView? SelectedItem
         {
             get
             {

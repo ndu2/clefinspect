@@ -3,7 +3,7 @@ using System;
 using System.ComponentModel;
 using System.Globalization;
 
-namespace clef_inspect.Model
+namespace clef_inspect.ViewModel
 {
     public class Settings : INotifyPropertyChanged
     {
@@ -59,6 +59,7 @@ namespace clef_inspect.Model
             ClefLlineFormatString = "{0,-" + DateWidthText.Length + "} {1,-" + LevelWidthText.Length + "} {2,-" + SourceContextWidthText.Length + "} {3}";
         }
 
+        public static string PinWidthText = "NNN";
         public static string DateWidthText { get; }
 
         public string Format(DateTime? dt)
@@ -76,7 +77,7 @@ namespace clef_inspect.Model
                 return dt.Value.ToUniversalTime().ToString(utc);
             }
         }
-        public string Format(ClefLine line)
+        public string Format(ClefLineView line)
         {
             return string.Format(ClefLlineFormatString, line.Time, line.Level, line.SourceContext, line.Message);
         }

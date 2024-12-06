@@ -1,5 +1,4 @@
-﻿using clef_inspect.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -57,5 +56,7 @@ namespace clef_inspect.ViewModel.ClefView
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Settings)));
             }
         }
+
+        public int DefaultCapacity { get; } = 100000;
     }
 }

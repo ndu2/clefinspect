@@ -1,23 +1,22 @@
-﻿using clef_inspect.Model;
+﻿using clef_inspect.ViewModel.ClefView;
 using System.ComponentModel;
 using System.Text;
 using System.Text.Json.Nodes;
-using System.Windows;
-using System.Windows.Media;
 
-namespace clef_inspect.ViewModel.ClefView
+namespace clef_inspect.Model
 {
-    public class ClefLine : INotifyPropertyChanged
+    public class ClefLine
     {
         private JsonObject? _line;
-        private ClefViewSettings _settings;
+        private bool _pin;
 
-        public ClefLine(JsonObject? line, ClefViewSettings settings)
+        public ClefLine(long sort, JsonObject? line)
         {
+            Sort = sort;
             _line = line;
-            _settings = settings;
-            settings.PropertyChanged += Settings_PropertyChanged;
+            _pin = false;
             Message = Render(line);
+            Time = GetTime(line);
         }
 
         private static string? Render(JsonObject? line)
@@ -68,19 +67,9 @@ namespace clef_inspect.ViewModel.ClefView
             outString.Append(mt.Substring(i1, mt.Length - i1));
             return outString.ToString();
         }
-
-        private void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        private static DateTime? GetTime(JsonObject? line)
         {
-            if (e.PropertyName == nameof(_settings.Settings)) { }
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Time)));
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DeltaTime)));
-        }
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        public DateTime? GetTime()
-        {
-            string? l = _line?["@t"]?.ToString();
+            string? l = line?["@t"]?.ToString();
             if (l != null)
             {
                 try
@@ -97,20 +86,8 @@ namespace clef_inspect.ViewModel.ClefView
             return null;
         }
 
-        public string? Time
-        {
-            get
-            {
-                return _settings.Settings.Format(GetTime());
-            }
-        }
-        public string? DeltaTime
-        {
-            get
-            {
-                return _settings.FormatDelta(GetTime());
-            }
-        }
+
+        public long Sort { get; }
 
         public string? Level
         {
@@ -119,25 +96,7 @@ namespace clef_inspect.ViewModel.ClefView
                 return _line?["@l"]?.ToString() ?? "Info";
             }
         }
-
-        public Brush LevelBackground
-        {
-            get
-            {
-                string? l = Level;
-                if (l != null)
-                {
-                    if (l.StartsWith('e') || l.StartsWith('E'))
-                        return Brushes.Red;
-                    if (l.StartsWith('w') || l.StartsWith('W'))
-                        return Brushes.Yellow;
-                    if (l.StartsWith('i') || l.StartsWith('I') || l.Length == 0)
-                        return Brushes.LightSkyBlue;
-                }
-                return SystemColors.WindowBrush;
-            }
-        }
-
+        public DateTime? Time { get; }
 
         public string? SourceContext
         {
@@ -146,12 +105,12 @@ namespace clef_inspect.ViewModel.ClefView
                 return _line?["SourceContext"]?.ToString();
             }
         }
-        public string? Message { get; set; }
+        public string? Message { get; } 
 
         public JsonObject? JsonObject
         {
             get => _line;
-        } 
+        }
 
         public string? Json
         {
@@ -161,9 +120,11 @@ namespace clef_inspect.ViewModel.ClefView
             }
         }
 
+        public bool Pin { get; set; } = false;
+
         public override string ToString()
         {
-            return _settings.Settings.Format(this);
+            return $"{Time};{Level};{Message}";
         }
     }
 }

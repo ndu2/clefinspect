@@ -1,6 +1,5 @@
 ﻿using clef_inspect.Model;
 using System.Collections.Specialized;
-using System.Text.Json.Nodes;
 
 namespace clef_inspect.ViewModel.ClefView
 {
@@ -11,42 +10,59 @@ namespace clef_inspect.ViewModel.ClefView
         /// a collection changed event for every item. in the most usecases (filtering a lot)
         /// changing the whole list with NotifyCollectionChangedAction.Reset seems to be faster
         /// </summary>
-        public class FilteredClef : List<ClefLine>, INotifyCollectionChanged
+        public class FilteredClef : List<ClefLineView>, INotifyCollectionChanged
         {
             private ClefViewSettings _settings;
 
             public FilteredClef(ClefViewSettings settings)
+                :base(settings.DefaultCapacity)
             {
                 _settings = settings;
             }
 
             public event NotifyCollectionChangedEventHandler? CollectionChanged;
 
-            public void Reload(Clef clef, ICollection<Filter> filters, Func<JsonObject?, bool> textFilterOk, ref int selectedIndex)
+            public void Reload(Clef clef, IEnumerable<Filter> filters2, Func<ClefLine, bool> textFilterOk, ref int selectedIndex, LinesChangedEventArgs.LinesChangedEventArgsAction action)
             {
-                ClefLine? selectedLine = this.ElementAtOrDefault(selectedIndex);
+                if(action == LinesChangedEventArgs.LinesChangedEventArgsAction.None)
+                {
+                    return;
+                }
+                Filter[] filters = filters2.ToArray();
+                ClefLineView? selectedLine = this.ElementAtOrDefault(selectedIndex);
                 DateTime? date = selectedLine?.GetTime();
                 selectedIndex = -1;
                 int selectedIndexExact = -1;
-                int idx = 0;
-                (object?, int) added = (null, 0);
+
+                int sourceIdx = (action == LinesChangedEventArgs.LinesChangedEventArgsAction.Add && Count > 0) ? this[Count - 1].SourceIdx + 1 : 0;
+                int idx = (action == LinesChangedEventArgs.LinesChangedEventArgsAction.Add) ? Count : 0;
+                    (object?, int) added = (null, 0);
                 bool changedAlot = false;
-                foreach (var line in clef.Lines.Reverse())
+                IList<ClefLine> lines = clef.ViewFrom(sourceIdx);
+
+                for(int i = 0; i < lines.Count; ++i)
                 {
-                    bool ok = filters.All(f => f.Accept(line)) && textFilterOk(line);
+                    ClefLine line = lines[i];
+                    bool ok = line.Pin || (filters.Length == 0 || filters.All(f => f.Accept(line))) && textFilterOk(line);
                     if (ok)
                     {
-                        ClefLine item = new ClefLine(line, _settings);
+                        ClefLineView item;
                         if (this.Count > idx)
                         {
-                            if (this[idx].JsonObject != item.JsonObject)
+                            if (line == this[idx].ClefLine)
                             {
-                                changedAlot = true;
+                                item = this[idx];
+                            }
+                            else
+                            {
+                                item = new ClefLineView(sourceIdx + i, line, _settings);
                                 this[idx] = item;
+                                changedAlot = true;
                             }
                         }
                         else
                         {
+                            item = new ClefLineView(sourceIdx + i, line, _settings);
                             this.Add(item);
                             if (added.Item1 == null)
                             {
@@ -54,6 +70,7 @@ namespace clef_inspect.ViewModel.ClefView
                             }
                             else
                             {
+                                // RangeActionsNotSupported
                                 changedAlot = true;
                             }
                         }

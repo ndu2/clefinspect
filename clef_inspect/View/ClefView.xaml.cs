@@ -1,6 +1,4 @@
 ﻿using clef_inspect.ViewModel.ClefView;
-using clef_inspect.Model;
-using clef_inspect.ViewModel.ClefView;
 using System;
 using System.Globalization;
 using System.Text;
@@ -8,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using clef_inspect.ViewModel;
 
 namespace clef_inspect.View
 {
@@ -33,6 +32,18 @@ namespace clef_inspect.View
             }
         }
 
+        public double PinWidth
+        {
+            get
+            {
+                FormattedText formattedText = new FormattedText(Settings.PinWidthText, CultureInfo.CurrentCulture,
+                    FlowDirection, new Typeface(FontFamily, FontStyle, FontWeight, FontStretch),
+                    FontSize, Brushes.Black,
+                    VisualTreeHelper.GetDpi(this).PixelsPerDip);
+
+                return formattedText.Width;
+            }
+        }
         public double DateWidth
         {
             get
@@ -92,16 +103,28 @@ namespace clef_inspect.View
             }
         }
 
+        private List<ClefLineView> GetSelectedInOrder()
+        {
+            System.Collections.IList list = ListViewLogEntries.SelectedItems;
+            List<ClefLineView> selected = new List<ClefLineView>(list.Count);
+            foreach (object item in list)
+            {
+                if (item is ClefLineView line)
+                {
+                    selected.Add(line);
+                }
+            }
+            selected.Sort((x, y) => (int)(x.Sort - y.Sort));
+            return selected;
+        }
+
         private void CopySelected_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             StringBuilder sb = new StringBuilder();
-            var sel = ListViewLogEntries.SelectedItems;
-            foreach (var item in sel)
+            IList<ClefLineView> sel = GetSelectedInOrder();
+            foreach (ClefLineView line in sel)
             {
-                if (item is ClefLine line)
-                {
-                    sb.AppendLine(line.ToString());
-                }
+                sb.AppendLine(line.ToString());
             }
             if(sb.Length > 0)
             {
@@ -112,33 +135,37 @@ namespace clef_inspect.View
         private void CopySelectedClef_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             StringBuilder sb = new StringBuilder();
-            var sel = ListViewLogEntries.SelectedItems;
-            foreach (var item in sel)
+            IList<ClefLineView> sel = GetSelectedInOrder();
+            foreach (ClefLineView line in sel)
             {
-                if (item is ClefLine line)
-                {
-                    sb.AppendLine(line.Json);
-                }
+                sb.AppendLine(line.Json);
             }
             if (sb.Length > 0)
             {
                 Clipboard.SetText(sb.ToString());
             }
         }
-        private void CopyAll_Click(object sender, System.Windows.RoutedEventArgs e)
+
+        private void PinSelected_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            StringBuilder sb = new StringBuilder();
-            foreach (var item in ListViewLogEntries.Items)
+            foreach (var item in ListViewLogEntries.SelectedItems)
             {
-                if (item is ClefLine line)
+                if (item is ClefLineView line)
                 {
-                    sb.AppendLine(line.ToString());
+                    line.Pin = true;
                 }
             }
-            if (sb.Length > 0)
+        }
+        private void UnpinSelected_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            foreach (var item in ListViewLogEntries.SelectedItems)
             {
-                Clipboard.SetText(sb.ToString());
+                if (item is ClefLineView line)
+                {
+                    line.Pin = false;
+                }
             }
         }
+        
     }
 }

@@ -13,7 +13,10 @@ namespace clef_inspect.View
         {
             InitializeComponent();
         }
-
+        public void OpenFiles(string[] files)
+        {
+            ((MainViewModel)this.DataContext).OpenFiles(files);
+        }
         private void OnDrop(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))

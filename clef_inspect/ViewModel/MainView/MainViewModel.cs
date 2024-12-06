@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using System.IO;
 using System.Windows.Input;
-using clef_inspect.Model;
 
 namespace clef_inspect.ViewModel.MainView
 {

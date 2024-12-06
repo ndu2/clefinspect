@@ -24,7 +24,7 @@
             FontWeight="Bold" Text="{Binding Name}" />
         <Button Grid.Row="0" Grid.Column="1" Command="{Binding CheckAll}" >All</Button>
         <Button Grid.Row="0" Grid.Column="2" Command="{Binding CheckNone}" >None</Button>
-        <ListBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" HorizontalContentAlignment="Stretch"
+        <ListBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" HorizontalContentAlignment="Stretch" VirtualizingPanel.VirtualizationMode="Recycling"
             ItemsSource="{Binding FilterValues}" >
             <ListBox.ItemTemplate>
                 <DataTemplate>

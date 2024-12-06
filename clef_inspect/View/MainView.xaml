@@ -23,10 +23,10 @@
                         <Style TargetType="ToggleButton">
                             <Style.Triggers>
                                 <Trigger Property="IsChecked" Value="True">
-                                    <Setter Property="Content" Value="&#xE102;" />
+                                    <Setter Property="Content" Value="&#xE103;" />
                                 </Trigger>
                                 <Trigger Property="IsChecked" Value="False">
-                                    <Setter Property="Content" Value="&#xE103;" />
+                                    <Setter Property="Content" Value="&#xE102;" />
                                 </Trigger>
                             </Style.Triggers>
                         </Style>

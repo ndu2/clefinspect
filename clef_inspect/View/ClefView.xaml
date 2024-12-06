@@ -65,6 +65,7 @@
                   SelectedIndex="{Binding SelectedIndex}"
                   Name="ListViewLogEntries"
                   Margin="2,2,2,2"
+                  VirtualizingPanel.VirtualizationMode="Recycling"
                   >
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
@@ -72,7 +73,15 @@
                 </Style>
             </ListView.ItemContainerStyle>
             <ListView.Resources>
+                <local:PinSymbolConverter x:Key="PinSymbolConverter" />
                 <GridView x:Key="User">
+                    <GridViewColumn Header="Pin" Width="{Binding ElementName=clefView, Path=PinWidth}">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock FontFamily="Segoe UI Symbol" Text="{Binding Pin, Mode=TwoWay, Converter={StaticResource PinSymbolConverter}}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                     <GridViewColumn Header="Date" Width="{Binding ElementName=clefView, Path=DateWidth}">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
@@ -120,7 +129,8 @@
                 <ContextMenu>
                     <MenuItem Header="Copy Selected Entries to Clipboard" Click="CopySelected_Click" />
                     <MenuItem Header="Copy Selected Entries to Clipboard (clef format)" Click="CopySelectedClef_Click" />
-                    <MenuItem Header="All Selected Entries to Clipboard" Click="CopyAll_Click" />
+                    <MenuItem Header="Pin Selected Entries" Click="PinSelected_Click" />
+                    <MenuItem Header="Unpin Selected Entries" Click="UnpinSelected_Click" />
                 </ContextMenu>
             </ListView.ContextMenu>
         </ListView>
