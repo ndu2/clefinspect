@@ -10,8 +10,8 @@ namespace clef_inspect.ViewModel
         private bool _localTime = true;
         private bool _devMode = false;
 
-        private static IFormatProvider local = CultureInfo.CurrentCulture.DateTimeFormat;
-        private static string utc = CultureInfo.InvariantCulture.DateTimeFormat.UniversalSortableDateTimePattern;
+        private static readonly IFormatProvider local = CultureInfo.CurrentCulture.DateTimeFormat;
+        private static readonly string utc = CultureInfo.InvariantCulture.DateTimeFormat.UniversalSortableDateTimePattern;
 
         public Settings()
         {

@@ -6,7 +6,8 @@ namespace clef_inspect.ViewModel.MainView
     {
         public class ExitCommand : ICommand
         {
-            public event EventHandler? CanExecuteChanged;
+            // no CS0067 though the event is left unused
+            public event EventHandler? CanExecuteChanged { add { } remove { } }
 
             public bool CanExecute(object? parameter)
             {

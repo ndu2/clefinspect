@@ -6,14 +6,15 @@ namespace clef_inspect.ViewModel.ClefView
     {
         private class ApplyTextFilterCommand : ICommand
         {
-            private ClefViewModel clefViewModel;
+            private readonly ClefViewModel clefViewModel;
 
             public ApplyTextFilterCommand(ClefViewModel clefViewModel)
             {
                 this.clefViewModel = clefViewModel;
             }
 
-            public event EventHandler? CanExecuteChanged;
+            // no CS0067 though the event is left unused
+            public event EventHandler? CanExecuteChanged { add { } remove { } }
 
             public bool CanExecute(object? parameter)
             {

@@ -1,9 +1,11 @@
-﻿namespace clef_inspect.Model
+﻿using System.Collections.Generic;
+
+namespace clef_inspect.Model
 {
     public class ClefLockedList
     {
-        private object _mutexLines = new object();
-        private List<ClefLine> _lines;
+        private readonly object _mutexLines = new();
+        private readonly List<ClefLine> _lines;
 
         public ClefLockedList()
         {
@@ -29,7 +31,7 @@
         {
             lock (_mutexLines)
             {
-                _lines[_lines.Count - 1] = clefLine;
+                _lines[^1] = clefLine;
             }
         }
 

@@ -9,7 +9,7 @@ namespace clef_inspect.ViewModel.ClefView
 {
     public class ClefLineView : INotifyPropertyChanged
     {
-        private ClefViewSettings _settings;
+        private readonly ClefViewSettings _settings;
         public ClefLineView(ClefLine line, ClefViewSettings settings)
         {
             ClefLine = line;

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Text;
@@ -10,24 +11,24 @@ namespace clef_inspect.Model
 {
     public partial class Clef : IDisposable, INotifyPropertyChanged
     {
-
         private const int FileRefreshDelayMs = 500;
         private const int BufferSize = 10 * 1024 * 1024;
         private const int UiRefreshDelayMs = 250;
         private bool _disposedValue;
-        private ClefLockedList _lines = new ClefLockedList();
-        private ConcurrentDictionary<string, (string, ConcurrentDictionary<string, int>)> _properties = new ConcurrentDictionary<string, (string, ConcurrentDictionary<string, int>)>();
-        private ConcurrentDictionary<string, ConcurrentDictionary<string, int>> _data = new ConcurrentDictionary<string, ConcurrentDictionary<string, int>>();
+        private readonly ClefLockedList _lines = new();
+        private readonly ConcurrentDictionary<string, (string, ConcurrentDictionary<string, int>)> _properties = new();
+        private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, int>> _data = new();
         private long _seekPos;
-        private Timer _timer;
+        private readonly Timer _timer;
         private bool _autoUpdate;
         private bool _fileOk;
 
-        private byte[] bytes = new byte[BufferSize];
-        private byte[] temp = new byte[BufferSize];
+        private readonly byte[] bytes = new byte[BufferSize];
+        private readonly byte[] temp = new byte[BufferSize];
         private int _bytesAvail = 0;
 
-        private Dictionary<string, string> _indexableProperties = new Dictionary<string, string> {
+        private readonly Dictionary<string, string> _indexableProperties = new()
+        {
             {"@l","Level"},
             //{"@i","Event Id"}
         };
@@ -138,8 +139,8 @@ namespace clef_inspect.Model
 
         public class TimedUiUpdate
         {
-            private int _ms;
-            private Action<LinesChangedEventArgs> _uiUpdate;
+            private readonly int _ms;
+            private readonly Action<LinesChangedEventArgs> _uiUpdate;
             DateTime _time;
             private bool _updateRunning;
             private LinesChangedEventArgsAction _uiUpdateAction;
@@ -182,7 +183,7 @@ namespace clef_inspect.Model
 
         private (bool, bool) Scan(Action<LinesChangedEventArgs> uiUpdate)
         {
-            TimedUiUpdate uiUpdateTimer = new TimedUiUpdate(UiRefreshDelayMs, uiUpdate);
+            TimedUiUpdate uiUpdateTimer = new(UiRefreshDelayMs, uiUpdate);
             try
             {
                 File.Refresh();
@@ -205,98 +206,96 @@ namespace clef_inspect.Model
                     }
                     int bytesAvailPref = _bytesAvail;
 
-                    using (FileStream fileStream = System.IO.File.Open(File.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                    using FileStream fileStream = System.IO.File.Open(File.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    fileStream.Seek(_seekPos, SeekOrigin.Begin);
+                    int bytesRead;
+                    int start = 0;
+                    while ((bytesRead = fileStream.Read(bytes, _bytesAvail, bytes.Length - _bytesAvail)) > 0)
                     {
-                        fileStream.Seek(_seekPos, SeekOrigin.Begin);
-                        int bytesRead;
-                        int start = 0;
-                        while ((bytesRead = fileStream.Read(bytes, _bytesAvail, bytes.Length - _bytesAvail)) > 0)
+                        long pos = _seekPos - _bytesAvail;
+                        start = 0;
+                        _bytesAvail += bytesRead;
+                        for (int i = 0; i < _bytesAvail; ++i)
                         {
-                            long pos = _seekPos - _bytesAvail;
-                            start = 0;
-                            _bytesAvail += bytesRead;
-                            for (int i = 0; i < _bytesAvail; ++i)
+                            if (bytes[i] == '\n')
                             {
-                                if (bytes[i] == '\n')
+                                int endline = i;
+                                if (i > 0 && bytes[i - 1] == '\r')
                                 {
-                                    int endline = i;
-                                    if (i > 0 && bytes[i - 1] == '\r')
-                                    {
-                                        endline--;
-                                    }
-                                    if (bytesAvailPref > 0)
-                                    {
-                                        if (bytesAvailPref != endline)
-                                        {
-                                            JsonObject? logline = Scan(bytes, start, endline);
-                                            _lines.ReplaceLast(new ClefLine(pos + i, logline));
-                                            uiUpdateTimer.Notify(LinesChangedEventArgsAction.Reset);
-                                        }
-                                        bytesAvailPref = 0;
-                                    }
-                                    else
+                                    endline--;
+                                }
+                                if (bytesAvailPref > 0)
+                                {
+                                    if (bytesAvailPref != endline)
                                     {
                                         JsonObject? logline = Scan(bytes, start, endline);
-                                        _lines.Add(new ClefLine(pos + i, logline));
-                                        uiUpdateTimer.Notify(LinesChangedEventArgsAction.Add);
+                                        _lines.ReplaceLast(new ClefLine(pos + i, logline));
+                                        uiUpdateTimer.Notify(LinesChangedEventArgsAction.Reset);
                                     }
-                                    start = i + 1;
+                                    bytesAvailPref = 0;
                                 }
-                            }
-                            if (start == 0)
-                            {
-                                // EOF or buffer full (log line too long).
-                                int dat;
-                                do
+                                else
                                 {
-                                    // eat the rest of a possibly too long line
-                                    dat = fileStream.ReadByte();
-                                } while (dat > 0 && dat != '\n');
-                                if (dat == '\n')
-                                {
-                                    // clear buffer and scan to the next line
-                                    _bytesAvail = 0;
-                                    dat = fileStream.ReadByte();
-                                    if (dat != '\r')
-                                    {
-                                        bytes[0] = (byte)dat;
-                                        _bytesAvail = 1;
-                                    }
+                                    JsonObject? logline = Scan(bytes, start, endline);
+                                    _lines.Add(new ClefLine(pos + i, logline));
+                                    uiUpdateTimer.Notify(LinesChangedEventArgsAction.Add);
                                 }
+                                start = i + 1;
                             }
-                            else
-                            {
-                                _bytesAvail = _bytesAvail - start;
-                                Array.Copy(bytes, start, temp, 0, _bytesAvail);
-                                Array.Copy(temp, bytes, _bytesAvail);
-                            }
-                            _seekPos = fileStream.Position;
-                            uiUpdateTimer.CheckAndUpdate(FillDefaultFilterStats);
                         }
-                        if (_bytesAvail > 0)
+                        if (start == 0)
                         {
-                            bool replaceLast = bytesAvailPref > 0;
-                            if (replaceLast)
+                            // EOF or buffer full (log line too long).
+                            int dat;
+                            do
                             {
-                                // replace last entry
-                                bytesAvailPref = 0;
-                            }
-                            // end of file. add rest in case there is no newline at the end
-                            JsonObject? logline = Scan(bytes, start, start + _bytesAvail);
-                            ClefLine line = new ClefLine(_seekPos - _bytesAvail, logline);
-                            if (replaceLast)
+                                // eat the rest of a possibly too long line
+                                dat = fileStream.ReadByte();
+                            } while (dat > 0 && dat != '\n');
+                            if (dat == '\n')
                             {
-                                _lines.ReplaceLast(line);
-                                uiUpdateTimer.Notify(LinesChangedEventArgsAction.Reset);
+                                // clear buffer and scan to the next line
+                                _bytesAvail = 0;
+                                dat = fileStream.ReadByte();
+                                if (dat != '\r')
+                                {
+                                    bytes[0] = (byte)dat;
+                                    _bytesAvail = 1;
+                                }
                             }
-                            else
-                            {
-                                _lines.Add(line);
-                                uiUpdateTimer.Notify(LinesChangedEventArgsAction.Add);
-                            }
+                        }
+                        else
+                        {
+                            _bytesAvail -= start;
                             Array.Copy(bytes, start, temp, 0, _bytesAvail);
                             Array.Copy(temp, bytes, _bytesAvail);
                         }
+                        _seekPos = fileStream.Position;
+                        uiUpdateTimer.CheckAndUpdate(FillDefaultFilterStats);
+                    }
+                    if (_bytesAvail > 0)
+                    {
+                        bool replaceLast = bytesAvailPref > 0;
+                        if (replaceLast)
+                        {
+                            // replace last entry
+                            bytesAvailPref = 0;
+                        }
+                        // end of file. add rest in case there is no newline at the end
+                        JsonObject? logline = Scan(bytes, start, start + _bytesAvail);
+                        ClefLine line = new(_seekPos - _bytesAvail, logline);
+                        if (replaceLast)
+                        {
+                            _lines.ReplaceLast(line);
+                            uiUpdateTimer.Notify(LinesChangedEventArgsAction.Reset);
+                        }
+                        else
+                        {
+                            _lines.Add(line);
+                            uiUpdateTimer.Notify(LinesChangedEventArgsAction.Add);
+                        }
+                        Array.Copy(bytes, start, temp, 0, _bytesAvail);
+                        Array.Copy(temp, bytes, _bytesAvail);
                     }
                 }
                 else
@@ -344,7 +343,7 @@ namespace clef_inspect.Model
             try
             {
                 string line = Encoding.UTF8.GetString(bytes, start, endline - start);
-                if (!(line[0] == '{') && line[line.Length - 1] == '}')
+                if (!(line[0] == '{') && line[^1] == '}')
                 {
                     return new JsonObject
                     {
@@ -362,7 +361,7 @@ namespace clef_inspect.Model
                             {
                                 (string, ConcurrentDictionary<string, int>) values = _properties.GetOrAdd(kv.Key, (k) =>
                                 {
-                                    ConcurrentDictionary<string, int> newSet = new ConcurrentDictionary<string, int>();
+                                    ConcurrentDictionary<string, int> newSet = new();
                                     return (_indexableProperties[k], newSet);
 
 
@@ -375,7 +374,7 @@ namespace clef_inspect.Model
                             {
                                 ConcurrentDictionary<string, int> values = _data.GetOrAdd(kv.Key, (k) =>
                                 {
-                                    ConcurrentDictionary<string, int> newSet = new ConcurrentDictionary<string, int>();
+                                    ConcurrentDictionary<string, int> newSet = new();
                                     return newSet;
                                 });
                                 values.AddOrUpdate(value.ToString(), 1, (s, c) => c + 1);

@@ -55,7 +55,7 @@ namespace clef_inspect.ViewModel.MainView
 
         public void OpenFile(string fileName)
         {
-            ClefTab tab = new ClefTab(fileName, Settings);
+            ClefTab tab = new(fileName, Settings);
             ClefTabs.Add(tab);
             tab.Closing += () =>
             {

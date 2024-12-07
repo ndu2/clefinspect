@@ -7,7 +7,7 @@ namespace clef_inspect.ViewModel.ClefView
     {
         private class CheckNoneCommand : ICommand
         {
-            private Filter _filter;
+            private readonly Filter _filter;
 
             public CheckNoneCommand(Filter filter)
             {

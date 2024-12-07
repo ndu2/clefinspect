@@ -7,8 +7,8 @@ namespace clef_inspect.ViewModel.MainView
     {
         public class UserActionCommand : ICommand
         {
-            private MainViewModel _vm;
-            private ClefViewModel.UserAction _action;
+            private readonly MainViewModel _vm;
+            private readonly ClefViewModel.UserAction _action;
 
             public UserActionCommand(MainViewModel vm, ClefViewModel.UserAction action)
             {
@@ -16,7 +16,8 @@ namespace clef_inspect.ViewModel.MainView
                 _action = action;
             }
 
-            public event EventHandler? CanExecuteChanged;
+            // no CS0067 though the event is left unused
+            public event EventHandler? CanExecuteChanged { add { } remove { } }
 
             public bool CanExecute(object? parameter) => true;
 

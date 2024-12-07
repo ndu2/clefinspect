@@ -4,7 +4,7 @@ namespace clef_inspect.Model
 {
     public class TextFilter : IFilter
     {
-        private string? _textFilter;
+        private readonly string? _textFilter;
         public TextFilter(string? textFilter)
         {
             _textFilter = textFilter;
@@ -12,7 +12,7 @@ namespace clef_inspect.Model
 
         public class Matcher : IMatcher
         {
-            private string? _textFilter;
+            private readonly string? _textFilter;
             public Matcher(string? textFilter)
             {
                 _textFilter = textFilter;

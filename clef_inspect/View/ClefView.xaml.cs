@@ -36,7 +36,7 @@ namespace clef_inspect.View
         {
             get
             {
-                FormattedText formattedText = new FormattedText(Settings.PinWidthText, CultureInfo.CurrentCulture,
+                FormattedText formattedText = new(Settings.PinWidthText, CultureInfo.CurrentCulture,
                     FlowDirection, new Typeface(FontFamily, FontStyle, FontWeight, FontStretch),
                     FontSize, Brushes.Black,
                     VisualTreeHelper.GetDpi(this).PixelsPerDip);
@@ -48,7 +48,7 @@ namespace clef_inspect.View
         {
             get
             {
-                FormattedText formattedText = new FormattedText(Settings.DateWidthText, CultureInfo.CurrentCulture,
+                FormattedText formattedText = new(Settings.DateWidthText, CultureInfo.CurrentCulture,
                     FlowDirection, new Typeface(FontFamily, FontStyle, FontWeight, FontStretch),
                     FontSize, Brushes.Black,
                     VisualTreeHelper.GetDpi(this).PixelsPerDip);
@@ -61,7 +61,7 @@ namespace clef_inspect.View
         {
             get
             {
-                FormattedText formattedText = new FormattedText(Settings.LevelWidthText, CultureInfo.CurrentCulture,
+                FormattedText formattedText = new(Settings.LevelWidthText, CultureInfo.CurrentCulture,
                         FlowDirection, new Typeface(FontFamily, FontStyle, FontWeight, FontStretch),
                         FontSize, Brushes.Black,
                         VisualTreeHelper.GetDpi(this).PixelsPerDip);
@@ -73,7 +73,7 @@ namespace clef_inspect.View
         {
             get
             {
-                FormattedText formattedText = new FormattedText(Settings.SourceContextWidthText, CultureInfo.CurrentCulture,
+                FormattedText formattedText = new(Settings.SourceContextWidthText, CultureInfo.CurrentCulture,
                         FlowDirection, new Typeface(FontFamily, FontStyle, FontWeight, FontStretch),
                         FontSize, Brushes.Black,
                         VisualTreeHelper.GetDpi(this).PixelsPerDip);
@@ -85,7 +85,7 @@ namespace clef_inspect.View
         {
             get
             {
-                FormattedText formattedText = new FormattedText(Settings.DeltaWidthText, CultureInfo.CurrentCulture,
+                FormattedText formattedText = new(Settings.DeltaWidthText, CultureInfo.CurrentCulture,
                         FlowDirection, new Typeface(FontFamily, FontStyle, FontWeight, FontStretch),
                         FontSize, Brushes.Black,
                         VisualTreeHelper.GetDpi(this).PixelsPerDip);
@@ -113,7 +113,7 @@ namespace clef_inspect.View
         private List<ClefLineView> GetSelectedInOrder()
         {
             System.Collections.IList list = ListViewLogEntries.SelectedItems;
-            List<ClefLineView> selected = new List<ClefLineView>(list.Count);
+            List<ClefLineView> selected = new(list.Count);
             foreach (object item in list)
             {
                 if (item is ClefLineView line)
@@ -139,7 +139,7 @@ namespace clef_inspect.View
 
         private void CopySelected()
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
             IList<ClefLineView> sel = GetSelectedInOrder();
             foreach (ClefLineView line in sel)
             {
@@ -154,7 +154,7 @@ namespace clef_inspect.View
 
         private void CopySelectedClef()
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
             IList<ClefLineView> sel = GetSelectedInOrder();
             foreach (ClefLineView line in sel)
             {

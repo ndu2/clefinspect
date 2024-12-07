@@ -11,6 +11,13 @@ namespace clef_inspect.ViewModel.MainView
             public CloseTabCommand(MainViewModel mainViewModel)
             {
                 this.mainViewModel = mainViewModel;
+                this.mainViewModel.PropertyChanged += (o, e) =>
+                {
+                    if(e.PropertyName == nameof(mainViewModel.ActiveTab))
+                    {
+                        CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+                    }
+                };
             }
 
             public event EventHandler? CanExecuteChanged;

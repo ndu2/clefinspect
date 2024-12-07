@@ -5,14 +5,12 @@ namespace clef_inspect.Model
 {
     public class ClefLine
     {
-        private JsonObject? _line;
-        private bool _pin;
+        private readonly JsonObject? _line;
 
         public ClefLine(long sort, JsonObject? line)
         {
             Sort = sort;
             _line = line;
-            _pin = false;
             Message = Render(line);
             Time = GetTime(line);
         }
@@ -33,7 +31,7 @@ namespace clef_inspect.Model
         {
             if (mt == null || line == null) return null;
             ParseState state = ParseState.Text;
-            StringBuilder outString = new StringBuilder();
+            StringBuilder outString = new();
             int i1 = 0;
             for (int i = 0; i < mt.Length; ++i)
             {
@@ -42,7 +40,7 @@ namespace clef_inspect.Model
                     case ParseState.Text:
                         if (mt[i] == '{')
                         {
-                            outString.Append(mt.Substring(i1, i - i1));
+                            outString.Append(mt[i1..i]);
                             state = ParseState.Token;
                             i1 = i;
                         }
@@ -62,7 +60,7 @@ namespace clef_inspect.Model
                         break;
                 }
             }
-            outString.Append(mt.Substring(i1, mt.Length - i1));
+            outString.Append(mt[i1..]);
             return outString.ToString();
         }
         private static DateTime? GetTime(JsonObject? line)
@@ -100,7 +98,9 @@ namespace clef_inspect.Model
         {
             get
             {
+#pragma warning disable CA1507 // Use nameof to express symbol names
                 return _line?["SourceContext"]?.ToString();
+#pragma warning restore CA1507 // Use nameof to express symbol names
             }
         }
         public string? Message { get; } 

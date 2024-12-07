@@ -11,9 +11,9 @@ namespace clef_inspect.ViewModel.ClefView
         {
             private Task? _filterTask;
             private CancellationTokenSource? _cancelFilterTask;
-            private ClefViewModel _clefViewModel;
+            private readonly ClefViewModel _clefViewModel;
             private LinesChangedEventArgsAction _filterAction;
-            private ClefViewSettings _settings;
+            private readonly ClefViewSettings _settings;
             private int _nextItemFromSource;
             public FilterTaskManager(ClefViewModel clefViewModel, ClefViewSettings settings)
             {
@@ -34,15 +34,17 @@ namespace clef_inspect.ViewModel.ClefView
                 }
                 _cancelFilterTask = new CancellationTokenSource();
                 _filterAction = Union(action, previousAction);
-                _filterTask = Reload(_clefViewModel.ClefLines, _cancelFilterTask.Token, _clefViewModel.Clef, matchers, _clefViewModel.SelectedIndex, _filterAction,
+                _filterTask = Reload(_clefViewModel.ClefLines, _clefViewModel.Clef, matchers, _clefViewModel.SelectedIndex, _filterAction,
                     () => previousFilterTask?.Wait(),
-                   onChanged);
+                   onChanged,
+                   _cancelFilterTask.Token);
             }
 
 
-            public Task Reload(FilteredClef clefLines, CancellationToken cancellationToken,
+            public Task Reload(FilteredClef clefLines,
                 Clef clef, List<IMatcher> filters, int selectedIndex, LinesChangedEventArgsAction action,
-                Action onRun, Action<int> onChanged)
+                Action onRun, Action<int> onChanged,
+                CancellationToken cancellationToken)
             {
                 if (action == LinesChangedEventArgsAction.None)
                 {
@@ -56,7 +58,7 @@ namespace clef_inspect.ViewModel.ClefView
 
                 int sourceIdx = (action == LinesChangedEventArgsAction.Add && clefLines.Count > 0) ? _nextItemFromSource : 0;
                 int idx = (action == LinesChangedEventArgsAction.Add) ? clefLines.Count : 0;
-                List<ClefLineView> result = new List<ClefLineView>(clefLines);
+                List<ClefLineView> result = new(clefLines);
 
                 return Task.Run(() =>
                 {
@@ -144,7 +146,7 @@ namespace clef_inspect.ViewModel.ClefView
                         }
                         onChanged(selectedIndex);
                     });
-                });
+                }, cancellationToken);
             }
         }
 

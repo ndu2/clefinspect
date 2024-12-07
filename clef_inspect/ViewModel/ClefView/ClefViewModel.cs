@@ -8,9 +8,9 @@ namespace clef_inspect.ViewModel.ClefView
 {
     public partial class ClefViewModel : INotifyPropertyChanged
     {
-        private ClefViewSettings _settings;
-        private Dictionary<string, Filter> _filters;
-        private FilterTaskManager _filterTaskManager;
+        private readonly ClefViewSettings _settings;
+        private readonly Dictionary<string, Filter> _filters;
+        private readonly FilterTaskManager _filterTaskManager;
         private string? _textFilter;
         private int _selectedIndex;
         private bool _calculationRunning;
@@ -87,7 +87,7 @@ namespace clef_inspect.ViewModel.ClefView
             {
                 if (!_filters.ContainsKey(p.Key))
                 {
-                    Filter filter = new Filter(p.Key, p.Value.Item2);
+                    Filter filter = new(p.Key, p.Value.Item2);
                     filter.FilterChanged += Reload;
                     _filters.Add(p.Key, filter);
                     Filters.Add(new ClefFilterViewModel(p.Value.Item1, filter));
@@ -101,7 +101,7 @@ namespace clef_inspect.ViewModel.ClefView
             {
                 if (!_filters.ContainsKey(p.Key))
                 {
-                    Filter filter = new Filter(p.Key, p.Value);
+                    Filter filter = new(p.Key, p.Value);
                     filter.FilterChanged += Reload;
                     _filters.Add(p.Key, filter);
                     Filters.Add(new ClefFilterViewModel(p.Key, filter));
@@ -126,8 +126,8 @@ namespace clef_inspect.ViewModel.ClefView
 
         private List<IMatcher> CreateMatchers()
         {
-            TextFilter tf = new TextFilter(_textFilter);
-            List<IMatcher> matchers = new List<IMatcher>();
+            TextFilter tf = new(_textFilter);
+            List<IMatcher> matchers = new();
             foreach (IFilter v in _filters.Values)
             {
                 if (!v.AccceptsAll)

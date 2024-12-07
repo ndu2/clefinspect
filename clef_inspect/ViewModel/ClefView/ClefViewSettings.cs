@@ -4,7 +4,7 @@ namespace clef_inspect.ViewModel.ClefView
 {
     public class ClefViewSettings : INotifyPropertyChanged
     {
-        private Settings _settings;
+        private readonly Settings _settings;
         private DateTime? _refTimeStamp;
 
         public ClefViewSettings(Settings settings)

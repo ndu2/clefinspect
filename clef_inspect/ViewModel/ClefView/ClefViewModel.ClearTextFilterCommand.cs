@@ -6,7 +6,7 @@ namespace clef_inspect.ViewModel.ClefView
     {
         private class ClearTextFilterCommand : ICommand
         {
-            private ClefViewModel clefViewModel;
+            private readonly ClefViewModel clefViewModel;
 
             public ClearTextFilterCommand(ClefViewModel clefViewModel)
             {

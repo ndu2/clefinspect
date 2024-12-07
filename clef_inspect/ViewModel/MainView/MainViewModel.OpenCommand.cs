@@ -13,7 +13,8 @@ namespace clef_inspect.ViewModel.MainView
                 this.mainViewModel = mainViewModel;
             }
 
-            public event EventHandler? CanExecuteChanged;
+            // no CS0067 though the event is left unused
+            public event EventHandler? CanExecuteChanged { add { } remove { } }
 
             public bool CanExecute(object? parameter)
             {
@@ -22,8 +23,10 @@ namespace clef_inspect.ViewModel.MainView
 
             public void Execute(object? parameter)
             {
-                var dialog = new Microsoft.Win32.OpenFileDialog();
-                dialog.Filter = @"all supported logs|*.json;*.clef|Json only (.json)|*.json|Clef only (.clef)|*.clef|All|*.*";
+                var dialog = new Microsoft.Win32.OpenFileDialog
+                {
+                    Filter = @"all supported logs|*.json;*.clef|Json only (.json)|*.json|Clef only (.clef)|*.clef|All|*.*"
+                };
                 bool? result = dialog.ShowDialog();
                 // Process open file dialog box results
                 if (result == true)

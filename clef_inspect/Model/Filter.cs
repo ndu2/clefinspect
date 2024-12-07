@@ -4,16 +4,16 @@ namespace clef_inspect.Model
 {
     public class Filter : IFilter
     {
-        private string _key;
+        private readonly string _key;
         private bool _disableNotifyFilterChanged;
         public Filter(string key, IEnumerable<KeyValuePair<string, int>> filter)
         {
             _disableNotifyFilterChanged = false;
             _key = key;
-            List<FilterValue> values = new List<FilterValue>();
+            List<FilterValue> values = new();
             foreach ((string value, int amount) in filter)
             {
-                FilterValue fi = new FilterValue(value, amount, true);
+                FilterValue fi = new(value, amount, true);
                 fi.PropertyChanged += (sender, e) =>
                 {
                     if (e.PropertyName == nameof(fi.Enabled))
@@ -53,7 +53,7 @@ namespace clef_inspect.Model
         public IMatcher Create()
         {
             bool allEnabled = true;
-            HashSet<string> enabledValues = new HashSet<string>();
+            HashSet<string> enabledValues = new();
             foreach (FilterValue fi in Values)
             {
                 if (fi.Enabled)
@@ -91,7 +91,7 @@ namespace clef_inspect.Model
                 FilterValue? filterValue = Values.FirstOrDefault((f) => (f.ValueMatcher == value));
                 if (filterValue == null)
                 {
-                    FilterValue newFilterValue = new FilterValue(value, amount, true);
+                    FilterValue newFilterValue = new(value, amount, true);
                     int pos = 0;
                     foreach (FilterValue fi in Values)
                     {
