@@ -12,20 +12,17 @@ namespace clef_inspect.Model
 
         public class Matcher : IMatcher
         {
-            private readonly string? _textFilter;
-            public Matcher(string? textFilter)
+            private readonly string[] _textFilters;
+
+            public Matcher(string textFilter)
             {
-                _textFilter = textFilter;
+                _textFilters = textFilter.Split(",");
             }
 
 
             public bool Accept(ClefLine line)
             {
-                if (_textFilter == null)
-                {
-                    return true;
-                }
-                if (_textFilter.Length == 0)
+                if (_textFilters.Length == 0)
                 {
                     return true;
                 }
@@ -37,15 +34,12 @@ namespace clef_inspect.Model
                 {
                     return false;
                 }
-                string[] textFilters = _textFilter.Split(",");
-                foreach (var dat in line.JsonObject)
+
+                foreach (string textFilter in _textFilters)
                 {
-                    foreach (string textFilter in textFilters)
+                    if (line.Message?.Contains(textFilter, StringComparison.InvariantCultureIgnoreCase) ?? false)
                     {
-                        if (dat.Value?.ToString().Contains(textFilter, StringComparison.InvariantCultureIgnoreCase) ?? false)
-                        {
-                            return true;
-                        }
+                        return true;
                     }
                 }
                 return false;
@@ -55,6 +49,10 @@ namespace clef_inspect.Model
 
         public IMatcher Create()
         {
+            if (_textFilter == null || _textFilter.Length == 0)
+            {
+                return new MatcherAcceptAll();
+            }
             return new Matcher(_textFilter);
         }
     }

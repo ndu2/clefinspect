@@ -44,10 +44,6 @@ namespace clef_inspect.Model
                 return _enabledValues.Contains(val);
             }
         }
-        public class MatcherAcceptAll : IMatcher
-        {
-            public bool Accept(ClefLine line) => true;
-        }
         public bool AccceptsAll => Values.All((f) => f.Enabled);
 
         public IMatcher Create()
