@@ -10,9 +10,19 @@ namespace clef_inspect.ViewModel.ClefView
     public class ClefLineView : INotifyPropertyChanged
     {
         private readonly ClefViewSettings _settings;
+        private readonly string? _messageOneLine;
         public ClefLineView(ClefLine line, ClefViewSettings settings)
         {
             ClefLine = line;
+            int nl = line.Message?.IndexOf('\n') ?? -1;
+            if (nl > 0)
+            {
+                _messageOneLine = line?.Message?[..(nl - 1)] + " ...";
+            }
+            else
+            {
+                _messageOneLine = line.Message;
+            }
             _settings = settings;
             settings.PropertyChanged += Settings_PropertyChanged;
         }
@@ -22,6 +32,7 @@ namespace clef_inspect.ViewModel.ClefView
             if (e.PropertyName == nameof(_settings.Settings)) { }
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Time)));
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DeltaTime)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Message)));
         }
         public string? Time
         {
@@ -62,7 +73,7 @@ namespace clef_inspect.ViewModel.ClefView
             }
         }
         public string? SourceContext => ClefLine.SourceContext;
-        public string? Message => ClefLine.Message;
+        public string? Message => _settings.Settings.OneLineOnly ? _messageOneLine: ClefLine.Message;
         public JsonObject? JsonObject => ClefLine.JsonObject;
         public string? Json => ClefLine.Json;
 

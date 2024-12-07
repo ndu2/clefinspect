@@ -8,7 +8,7 @@ namespace clef_inspect.ViewModel
     public class Settings : INotifyPropertyChanged
     {
         private bool _localTime = true;
-        private bool _devMode = false;
+        private bool _oneLineOnly = false;
 
         private static readonly IFormatProvider local = CultureInfo.CurrentCulture.DateTimeFormat;
         private static readonly string utc = CultureInfo.InvariantCulture.DateTimeFormat.UniversalSortableDateTimePattern;
@@ -32,15 +32,15 @@ namespace clef_inspect.ViewModel
                 }
             }
         }
-        public bool DevMode
+        public bool OneLineOnly
         {
-            get => _devMode;
+            get => _oneLineOnly;
             set
             {
-                if (_devMode != value)
+                if (_oneLineOnly != value)
                 {
-                    _devMode = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DevMode)));
+                    _oneLineOnly = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(OneLineOnly)));
                 }
             }
         }
