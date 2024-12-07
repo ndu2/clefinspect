@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace clef_inspect.Model
+﻿namespace clef_inspect.Model
 {
     public class ClefLockedList
     {

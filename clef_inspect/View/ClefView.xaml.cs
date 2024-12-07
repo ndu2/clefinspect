@@ -1,5 +1,4 @@
 ﻿using clef_inspect.ViewModel.ClefView;
-using System;
 using System.Globalization;
 using System.Text;
 using System.Windows;
@@ -29,6 +28,7 @@ namespace clef_inspect.View
                 {
                     ListViewLogEntries.ScrollIntoView(viewModel.SelectedItem);
                 };
+                viewModel.UserActionHandler += OnUserAction;
             }
         }
 
@@ -102,6 +102,13 @@ namespace clef_inspect.View
                 (DataContext as ClefViewModel)?.ApplyTextFilter.Execute(this);
             }
         }
+        private void TextDatePosition_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                TextDatePosition.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+            }
+        }
 
         private List<ClefLineView> GetSelectedInOrder()
         {
@@ -118,7 +125,19 @@ namespace clef_inspect.View
             return selected;
         }
 
-        private void CopySelected_Click(object sender, System.Windows.RoutedEventArgs e)
+
+        private void OnUserAction(ClefViewModel.UserAction userAction)
+        {
+            switch (userAction)
+            {
+                case ClefViewModel.UserAction.Copy: CopySelected(); break;
+                case ClefViewModel.UserAction.CopyClef: CopySelectedClef(); break;
+                case ClefViewModel.UserAction.Pin: PinSelected(); break;
+                case ClefViewModel.UserAction.Unpin: UnpinSelected(); break;
+            }
+        }
+
+        private void CopySelected()
         {
             StringBuilder sb = new StringBuilder();
             IList<ClefLineView> sel = GetSelectedInOrder();
@@ -126,13 +145,14 @@ namespace clef_inspect.View
             {
                 sb.AppendLine(line.ToString());
             }
-            if(sb.Length > 0)
+            if (sb.Length > 0)
             {
                 Clipboard.SetText(sb.ToString());
             }
         }
+        private void CopySelected_Click(object sender, System.Windows.RoutedEventArgs e) => CopySelected();
 
-        private void CopySelectedClef_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void CopySelectedClef()
         {
             StringBuilder sb = new StringBuilder();
             IList<ClefLineView> sel = GetSelectedInOrder();
@@ -145,8 +165,9 @@ namespace clef_inspect.View
                 Clipboard.SetText(sb.ToString());
             }
         }
+        private void CopySelectedClef_Click(object sender, System.Windows.RoutedEventArgs e) => CopySelectedClef();
 
-        private void PinSelected_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void PinSelected()
         {
             foreach (var item in ListViewLogEntries.SelectedItems)
             {
@@ -156,7 +177,8 @@ namespace clef_inspect.View
                 }
             }
         }
-        private void UnpinSelected_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void PinSelected_Click(object sender, System.Windows.RoutedEventArgs e) => PinSelected();
+        private void UnpinSelected()
         {
             foreach (var item in ListViewLogEntries.SelectedItems)
             {
@@ -166,6 +188,7 @@ namespace clef_inspect.View
                 }
             }
         }
-        
+        private void UnpinSelected_Click(object sender, System.Windows.RoutedEventArgs e) => UnpinSelected();
+
     }
 }

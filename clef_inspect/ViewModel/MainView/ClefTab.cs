@@ -14,6 +14,13 @@ namespace clef_inspect.ViewModel.MainView
             ClefViewModel = new ClefViewModel(fileName, settings);
             Close = new CloseTabCommand(this);
 
+            ClefViewModel.PropertyChanged += (sender, e) =>
+            {
+                if (e.PropertyName == nameof(ClefViewModel.CalculationRunning))
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CalculationRunning)));
+                }
+            };
             ClefViewModel.Clef.PropertyChanged += (sender, e) =>
             {
                 if(e.PropertyName == nameof(Clef.AutoUpdate))
@@ -29,7 +36,7 @@ namespace clef_inspect.ViewModel.MainView
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public void DoClose()
+        private void DoClose()
         {
             Closing?.Invoke();
             ClefViewModel.DoClose();
@@ -51,6 +58,10 @@ namespace clef_inspect.ViewModel.MainView
         public Visibility FileError
         {
             get => ClefViewModel.Clef.FileOk ? Visibility.Hidden: Visibility.Visible;
+        }
+        public Visibility CalculationRunning
+        {
+            get => ClefViewModel.CalculationRunning ? Visibility.Visible: Visibility.Hidden;
         }
 
     }

@@ -1,18 +1,14 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Text.Json.Nodes;
+﻿using System.Collections.ObjectModel;
 
 namespace clef_inspect.Model
 {
-    public class Filter
+    public class Filter : IFilter
     {
         private string _key;
-        private HashSet<string>? _enabledValues;
-        private bool _holdBackUpdateFilterSet;
+        private bool _disableNotifyFilterChanged;
         public Filter(string key, IEnumerable<KeyValuePair<string, int>> filter)
         {
-            _holdBackUpdateFilterSet = false;
+            _disableNotifyFilterChanged = false;
             _key = key;
             List<FilterValue> values = new List<FilterValue>();
             foreach ((string value, int amount) in filter)
@@ -22,7 +18,7 @@ namespace clef_inspect.Model
                 {
                     if (e.PropertyName == nameof(fi.Enabled))
                     {
-                        UpdateFilterSet();
+                        NotifyFilterChanged();
                     }
                 };
                 values.Add(fi);
@@ -31,32 +27,60 @@ namespace clef_inspect.Model
             Values = new ObservableCollection<FilterValue>(values);
         }
 
-        private void UpdateFilterSet()
+        public class Matcher : IMatcher
         {
-            if (_holdBackUpdateFilterSet)
+            private readonly string _key;
+            private readonly HashSet<string> _enabledValues;
+
+            public Matcher(string key, HashSet<string> enabledValues)
             {
-                return;
+                _key = key;
+                _enabledValues = enabledValues;
             }
+
+            public bool Accept(ClefLine line)
+            {
+                string val = line.JsonObject?[_key]?.ToString() ?? "";
+                return _enabledValues.Contains(val);
+            }
+        }
+        public class MatcherAcceptAll : IMatcher
+        {
+            public bool Accept(ClefLine line) => true;
+        }
+        public bool AccceptsAll => Values.All((f) => f.Enabled);
+
+        public IMatcher Create()
+        {
             bool allEnabled = true;
-            if(_enabledValues == null)
-            {
-                _enabledValues = new HashSet<string>();
-            }
+            HashSet<string> enabledValues = new HashSet<string>();
             foreach (FilterValue fi in Values)
             {
                 if (fi.Enabled)
                 {
-                    _enabledValues.Add(fi.ValueMatcher);
+                    enabledValues.Add(fi.ValueMatcher);
                 }
                 else
                 {
-                    _enabledValues.Remove(fi.ValueMatcher);
+                    enabledValues.Remove(fi.ValueMatcher);
                     allEnabled = false;
                 }
             }
             if (allEnabled)
             {
-                _enabledValues = null;
+                return new MatcherAcceptAll();
+            }
+            else
+            {
+                return new Matcher(_key, enabledValues);
+            }
+        }
+
+        private void NotifyFilterChanged()
+        {
+            if (_disableNotifyFilterChanged)
+            {
+                return;
             }
             FilterChanged?.Invoke();
         }
@@ -85,21 +109,10 @@ namespace clef_inspect.Model
                 }
             }
         }
-        public bool AllEnabled => (_enabledValues == null);
-
-        public bool Accept(ClefLine line)
-        {
-            if(_enabledValues == null)
-            {
-                return true;
-            }
-            string val = line.JsonObject?[_key]?.ToString() ?? "";
-            return _enabledValues.Contains(val);
-        }
 
         public void CheckAll()
         {
-            _holdBackUpdateFilterSet = true;
+            _disableNotifyFilterChanged = true;
             try
             {
                 foreach (var item in Values)
@@ -109,14 +122,14 @@ namespace clef_inspect.Model
             }
             finally
             {
-                _holdBackUpdateFilterSet = false;
-                UpdateFilterSet();
+                _disableNotifyFilterChanged = false;
+                NotifyFilterChanged();
             }
         }
 
         public void UncheckAll()
         {
-            _holdBackUpdateFilterSet = true;
+            _disableNotifyFilterChanged = true;
             try
             {
                 foreach (var item in Values)
@@ -126,8 +139,8 @@ namespace clef_inspect.Model
             }
             finally
             {
-                _holdBackUpdateFilterSet = false;
-                UpdateFilterSet();
+                _disableNotifyFilterChanged = false;
+                NotifyFilterChanged();
             }
         }
 

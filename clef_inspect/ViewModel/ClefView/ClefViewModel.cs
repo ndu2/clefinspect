@@ -2,7 +2,6 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
-using System.Text.Json.Nodes;
 using System.Windows.Input;
 
 namespace clef_inspect.ViewModel.ClefView
@@ -11,20 +10,22 @@ namespace clef_inspect.ViewModel.ClefView
     {
         private ClefViewSettings _settings;
         private Dictionary<string, Filter> _filters;
+        private FilterTaskManager _filterTaskManager;
         private string? _textFilter;
         private int _selectedIndex;
+        private bool _calculationRunning;
 
         public ClefViewModel(string fileName, Settings settings)
         {
-            
             _settings = new ClefViewSettings(settings);
+            _filters = new Dictionary<string, Filter>();
+            _filterTaskManager = new FilterTaskManager(this, _settings);
+            _calculationRunning = false;
             settings.PropertyChanged += (s, e) =>
             {
                 if (e.PropertyName == nameof(settings.LocalTime))
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DatePosition)));
             };
-
-            _filters = new Dictionary<string, Filter>();
             Clef = new Clef(new FileInfo(fileName));
             ClefLines = new FilteredClef(_settings);
             Filters = new ObservableCollection<ClefFilterViewModel>();
@@ -33,8 +34,30 @@ namespace clef_inspect.ViewModel.ClefView
             Clef.LinesChanged += Reload;
         }
 
+
+        public bool CalculationRunning
+        {
+            get => _calculationRunning;
+            set
+            {
+                if (value != _calculationRunning)
+                {
+                    _calculationRunning = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CalculationRunning)));
+                }
+            }
+        }
+
         public event PropertyChangedEventHandler? PropertyChanged;
         public event Action? Reloaded;
+
+        public enum UserAction { Copy, CopyClef, Pin, Unpin };
+        public delegate void UserActionEvent(UserAction userAction);
+        public event UserActionEvent? UserActionHandler;
+        public void DoUserAction(UserAction userAction)
+        {
+            UserActionHandler?.Invoke(userAction);
+        }
 
         public void DoClose()
         {
@@ -89,46 +112,35 @@ namespace clef_inspect.ViewModel.ClefView
                 }
             }
 
-            // View uses UI virtualization, so we can add everything to ClefLines
-            // Unfortunately ObservableCollection supports only adding one line at a
-            // time (triggering a lot of layouting stuff)
-            int selectedIndex = SelectedIndex;
-            ClefLines.Reload(Clef, _filters.Values.Where((f) => !f.AllEnabled), TextFilterOk, ref selectedIndex, e.Action);
-            SelectedIndex = selectedIndex;
-            Reloaded?.Invoke();
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ClefLines)));
+            List<IMatcher> matchers = CreateMatchers();
+            CalculationRunning = true;
+
+            _filterTaskManager.Filter(matchers, e.Action,
+                 (selectedIndex) =>
+                 {
+                     SelectedIndex = selectedIndex;
+                     Reloaded?.Invoke();
+                     CalculationRunning = false;
+                 });
         }
 
-        private bool TextFilterOk(ClefLine line)
+        private List<IMatcher> CreateMatchers()
         {
-            if (_textFilter == null)
+            TextFilter tf = new TextFilter(_textFilter);
+            List<IMatcher> matchers = new List<IMatcher>();
+            foreach (IFilter v in _filters.Values)
             {
-                return true;
-            }
-            if (_textFilter.Length == 0)
-            {
-                return true;
-            }
-            if (line == null)
-            {
-                return false;
-            }
-            if(line.JsonObject == null)
-            {
-                return false;
-            }
-            string[] textFilters = _textFilter.Split(",");
-            foreach (var dat in line.JsonObject)
-            {
-                foreach (string textFilter in textFilters)
+                if (!v.AccceptsAll)
                 {
-                    if (dat.Value?.ToString().Contains(textFilter, StringComparison.InvariantCultureIgnoreCase) ?? false)
-                    {
-                        return true;
-                    }
+                    matchers.Add(v.Create());
                 }
             }
-            return false;
+            if (!tf.AccceptsAll)
+            {
+                matchers.Add(tf.Create());
+            }
+
+            return matchers;
         }
 
         public Clef Clef { get; }

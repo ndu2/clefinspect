@@ -57,7 +57,7 @@
                 FontFamily="Segoe UI Symbol" Content="&#xE10A;" Command="{Binding ClearTextFilter}" Margin="5,0,5,0" />
 
         <TextBox Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="2" Margin="2,2,2,2" Width="{Binding ElementName=clefView, Path=DateWidth}"
-                 Text="{Binding DatePosition, ValidatesOnExceptions=True, UpdateSourceTrigger=PropertyChanged}" />
+                 Name="TextDatePosition" Text="{Binding DatePosition, ValidatesOnExceptions=True, UpdateSourceTrigger=Explicit}" KeyDown="TextDatePosition_KeyDown" />
 
         <ListView Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="5"
                   ScrollViewer.VerticalScrollBarVisibility="Visible" 
@@ -78,7 +78,7 @@
                     <GridViewColumn Header="Pin" Width="{Binding ElementName=clefView, Path=PinWidth}">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock FontFamily="Segoe UI Symbol" Text="{Binding Pin, Mode=TwoWay, Converter={StaticResource PinSymbolConverter}}" />
+                                <TextBlock FontFamily="Segoe UI Symbol" Text="{Binding Pin, Mode=OneWay, Converter={StaticResource PinSymbolConverter}}" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

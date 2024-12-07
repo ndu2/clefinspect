@@ -1,6 +1,5 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.IO;
 using System.Windows.Input;
 
 namespace clef_inspect.ViewModel.MainView
@@ -20,12 +19,22 @@ namespace clef_inspect.ViewModel.MainView
             }
             Exit = new ExitCommand();
             Open = new OpenCommand(this);
+            CloseTab = new CloseTabCommand(this);
+            CopySelected = new UserActionCommand(this, ClefView.ClefViewModel.UserAction.Copy);
+            CopyClefSelected = new UserActionCommand(this, ClefView.ClefViewModel.UserAction.CopyClef);
+            PinSelected = new UserActionCommand(this, ClefView.ClefViewModel.UserAction.Pin);
+            UnpinSelected = new UserActionCommand(this, ClefView.ClefViewModel.UserAction.Unpin);
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
         public Settings Settings { get; }
         public ICommand Open { get; set; }
+        public CloseTabCommand CloseTab { get; }
+        public UserActionCommand CopySelected { get; }
+        public UserActionCommand CopyClefSelected { get; }
+        public UserActionCommand PinSelected { get; }
+        public UserActionCommand UnpinSelected { get; }
         public ICommand Exit { get; set; }
 
         private ClefTab? _activeTab;

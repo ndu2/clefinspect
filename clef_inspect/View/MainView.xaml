@@ -11,13 +11,21 @@
     <Window.DataContext>
         <viewmodel:MainViewModel></viewmodel:MainViewModel>
     </Window.DataContext>
-
+    <Window.InputBindings>
+        <KeyBinding Command="{Binding Open}" Gesture="CTRL+O" />
+        <KeyBinding Command="{Binding CopySelected}" Gesture="CTRL+C" />
+        <KeyBinding Command="{Binding CopyClefSelected}" Gesture="CTRL+SHIFT+C" />
+        <KeyBinding Command="{Binding PinSelected}" Gesture="CTRL+P" />
+        <KeyBinding Command="{Binding UnpinSelected}" Gesture="CTRL+U" />
+        <KeyBinding Command="{Binding CloseTab}" Gesture="CTRL+W" />
+    </Window.InputBindings>
     <Window.Resources>
         <DataTemplate x:Key="tabControlHeaderTemplate" DataType="{x:Type viewmodel:ClefTab}">
             <StackPanel Orientation="Horizontal">
                 <!--https://adamdawes.com/windows8/win8_segoeuisymbol.html-->
                 <TextBlock Text="{Binding Name}" />
-                <TextBlock FontFamily="Segoe UI Symbol" Text="(!)" Foreground="Red" Visibility="{Binding FileError}" Margin="5,0,2,0" />                
+                <TextBlock FontFamily="Segoe UI Symbol" Text="(!)" Foreground="Red" Visibility="{Binding FileError}" Margin="5,0,2,0" />
+                <TextBlock FontFamily="Segoe UI Symbol" Text="&#xE117;" Visibility="{Binding CalculationRunning}" Margin="2,0,2,0" />
                 <ToggleButton FontFamily="Segoe UI Symbol" IsChecked="{Binding AutoUpdate, Mode=TwoWay}" Margin="2,0,2,0" >
                     <ToggleButton.Style>
                         <Style TargetType="ToggleButton">
@@ -35,7 +43,6 @@
                 <Button FontFamily="Segoe UI Symbol" Content="&#xE10A;" Command="{Binding Close}" Margin="2,0,5,0" />
             </StackPanel>
         </DataTemplate>
-
         <DataTemplate DataType="{x:Type viewmodel:ClefTab}">
             <local:ClefView DataContext="{Binding ClefViewModel}" />
         </DataTemplate>
@@ -47,12 +54,18 @@
                 <MenuItem Header="_Open" Command="{Binding Open}"/>
                 <MenuItem Header="_Exit" Command="{Binding Exit}"/>
             </MenuItem>
+            <MenuItem Header="_Tools">
+                <MenuItem Header="_Copy Selected Entries to Clipboard" Command="{Binding CopySelected}" />
+                <MenuItem Header="Copy _Selected Entries to Clipboard (clef format)" Command="{Binding CopyClefSelected}" />
+                <MenuItem Header="_Pin Selected Entries" Command="{Binding PinSelected}" />
+                <MenuItem Header="_Unpin Selected Entries" Command="{Binding UnpinSelected}" />
+            </MenuItem>
             <MenuItem Header="_View">
                 <!--<MenuItem Header="_Dev Mode" IsCheckable="True" IsChecked="{Binding Settings.DevMode}"/>-->
                 <MenuItem Header="_Local Time" IsCheckable="True" IsChecked="{Binding Settings.LocalTime}"/>
             </MenuItem>
         </Menu>
-        <TabControl ItemsSource="{Binding ClefTabs}" SelectedItem="{Binding ActiveTab}"
+        <TabControl ItemsSource="{Binding ClefTabs}" SelectedItem="{Binding ActiveTab}" Name="ClefTabControl"
             ItemTemplate="{StaticResource tabControlHeaderTemplate}">
         </TabControl>
     </DockPanel>

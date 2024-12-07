@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.IO;
 using System.Text;
@@ -177,21 +176,7 @@ namespace clef_inspect.Model
             }
             public void Notify(LinesChangedEventArgsAction uiUpdateAction)
             {
-                switch (uiUpdateAction)
-                {
-                    case LinesChangedEventArgsAction.Reset:
-                        _uiUpdateAction = LinesChangedEventArgsAction.Reset;
-                        break;
-                    case LinesChangedEventArgsAction.Add:
-                        if(_uiUpdateAction == LinesChangedEventArgsAction.None)
-                        {
-                            _uiUpdateAction = LinesChangedEventArgsAction.Add;
-                        }
-                        break;
-                    case LinesChangedEventArgsAction.None:
-                    default:
-                        break;
-                }
+                _uiUpdateAction = Union(_uiUpdateAction, uiUpdateAction);
             }
         }
 

@@ -1,5 +1,5 @@
 ﻿using clef_inspect.ViewModel.MainView;
-using System;
+using System.Reflection;
 using System.Windows;
 
 namespace clef_inspect.View
@@ -12,11 +12,13 @@ namespace clef_inspect.View
         public MainView()
         {
             InitializeComponent();
+            this.Title += " "+ Assembly.GetExecutingAssembly().GetName().Version;
         }
         public void OpenFiles(string[] files)
         {
             ((MainViewModel)this.DataContext).OpenFiles(files);
         }
+
         private void OnDrop(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))

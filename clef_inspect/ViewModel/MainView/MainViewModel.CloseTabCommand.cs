@@ -2,29 +2,30 @@
 
 namespace clef_inspect.ViewModel.MainView
 {
-    public partial class ClefTab
+    public partial class MainViewModel
     {
-
         public class CloseTabCommand : ICommand
         {
-            private ClefTab clefTab;
+            private readonly MainViewModel mainViewModel;
 
-            public CloseTabCommand(ClefTab clefTab)
+            public CloseTabCommand(MainViewModel mainViewModel)
             {
-                this.clefTab = clefTab;
+                this.mainViewModel = mainViewModel;
             }
 
             public event EventHandler? CanExecuteChanged;
 
             public bool CanExecute(object? parameter)
             {
-                return true;
+                return this.mainViewModel?.ActiveTab?.Close.CanExecute(parameter) ?? false;
             }
 
             public void Execute(object? parameter)
             {
-                clefTab.DoClose();
+
+                this.mainViewModel?.ActiveTab?.Close.Execute(parameter);
             }
         }
+
     }
 }

@@ -1,23 +1,17 @@
 ﻿using clef_inspect.Model;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
 using System.Text.Json.Nodes;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
-using System.Windows.Shapes;
 
 namespace clef_inspect.ViewModel.ClefView
 {
     public class ClefLineView : INotifyPropertyChanged
     {
         private ClefViewSettings _settings;
-        public ClefLineView(int sourceIdx, ClefLine line, ClefViewSettings settings)
+        public ClefLineView(ClefLine line, ClefViewSettings settings)
         {
-            SourceIdx = sourceIdx;
             ClefLine = line;
             _settings = settings;
             settings.PropertyChanged += Settings_PropertyChanged;
@@ -44,7 +38,6 @@ namespace clef_inspect.ViewModel.ClefView
             }
         }
 
-        public int SourceIdx { get; }
         public ClefLine ClefLine { get; }
         public long Sort => ClefLine.Sort;
         public DateTime? GetTime() => ClefLine.Time;

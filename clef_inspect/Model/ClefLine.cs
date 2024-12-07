@@ -1,6 +1,4 @@
-﻿using clef_inspect.ViewModel.ClefView;
-using System.ComponentModel;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json.Nodes;
 
 namespace clef_inspect.Model
