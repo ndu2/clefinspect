@@ -24,7 +24,6 @@ namespace clef_inspect.Model
         {
             Text,
             Token,
-            TokenEaten,
         }
 
         private static string? Render(string? mt, JsonObject? line)
@@ -48,15 +47,11 @@ namespace clef_inspect.Model
                     case ParseState.Token:
                         if (mt[i] == '}')
                         {
-                            state = ParseState.TokenEaten;
+                            state = ParseState.Text;
                             string t1 = mt.Substring(i1 + 1, i - i1 - 1);
-                            outString.Append(line[t1] ?? $"{{{t1}}}");
-
+                            outString.Append(line[t1]?.ToJsonString() ?? $"{{{t1}}}");
+                            i1 = i + 1;
                         }
-                        break;
-                    case ParseState.TokenEaten:
-                        state = ParseState.Text;
-                        i1 = i;
                         break;
                 }
             }
