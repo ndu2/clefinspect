@@ -51,14 +51,15 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
-                <MenuItem Header="_Open" Command="{Binding Open}"/>
-                <MenuItem Header="_Exit" Command="{Binding Exit}"/>
+                <MenuItem Header="_Open" Command="{Binding Open}" InputGestureText="Ctrl+O"/>
+                <MenuItem Header="_Close" Command="{Binding CloseTab}" InputGestureText="Ctrl+W"/>
+                <MenuItem Header="_Exit" Command="{Binding Exit}" InputGestureText="Alt+F4"/>
             </MenuItem>
             <MenuItem Header="_Tools">
-                <MenuItem Header="_Copy Selected Entries to Clipboard" Command="{Binding CopySelected}" />
-                <MenuItem Header="Copy _Selected Entries to Clipboard (clef format)" Command="{Binding CopyClefSelected}" />
-                <MenuItem Header="_Pin Selected Entries" Command="{Binding PinSelected}" />
-                <MenuItem Header="_Unpin Selected Entries" Command="{Binding UnpinSelected}" />
+                <MenuItem Header="_Copy Selected Entries to Clipboard" Command="{Binding CopySelected}" InputGestureText="Ctrl+C" />
+                <MenuItem Header="Copy _Selected Entries to Clipboard (clef format)" Command="{Binding CopyClefSelected}" InputGestureText="Ctrl+Shift+C"/>
+                <MenuItem Header="_Pin Selected Entries" Command="{Binding PinSelected}"  InputGestureText="Ctrl+P"/>
+                <MenuItem Header="_Unpin Selected Entries" Command="{Binding UnpinSelected}" InputGestureText="Ctrl+U" />
             </MenuItem>
             <MenuItem Header="_View">
                 <MenuItem Header="_One Line Only" IsCheckable="True" IsChecked="{Binding Settings.OneLineOnly}"/>

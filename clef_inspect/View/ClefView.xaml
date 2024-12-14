@@ -121,10 +121,10 @@
             <ListView.ContextMenu>
 
                 <ContextMenu>
-                    <MenuItem Header="Copy Selected Entries to Clipboard" Click="CopySelected_Click" />
-                    <MenuItem Header="Copy Selected Entries to Clipboard (clef format)" Click="CopySelectedClef_Click" />
-                    <MenuItem Header="Pin Selected Entries" Click="PinSelected_Click" />
-                    <MenuItem Header="Unpin Selected Entries" Click="UnpinSelected_Click" />
+                    <MenuItem Header="Copy Selected Entries to Clipboard" Click="CopySelected_Click" InputGestureText="Ctrl+C" />
+                    <MenuItem Header="Copy Selected Entries to Clipboard (clef format)" Click="CopySelectedClef_Click" InputGestureText="Ctrl+Shift+C" />
+                    <MenuItem Header="Pin Selected Entries" Click="PinSelected_Click" InputGestureText="Ctrl+P" />
+                    <MenuItem Header="Unpin Selected Entries" Click="UnpinSelected_Click" InputGestureText="Ctrl+U" />
                 </ContextMenu>
             </ListView.ContextMenu>
         </ListView>
