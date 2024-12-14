@@ -1,13 +1,14 @@
 ﻿using clef_inspect.ViewModel.MainView;
 using System.Reflection;
 using System.Windows;
+using static clef_inspect.SingleInstanceManager;
 
 namespace clef_inspect.View
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainView : Window
+    public partial class MainView : Window, IMainView
     {
         public MainView()
         {
