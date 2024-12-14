@@ -10,6 +10,7 @@ namespace clef_inspect.ViewModel.ClefView
     {
         private readonly ClefViewSettings _settings;
         private readonly Dictionary<string, Filter> _filters;
+        private readonly ObservableCollection<DataColumnView> _dataColumns;
         private readonly FilterTaskManager _filterTaskManager;
         private string? _textFilter;
         private int _selectedIndex;
@@ -19,6 +20,7 @@ namespace clef_inspect.ViewModel.ClefView
         {
             _settings = new ClefViewSettings(settings);
             _filters = new Dictionary<string, Filter>();
+            _dataColumns = new ObservableCollection<DataColumnView>();
             _filterTaskManager = new FilterTaskManager(this, _settings);
             _calculationRunning = false;
             settings.PropertyChanged += (s, e) =>
@@ -33,6 +35,7 @@ namespace clef_inspect.ViewModel.ClefView
             ApplyTextFilter = new ApplyTextFilterCommand(this);
             Clef.LinesChanged += Reload;
         }
+        public ClefViewSettings Settings => _settings;
 
 
         public bool CalculationRunning
@@ -50,7 +53,11 @@ namespace clef_inspect.ViewModel.ClefView
 
         public event PropertyChangedEventHandler? PropertyChanged;
         public event Action? Reloaded;
-
+        public event Action? DataColumnEnabledChanged;
+        public void NotifyDataColumnEnabledChanged()
+        {
+            DataColumnEnabledChanged?.Invoke();
+        }
         public enum UserAction { Copy, CopyClef, Pin, Unpin };
         public delegate void UserActionEvent(UserAction userAction);
         public event UserActionEvent? UserActionHandler;
@@ -70,9 +77,10 @@ namespace clef_inspect.ViewModel.ClefView
             if(e.Action != LinesChangedEventArgs.LinesChangedEventArgsAction.None)
             {
                 Reload(e);
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DateInfo)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FileInfo)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DataColumns)));
             }
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DateInfo)));
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FileInfo)));
         }
 
 
@@ -105,6 +113,7 @@ namespace clef_inspect.ViewModel.ClefView
                     filter.FilterChanged += Reload;
                     _filters.Add(p.Key, filter);
                     Filters.Add(new ClefFilterViewModel(p.Key, filter));
+                    _dataColumns.Add(new DataColumnView(p.Key, false, NotifyDataColumnEnabledChanged));
                 }
                 else
                 {
@@ -123,6 +132,7 @@ namespace clef_inspect.ViewModel.ClefView
                      CalculationRunning = false;
                  });
         }
+        public ObservableCollection<DataColumnView> DataColumns => _dataColumns;
 
         private List<IMatcher> CreateMatchers()
         {
@@ -201,6 +211,8 @@ namespace clef_inspect.ViewModel.ClefView
                 return ClefLines[SelectedIndex];
             }
         }
+        public double VerticalOffset { get; set; }
+        public double HorizontalOffset { get; set; }
 
         public int SelectedIndex
         {
@@ -248,6 +260,5 @@ namespace clef_inspect.ViewModel.ClefView
                 }
             }
         }
-
     }
 }

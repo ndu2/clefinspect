@@ -61,6 +61,7 @@
 
         <ListView Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="5"
                   ScrollViewer.VerticalScrollBarVisibility="Visible" 
+                  ScrollViewer.ScrollChanged="ListViewLogEntries_ScrollChanged"
                   ItemsSource="{Binding ClefLines}"
                   SelectedIndex="{Binding SelectedIndex}"
                   Name="ListViewLogEntries"
@@ -100,13 +101,6 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Level}" Background="{Binding LevelBackground}" />
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="SourceContext" Width="{Binding ElementName=clefView, Path=SourceContextWidth}">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding SourceContext}" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

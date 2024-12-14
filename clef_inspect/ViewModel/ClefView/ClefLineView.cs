@@ -27,12 +27,15 @@ namespace clef_inspect.ViewModel.ClefView
             settings.PropertyChanged += Settings_PropertyChanged;
         }
         public event PropertyChangedEventHandler? PropertyChanged;
+
         private void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(_settings.Settings)) { }
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Time)));
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DeltaTime)));
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Message)));
+            if (e.PropertyName == nameof(_settings.Settings))
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Time)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DeltaTime)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Message)));
+            }
         }
         public string? Time
         {
@@ -86,6 +89,22 @@ namespace clef_inspect.ViewModel.ClefView
                 {
                     ClefLine.Pin = value;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Pin)));
+                }
+            }
+        }
+
+        public string? this[string key]
+        {
+            get
+            {
+                JsonNode? jsonNode;
+                if(ClefLine?.JsonObject?.TryGetPropertyValue(key, out jsonNode) ?? false)
+                {
+                    return _settings.Settings.OneLineOnly ? jsonNode?.ToJsonString() : jsonNode?.ToString();
+                }
+                else
+                {
+                    return null;
                 }
             }
         }

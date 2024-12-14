@@ -6,6 +6,9 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using clef_inspect.ViewModel;
+using System.Windows.Data;
+using static clef_inspect.ViewModel.ClefView.ClefViewModel;
+using System.ComponentModel;
 
 namespace clef_inspect.View
 {
@@ -14,14 +17,65 @@ namespace clef_inspect.View
     /// </summary>
     public partial class ClefView : UserControl
     {
+        private readonly Dictionary<string, GridViewColumn> _customColumns = new Dictionary<string, GridViewColumn>();
+        private ScrollViewer? _listViewLogEntriesScrollViewer = null;
+
         public ClefView()
         {
             InitializeComponent();
             this.DataContextChanged += ClefView_DataContextChanged;
         }
+        private void OnDataColumnEnabledChanged()
+        {
+            if (DataContext is ClefViewModel viewModel)
+            {
+                foreach (DataColumnView dataColumn in viewModel.DataColumns)
+                {
+                    if(dataColumn.Enabled)
+                    {
+                        AddColumn(dataColumn.Header);
+                    }
+                    else
+                    {
+                        RemoveColumn(dataColumn.Header);
+                    }
+                }
+            }
+        }
+        public void AddColumn(string key)
+        {
+            if (_customColumns.ContainsKey(key))
+            {
+                return;
+            }
+            if (ListViewLogEntries.View is GridView gv)
+            {
+                GridViewColumn gvc = new()
+                {
+                    Header = key,
+                    DisplayMemberBinding = new Binding($"[{key}]")
+                };
+                gv.Columns.Add(gvc);
+                _customColumns.Add(key, gvc);
+            }
+        }
+
+        public void RemoveColumn(string key)
+        {
+            GridViewColumn? gvc;
+            if (_customColumns.TryGetValue(key, out gvc))
+            {
+                if (ListViewLogEntries.View is GridView gv)
+                {
+                    _customColumns.Remove(key);
+                    gv.Columns.Remove(gvc);
+                }
+            }
+        }
 
         private void ClefView_DataContextChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
         {
+
             if (DataContext is ClefViewModel viewModel)
             {
                 viewModel.Reloaded += () =>
@@ -29,6 +83,14 @@ namespace clef_inspect.View
                     ListViewLogEntries.ScrollIntoView(viewModel.SelectedItem);
                 };
                 viewModel.UserActionHandler += OnUserAction;
+                viewModel.DataColumnEnabledChanged += OnDataColumnEnabledChanged;
+                OnDataColumnEnabledChanged();
+                if(_listViewLogEntriesScrollViewer != null)
+                {
+                    _listViewLogEntriesScrollViewer.ScrollToVerticalOffset(viewModel.VerticalOffset);
+                    _listViewLogEntriesScrollViewer.ScrollToHorizontalOffset(viewModel.HorizontalOffset);
+                }
+                viewModel.Settings.Settings.PropertyChanged += ListViewLogEntries_Update;
             }
         }
 
@@ -190,5 +252,61 @@ namespace clef_inspect.View
         }
         private void UnpinSelected_Click(object sender, System.Windows.RoutedEventArgs e) => UnpinSelected();
 
+
+        public static ScrollViewer? GetScrollViewer(DependencyObject o)
+        {
+            //https://stackoverflow.com/questions/1009036/how-can-i-programmatically-scroll-a-wpf-listview
+            // Return the DependencyObject if it is a ScrollViewer
+            if (o is ScrollViewer oo)
+            { return oo; }
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(o); i++)
+            {
+                var child = VisualTreeHelper.GetChild(o, i);
+                var result = GetScrollViewer(child);
+                if (result == null)
+                {
+                    continue;
+                }
+                else
+                {
+                    return result;
+                }
+            }
+            return null;
+        }
+
+        private void ListViewLogEntries_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            if (DataContext is ClefViewModel viewModel)
+            {
+                if (_listViewLogEntriesScrollViewer == null)
+                {
+                    _listViewLogEntriesScrollViewer = GetScrollViewer(ListViewLogEntries);
+                }
+                if (_listViewLogEntriesScrollViewer != null)
+                {
+                    viewModel.VerticalOffset = _listViewLogEntriesScrollViewer.VerticalOffset;
+                    viewModel.HorizontalOffset = _listViewLogEntriesScrollViewer.HorizontalOffset;
+                }
+            }
+        }
+        private void ListViewLogEntries_Update(object? sender, PropertyChangedEventArgs e)
+        {
+            ListViewLogEntries_Update(ListViewLogEntries);
+        }
+
+        private void ListViewLogEntries_Update(DependencyObject d)
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(d); i++)
+            {
+                DependencyObject child = VisualTreeHelper.GetChild(d, i);
+                if (child is TextBlock o)
+                {
+                    var x = o.GetBindingExpression(TextBlock.TextProperty);
+                    x?.UpdateTarget();
+                }
+                ListViewLogEntries_Update(child);
+            }
+        }
     }
 }

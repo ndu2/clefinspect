@@ -63,6 +63,16 @@
             <MenuItem Header="_View">
                 <MenuItem Header="_One Line Only" IsCheckable="True" IsChecked="{Binding Settings.OneLineOnly}"/>
                 <MenuItem Header="_Local Time" IsCheckable="True" IsChecked="{Binding Settings.LocalTime}"/>
+                <Separator />
+                <MenuItem Header="_Columns" ItemsSource="{Binding ActiveTab.ClefViewModel.DataColumns}">
+                    <MenuItem.ItemContainerStyle>
+                        <Style>
+                            <Setter Property="MenuItem.IsCheckable" Value="True" />
+                            <Setter Property="MenuItem.Header" Value="{Binding Header}"/>
+                            <Setter Property="MenuItem.IsChecked" Value="{Binding Enabled, Mode=TwoWay}"/>
+                        </Style>
+                    </MenuItem.ItemContainerStyle>
+                </MenuItem>
             </MenuItem>
         </Menu>
         <TabControl ItemsSource="{Binding ClefTabs}" SelectedItem="{Binding ActiveTab}" Name="ClefTabControl"
