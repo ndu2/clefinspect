@@ -12,7 +12,7 @@ namespace clef_inspect.ViewModel.ClefView
         private readonly Dictionary<string, Filter> _filters;
         private readonly ObservableCollection<DataColumnView> _dataColumns;
         private readonly FilterTaskManager _filterTaskManager;
-        private string? _textFilter;
+        private TextFilter? _textFilter;
         private int _selectedIndex;
         private bool _calculationRunning;
 
@@ -136,7 +136,6 @@ namespace clef_inspect.ViewModel.ClefView
 
         private List<IMatcher> CreateMatchers()
         {
-            TextFilter tf = new(_textFilter);
             List<IMatcher> matchers = new();
             foreach (IFilter v in _filters.Values)
             {
@@ -145,9 +144,9 @@ namespace clef_inspect.ViewModel.ClefView
                     matchers.Add(v.Create());
                 }
             }
-            if (!tf.AccceptsAll)
+            if (null != _textFilter && !_textFilter.AccceptsAll)
             {
-                matchers.Add(tf.Create());
+                matchers.Add(_textFilter.Create());
             }
 
             return matchers;
@@ -185,12 +184,12 @@ namespace clef_inspect.ViewModel.ClefView
 
         public string? TextFilter
         {
-            get => _textFilter;
+            get => _textFilter?.FilterString;
             set
             {
-                if (value != _textFilter)
+                if (value != _textFilter?.FilterString)
                 {
-                    _textFilter = value;
+                    _textFilter = new(value);
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(TextFilter)));
                 }
             }

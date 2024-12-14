@@ -1,28 +1,33 @@
 ﻿using System;
+using System.Text;
 
 namespace clef_inspect.Model
 {
     public class TextFilter : IFilter
     {
-        private readonly string? _textFilter;
-        public TextFilter(string? textFilter)
+        private readonly List<string> _textFilters;
+        private readonly string? _filterString;
+
+        public TextFilter(string? filterString)
         {
-            _textFilter = textFilter;
+            _textFilters = TextFilterParser.Parse(filterString);
+            _filterString = filterString;
         }
+        public string? FilterString => _filterString;
 
         public class Matcher : IMatcher
         {
-            private readonly string[] _textFilters;
+            private readonly List<string> _textFilters;
 
-            public Matcher(string textFilter)
+            public Matcher(List<string> textFilters)
             {
-                _textFilters = textFilter.Split(",");
+                _textFilters = textFilters;
             }
 
 
             public bool Accept(ClefLine line)
             {
-                if (_textFilters.Length == 0)
+                if (_textFilters.Count == 0)
                 {
                     return true;
                 }
@@ -34,7 +39,6 @@ namespace clef_inspect.Model
                 {
                     return false;
                 }
-
                 foreach (string textFilter in _textFilters)
                 {
                     if (line.Message?.Contains(textFilter, StringComparison.InvariantCultureIgnoreCase) ?? false)
@@ -45,15 +49,15 @@ namespace clef_inspect.Model
                 return false;
             }
         }
-        public bool AccceptsAll => (_textFilter == null || _textFilter.Length == 0);
+        public bool AccceptsAll => _textFilters == null || _textFilters.Count == 0 || _textFilters.All(f => { return f.Length == 0; });
 
         public IMatcher Create()
         {
-            if (_textFilter == null || _textFilter.Length == 0)
+            if (AccceptsAll)
             {
                 return new MatcherAcceptAll();
             }
-            return new Matcher(_textFilter);
+            return new Matcher(_textFilters);
         }
     }
 
