@@ -370,14 +370,14 @@ namespace clef_inspect.Model
                             }
                         }
                         {
-                            if (!(kv.Key[0]=='@') && kv.Value is JsonValue value)
+                            if (!(kv.Key[0] == '@') && kv.Value != null)
                             {
                                 ConcurrentDictionary<string, int> values = _data.GetOrAdd(kv.Key, (k) =>
                                 {
                                     ConcurrentDictionary<string, int> newSet = new();
                                     return newSet;
                                 });
-                                values.AddOrUpdate(value.ToString(), 1, (s, c) => c + 1);
+                                values.AddOrUpdate(kv.Value.ToString(), 1, (s, c) => c + 1);
                             }
                         }
                     }

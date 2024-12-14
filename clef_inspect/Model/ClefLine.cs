@@ -109,7 +109,7 @@ namespace clef_inspect.Model
         {
             get
             {
-                return _line?.ToString();
+                return _line?.ToJsonString();
             }
         }
 
