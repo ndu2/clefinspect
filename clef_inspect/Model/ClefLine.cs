@@ -93,9 +93,7 @@ namespace clef_inspect.Model
         {
             get
             {
-#pragma warning disable CA1507 // Use nameof to express symbol names
-                return _line?["SourceContext"]?.ToString();
-#pragma warning restore CA1507 // Use nameof to express symbol names
+                return _line?[nameof(SourceContext)]?.ToString();
             }
         }
         public string? Message { get; } 

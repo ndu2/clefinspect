@@ -50,6 +50,10 @@
 
     <DockPanel>
         <Menu DockPanel.Dock="Top">
+            <Menu.Resources>
+                <local:InverseBoolConverter x:Key="InverseBoolConverter" />
+                <local:CannotExecuteCommand x:Key="CannotExecuteCommand" />
+            </Menu.Resources>
             <MenuItem Header="_File">
                 <MenuItem Header="_Open" Command="{Binding Open}" InputGestureText="Ctrl+O"/>
                 <MenuItem Header="_Close" Command="{Binding CloseTab}" InputGestureText="Ctrl+W"/>
@@ -60,6 +64,18 @@
                 <MenuItem Header="Copy _Selected Entries to Clipboard (clef format)" Command="{Binding CopyClefSelected}" InputGestureText="Ctrl+Shift+C"/>
                 <MenuItem Header="_Pin Selected Entries" Command="{Binding PinSelected}"  InputGestureText="Ctrl+P"/>
                 <MenuItem Header="_Unpin Selected Entries" Command="{Binding UnpinSelected}" InputGestureText="Ctrl+U" />
+            </MenuItem>
+            <MenuItem Header="_Filter" ItemsSource="{Binding ActiveTab.ClefViewModel.Filters}" Command="{Binding ActiveTab.ClefViewModel.FiltersMenu, FallbackValue={StaticResource CannotExecuteCommand}}" >
+                <MenuItem.ItemContainerStyle>
+                    <Style>
+                        <Setter Property="MenuItem.IsCheckable" Value="True"/>
+                        <Setter Property="MenuItem.Header" Value="{Binding Name}"/>
+                        <!--<Setter Property="MenuItem.IsChecked" Value="{Binding Visible}"/>-->
+                        <Setter Property="MenuItem.IsChecked" Value="{Binding Visible, Mode=OneWay}"/>
+                        <Setter Property="MenuItem.CommandParameter" Value="{Binding Visible, Converter={StaticResource InverseBoolConverter}}" />
+                        <Setter Property="MenuItem.Command" Value="{Binding ChangeVisibility}"/>
+                    </Style>
+                </MenuItem.ItemContainerStyle>
             </MenuItem>
             <MenuItem Header="_View">
                 <MenuItem Header="_One Line Only" IsCheckable="True" IsChecked="{Binding Settings.OneLineOnly}"/>

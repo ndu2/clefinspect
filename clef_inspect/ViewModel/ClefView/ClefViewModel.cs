@@ -33,10 +33,10 @@ namespace clef_inspect.ViewModel.ClefView
             Filters = new ObservableCollection<ClefFilterViewModel>();
             ClearTextFilter = new ClearTextFilterCommand(this);
             ApplyTextFilter = new ApplyTextFilterCommand(this);
+            FiltersMenu = new FiltersMenuCommand(this);
             Clef.LinesChanged += Reload;
         }
         public ClefViewSettings Settings => _settings;
-
 
         public bool CalculationRunning
         {
@@ -91,6 +91,7 @@ namespace clef_inspect.ViewModel.ClefView
 
         private void Reload(LinesChangedEventArgs e)
         {
+            bool newFilters = false;
             foreach (var p in Clef.Properties)
             {
                 if (!_filters.ContainsKey(p.Key))
@@ -98,7 +99,16 @@ namespace clef_inspect.ViewModel.ClefView
                     Filter filter = new(p.Key, p.Value.Item2);
                     filter.FilterChanged += Reload;
                     _filters.Add(p.Key, filter);
-                    Filters.Add(new ClefFilterViewModel(p.Value.Item1, filter));
+                    ClefFilterViewModel clefFilterViewModel = new(p.Value.Item1, filter, true);
+                    clefFilterViewModel.PropertyChanged += (sender, e) =>
+                    {
+                        if (e.PropertyName == nameof(clefFilterViewModel.Visible))
+                        {
+                            NotifyVisibleFiltersChanged();
+                        }
+                    };
+                    Filters.Add(clefFilterViewModel);
+                    newFilters = true;
                 }
                 else
                 {
@@ -112,13 +122,26 @@ namespace clef_inspect.ViewModel.ClefView
                     Filter filter = new(p.Key, p.Value);
                     filter.FilterChanged += Reload;
                     _filters.Add(p.Key, filter);
-                    Filters.Add(new ClefFilterViewModel(p.Key, filter));
+                    ClefFilterViewModel clefFilterViewModel = new(p.Key, filter, p.Key.Equals(nameof(ClefLine.SourceContext)));
+                    clefFilterViewModel.PropertyChanged += (sender, e) =>
+                    {
+                        if (e.PropertyName == nameof(clefFilterViewModel.Visible))
+                        {
+                            NotifyVisibleFiltersChanged();
+                        }
+                    };
+                    Filters.Add(clefFilterViewModel);
                     _dataColumns.Add(new DataColumnView(p.Key, false, NotifyDataColumnEnabledChanged));
+                    newFilters = true;
                 }
                 else
                 {
                     _filters[p.Key].Update(p.Value);
                 }
+            }
+            if (newFilters)
+            {
+                NotifyVisibleFiltersChanged();
             }
 
             List<IMatcher> matchers = CreateMatchers();
@@ -181,6 +204,17 @@ namespace clef_inspect.ViewModel.ClefView
 
         public bool AutoUpdate { get; set; }
         public ObservableCollection<ClefFilterViewModel> Filters { get; set; }
+        public IEnumerable<ClefFilterViewModel> VisibleFilters
+        {
+            get
+            {
+                return Filters.Where(f => f.Visible);
+            }
+        }
+        private void NotifyVisibleFiltersChanged()
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(VisibleFilters)));
+        }
 
         public string? TextFilter
         {
@@ -195,9 +229,10 @@ namespace clef_inspect.ViewModel.ClefView
             }
         }
 
-        public ICommand ClearTextFilter { get; set; }
+        public ICommand ClearTextFilter { get; }
 
-        public ICommand ApplyTextFilter { get; set; }
+        public ICommand ApplyTextFilter { get; }
+        public ICommand FiltersMenu { get; }
 
         public ClefLineView? SelectedItem
         {
