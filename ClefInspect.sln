@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34607.119
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ndu.ClefInspect", "ndu.ClefInspect\ndu.ClefInspect.csproj", "{202C4017-7C4E-4E0C-A14D-224286560B5B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ndu.ClefInspect.Tests", "ndu.ClefInspect.Tests\ndu.ClefInspect.Tests.csproj", "{66D9A749-64F4-4738-BA6D-F4E41E96A683}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{202C4017-7C4E-4E0C-A14D-224286560B5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{202C4017-7C4E-4E0C-A14D-224286560B5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{202C4017-7C4E-4E0C-A14D-224286560B5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{202C4017-7C4E-4E0C-A14D-224286560B5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66D9A749-64F4-4738-BA6D-F4E41E96A683}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66D9A749-64F4-4738-BA6D-F4E41E96A683}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66D9A749-64F4-4738-BA6D-F4E41E96A683}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66D9A749-64F4-4738-BA6D-F4E41E96A683}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {73164BB5-FC5E-429F-B8A9-DE1FDD6B4FB4}
+	EndGlobalSection
+EndGlobal
