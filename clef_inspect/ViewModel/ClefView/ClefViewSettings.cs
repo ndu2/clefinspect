@@ -4,16 +4,16 @@ namespace clef_inspect.ViewModel.ClefView
 {
     public class ClefViewSettings : INotifyPropertyChanged
     {
-        private readonly Settings _settings;
+        private readonly MainViewSettings _settings;
         private DateTime? _refTimeStamp;
 
-        public ClefViewSettings(Settings settings)
+        public ClefViewSettings(MainViewSettings settings)
         {
             _settings = settings;
-            _settings.PropertyChanged += (s, e) => { PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Settings))); };
+            PropertyChangedEventManager.AddHandler(_settings, (s, e)=> { PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SessionSettings))); }, String.Empty);
         }
 
-        public Settings Settings => _settings;
+        public MainViewSettings SessionSettings => _settings;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -26,7 +26,7 @@ namespace clef_inspect.ViewModel.ClefView
             return (dt - _refTimeStamp).Value.TotalMilliseconds.ToString("0.0");
         }
 
-        public string FormatFileSize(long seekPos)
+        public static string FormatFileSize(long seekPos)
         {
             if (seekPos < 1024)
             {
@@ -48,7 +48,7 @@ namespace clef_inspect.ViewModel.ClefView
             set
             {
                 _refTimeStamp = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Settings)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SessionSettings)));
             }
         }
 

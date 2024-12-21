@@ -1,16 +1,19 @@
-﻿namespace clef_inspect.ViewModel.ClefView
+﻿using System.ComponentModel;
+
+namespace clef_inspect.ViewModel.ClefView
 {
     public partial class ClefViewModel
     {
-        public class DataColumnView
+        public class DataColumnView: INotifyPropertyChanged
         {
             private bool _enabled;
-            private Action _enabledChanged;
-            public DataColumnView(string header, bool enabled, Action enabledChanged)
+
+            public event PropertyChangedEventHandler? PropertyChanged;
+
+            public DataColumnView(string header, bool enabled)
             {
                 Header = header;
                 Enabled = enabled;
-                _enabledChanged = enabledChanged;
             }
 
             public string Header { get; }
@@ -22,7 +25,7 @@
                     if(_enabled != value)
                     {
                         _enabled = value;
-                        _enabledChanged.Invoke();
+                        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Enabled)));
                     }
                 }
             }

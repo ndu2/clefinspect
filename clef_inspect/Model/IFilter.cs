@@ -4,6 +4,7 @@
     {
         IMatcher Create();
 
-        bool AccceptsAll { get; }
+        bool AcceptsAll { get; }
+        bool AcceptsNone { get; }
     }
 }

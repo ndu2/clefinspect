@@ -4,7 +4,8 @@ namespace clef_inspect.View
 {
     public class CannotExecuteCommand : ICommand
     {
-        public event EventHandler? CanExecuteChanged;
+        // no CS0067 though the event is left unused
+        public event EventHandler? CanExecuteChanged { add { } remove { } }
 
         public bool CanExecute(object? parameter)
         {

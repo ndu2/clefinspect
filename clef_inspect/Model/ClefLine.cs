@@ -84,18 +84,11 @@ namespace clef_inspect.Model
         {
             get
             {
-                return _line?["@l"]?.ToString() ?? "Info";
+                return _line?[Clef.LEVEL_KEY]?.ToString() ?? Clef.LEVEL_EMPTY;
             }
         }
         public DateTime? Time { get; }
 
-        public string? SourceContext
-        {
-            get
-            {
-                return _line?[nameof(SourceContext)]?.ToString();
-            }
-        }
         public string? Message { get; } 
 
         public JsonObject? JsonObject

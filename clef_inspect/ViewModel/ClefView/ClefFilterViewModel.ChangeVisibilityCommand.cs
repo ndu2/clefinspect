@@ -1,4 +1,5 @@
 ﻿using clef_inspect.Model;
+using System.ComponentModel;
 using System.Windows.Input;
 
 namespace clef_inspect.ViewModel.ClefView
@@ -8,7 +9,7 @@ namespace clef_inspect.ViewModel.ClefView
         private class ChangeVisibilityCommand : ICommand
         {
             private readonly ClefFilterViewModel _vm;
-            private Filter _filter;
+            private readonly Filter _filter;
 
             public ChangeVisibilityCommand(ClefFilterViewModel vm, Filter filter)
             {
@@ -21,7 +22,7 @@ namespace clef_inspect.ViewModel.ClefView
                     }
                 };
                 _filter = filter;
-                _filter.FilterChanged += NotifyCanExecuteChanged;
+                PropertyChangedEventManager.AddHandler(filter, (s, e) => { NotifyCanExecuteChanged(); }, nameof(filter.AcceptsAll));
             }
 
             private void NotifyCanExecuteChanged()
@@ -41,7 +42,7 @@ namespace clef_inspect.ViewModel.ClefView
                 {
                     if (b != _vm.Visible)
                     {
-                        return b == true || _filter.Values.All(v => v.Enabled);
+                        return b == true || _filter.AcceptsAll;
                     }
                     else
                     {

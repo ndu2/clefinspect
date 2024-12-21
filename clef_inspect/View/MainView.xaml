@@ -53,10 +53,15 @@
             <Menu.Resources>
                 <local:InverseBoolConverter x:Key="InverseBoolConverter" />
                 <local:CannotExecuteCommand x:Key="CannotExecuteCommand" />
+                <local:BooleanVisibilityCollapsedConverter x:Key="BooleanVisibilityCollapsedConverter" />
             </Menu.Resources>
             <MenuItem Header="_File">
                 <MenuItem Header="_Open" Command="{Binding Open}" InputGestureText="Ctrl+O"/>
                 <MenuItem Header="_Close" Command="{Binding CloseTab}" InputGestureText="Ctrl+W"/>
+                <Separator />
+                <MenuItem Header="Save Session" Command="{Binding SaveSession}" Visibility="{Binding Settings.CanPersist, Converter={StaticResource BooleanVisibilityCollapsedConverter}}" />
+                <MenuItem Header="Load Session" Command="{Binding LoadSession}" Visibility="{Binding Settings.CanPersist, Converter={StaticResource BooleanVisibilityCollapsedConverter}}" />
+                <Separator Visibility="{Binding Settings.CanPersist, Converter={StaticResource BooleanVisibilityCollapsedConverter}}" />
                 <MenuItem Header="_Exit" Command="{Binding Exit}" InputGestureText="Alt+F4"/>
             </MenuItem>
             <MenuItem Header="_Tools">
@@ -65,7 +70,7 @@
                 <MenuItem Header="_Pin Selected Entries" Command="{Binding PinSelected}"  InputGestureText="Ctrl+P"/>
                 <MenuItem Header="_Unpin Selected Entries" Command="{Binding UnpinSelected}" InputGestureText="Ctrl+U" />
             </MenuItem>
-            <MenuItem Header="_Filter" ItemsSource="{Binding ActiveTab.ClefViewModel.Filters}" Command="{Binding ActiveTab.ClefViewModel.FiltersMenu, FallbackValue={StaticResource CannotExecuteCommand}}" >
+            <MenuItem Header="_Filter" ItemsSource="{Binding ActiveTab.ClefViewModel.Filters}" Command="{Binding ActiveTab.ClefViewModel.FiltersMenu, FallbackValue={StaticResource CannotExecuteCommand}}">
                 <MenuItem.ItemContainerStyle>
                     <Style>
                         <Setter Property="MenuItem.IsCheckable" Value="True"/>
@@ -81,6 +86,9 @@
                 <MenuItem Header="_One Line Only" IsCheckable="True" IsChecked="{Binding Settings.OneLineOnly}"/>
                 <MenuItem Header="_Local Time" IsCheckable="True" IsChecked="{Binding Settings.LocalTime}"/>
                 <Separator />
+                <MenuItem Header="Save View as Default" Command="{Binding SaveViewDefaults}" Visibility="{Binding Settings.CanPersist, Converter={StaticResource BooleanVisibilityCollapsedConverter}}" />
+                <MenuItem Header="Apply Default View" Command="{Binding ApplyViewDefaults}"  Visibility="{Binding Settings.CanPersist, Converter={StaticResource BooleanVisibilityCollapsedConverter}}" />
+                <Separator Visibility="{Binding Settings.CanPersist, Converter={StaticResource BooleanVisibilityCollapsedConverter}}" />
                 <MenuItem Header="_Columns" ItemsSource="{Binding ActiveTab.ClefViewModel.DataColumns}">
                     <MenuItem.ItemContainerStyle>
                         <Style>

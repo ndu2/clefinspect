@@ -9,35 +9,38 @@ namespace clef_inspect.ViewModel.MainView
     public partial class ClefTab : INotifyPropertyChanged
     {
 
-        public ClefTab(string fileName, Settings settings)
+        public ClefTab(string fileName, MainViewSettings settings)
         {
             ClefViewModel = new ClefViewModel(fileName, settings);
             Close = new CloseTabCommand(this);
-
-            ClefViewModel.PropertyChanged += (sender, e) =>
-            {
-                if (e.PropertyName == nameof(ClefViewModel.CalculationRunning))
-                {
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CalculationRunning)));
-                }
-            };
-            ClefViewModel.Clef.PropertyChanged += (sender, e) =>
-            {
-                if(e.PropertyName == nameof(Clef.AutoUpdate))
-                {
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AutoUpdate)));
-                }
-                if (e.PropertyName == nameof(Clef.FileOk))
-                {
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FileError)));
-                }
-            };
+            ClefViewModel.PropertyChanged += OnClefViewModelPropertyChanged;
+            ClefViewModel.Clef.PropertyChanged += OnClefPropertyChanged;
         }
-
         public event PropertyChangedEventHandler? PropertyChanged;
+
+        private void OnClefViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ClefViewModel.CalculationRunning))
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CalculationRunning)));
+            }
+        }
+        private void OnClefPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Clef.AutoUpdate))
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AutoUpdate)));
+            }
+            if (e.PropertyName == nameof(Clef.FileOk))
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FileError)));
+            }
+        }
 
         private void DoClose()
         {
+            ClefViewModel.PropertyChanged -= OnClefViewModelPropertyChanged;
+            ClefViewModel.Clef.PropertyChanged -= OnClefPropertyChanged;
             Closing?.Invoke();
             ClefViewModel.DoClose();
         }

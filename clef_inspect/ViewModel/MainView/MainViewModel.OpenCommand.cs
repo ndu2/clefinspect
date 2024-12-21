@@ -1,10 +1,8 @@
-﻿using System.Windows.Input;
-
-namespace clef_inspect.ViewModel.MainView
+﻿namespace clef_inspect.ViewModel.MainView
 {
     public partial class MainViewModel
     {
-        public class OpenCommand : ICommand
+        public class OpenCommand : AbstractCanAlwaysExecuteCommand
         {
             private readonly MainViewModel mainViewModel;
 
@@ -13,15 +11,7 @@ namespace clef_inspect.ViewModel.MainView
                 this.mainViewModel = mainViewModel;
             }
 
-            // no CS0067 though the event is left unused
-            public event EventHandler? CanExecuteChanged { add { } remove { } }
-
-            public bool CanExecute(object? parameter)
-            {
-                return true;
-            }
-
-            public void Execute(object? parameter)
+            public override void Execute(object? parameter)
             {
                 var dialog = new Microsoft.Win32.OpenFileDialog
                 {

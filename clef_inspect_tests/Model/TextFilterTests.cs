@@ -23,9 +23,9 @@ namespace ndu.ClefInspect.Tests.Model
         [TestMethod]
         public void Accept_AcceptAllEmpty()
         {
-            Assert.IsTrue(new TextFilter(null).AccceptsAll);
-            Assert.IsTrue(new TextFilter("").AccceptsAll);
-            Assert.IsTrue(new TextFilter("   , ").AccceptsAll);
+            Assert.IsTrue(new TextFilter(null).AcceptsAll);
+            Assert.IsTrue(new TextFilter("").AcceptsAll);
+            Assert.IsTrue(new TextFilter("   , ").AcceptsAll);
         }
 
         [TestMethod]

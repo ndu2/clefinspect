@@ -49,11 +49,12 @@ namespace clef_inspect.Model
                 return false;
             }
         }
-        public bool AccceptsAll => _textFilters == null || _textFilters.Count == 0 || _textFilters.All(f => { return f.Length == 0; });
+        public bool AcceptsAll => _textFilters == null || _textFilters.Count == 0 || _textFilters.All(f => { return f.Length == 0; });
+        public bool AcceptsNone => false;
 
         public IMatcher Create()
         {
-            if (AccceptsAll)
+            if (AcceptsAll)
             {
                 return new MatcherAcceptAll();
             }

@@ -1,4 +1,5 @@
-﻿using System.Windows.Input;
+﻿using System.ComponentModel;
+using System.Windows.Input;
 using clef_inspect.Model;
 
 namespace clef_inspect.ViewModel.ClefView
@@ -12,13 +13,13 @@ namespace clef_inspect.ViewModel.ClefView
             public CheckNoneCommand(Filter filter)
             {
                 _filter = filter;
-                _filter.FilterChanged += () => { CanExecuteChanged?.Invoke(this, EventArgs.Empty); };
+                PropertyChangedEventManager.AddHandler(_filter, (s, e) => { CanExecuteChanged?.Invoke(this, EventArgs.Empty); }, nameof(_filter.AcceptsNone));
             }
             public event EventHandler? CanExecuteChanged;
 
             public bool CanExecute(object? parameter)
             {
-                return _filter.Values.Any(v => v.Enabled);
+                return !_filter.AcceptsNone;
             }
 
             public void Execute(object? parameter)

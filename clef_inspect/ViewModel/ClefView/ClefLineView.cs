@@ -1,6 +1,6 @@
 ﻿using clef_inspect.Model;
-using System;
 using System.ComponentModel;
+using System.Text;
 using System.Text.Json.Nodes;
 using System.Windows;
 using System.Windows.Media;
@@ -24,13 +24,13 @@ namespace clef_inspect.ViewModel.ClefView
                 _messageOneLine = line.Message;
             }
             _settings = settings;
-            settings.PropertyChanged += Settings_PropertyChanged;
+            PropertyChangedEventManager.AddHandler(settings, Settings_PropertyChanged, String.Empty);
         }
         public event PropertyChangedEventHandler? PropertyChanged;
 
         private void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(_settings.Settings))
+            if (e.PropertyName == nameof(_settings.SessionSettings))
             {
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Time)));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DeltaTime)));
@@ -41,7 +41,7 @@ namespace clef_inspect.ViewModel.ClefView
         {
             get
             {
-                return _settings.Settings.Format(GetTime());
+                return _settings.SessionSettings.Format(GetTime());
             }
         }
         public string? DeltaTime
@@ -65,7 +65,7 @@ namespace clef_inspect.ViewModel.ClefView
                 string? l = Level;
                 if (l != null)
                 {
-                    if (l.StartsWith('e') || l.StartsWith('E'))
+                    if (l.StartsWith('e') || l.StartsWith('E') || l.StartsWith('f') || l.StartsWith('F'))
                         return Brushes.Red;
                     if (l.StartsWith('w') || l.StartsWith('W'))
                         return Brushes.Yellow;
@@ -75,8 +75,7 @@ namespace clef_inspect.ViewModel.ClefView
                 return SystemColors.WindowBrush;
             }
         }
-        public string? SourceContext => ClefLine.SourceContext;
-        public string? Message => _settings.Settings.OneLineOnly ? _messageOneLine: ClefLine.Message;
+        public string? Message => _settings.SessionSettings.OneLineOnly ? _messageOneLine: ClefLine.Message;
         public JsonObject? JsonObject => ClefLine.JsonObject;
         public string? Json => ClefLine.Json;
 
@@ -97,10 +96,9 @@ namespace clef_inspect.ViewModel.ClefView
         {
             get
             {
-                JsonNode? jsonNode;
-                if(ClefLine?.JsonObject?.TryGetPropertyValue(key, out jsonNode) ?? false)
+                if (ClefLine?.JsonObject?.TryGetPropertyValue(key, out JsonNode? jsonNode) ?? false)
                 {
-                    return _settings.Settings.OneLineOnly ? jsonNode?.ToJsonString() : jsonNode?.ToString();
+                    return _settings.SessionSettings.OneLineOnly ? jsonNode?.ToJsonString() : jsonNode?.ToString();
                 }
                 else
                 {
@@ -110,7 +108,18 @@ namespace clef_inspect.ViewModel.ClefView
         }
         public override string ToString()
         {
-            return _settings.Settings.Format(this);
+            return MainViewSettings.Format(this);
+        }
+
+        public string? ToString(IList<string> columns)
+        {
+            StringBuilder sb = new(MainViewSettings.FormatNoLog(this));
+            foreach (string c in columns)
+            {
+                sb.Append(MainViewSettings.FormatCol(this[c]));
+            }
+            sb.Append(Message);
+            return sb.ToString();
         }
     }
 }

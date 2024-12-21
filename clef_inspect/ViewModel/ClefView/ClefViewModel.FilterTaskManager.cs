@@ -27,15 +27,35 @@ namespace clef_inspect.ViewModel.ClefView
             {
                 Task? previousFilterTask = _filterTask;
                 LinesChangedEventArgsAction previousAction = LinesChangedEventArgsAction.None;
-                if (previousFilterTask != null)
+                CancellationTokenSource? previousCancellationToken = _cancelFilterTask;
+                if (previousFilterTask != null && previousCancellationToken != null && previousFilterTask.Status != TaskStatus.RanToCompletion)
                 {
-                    _cancelFilterTask?.Cancel();
+                    previousCancellationToken.Cancel();
                     previousAction = _filterAction;
+                }
+                else
+                {
+                    previousFilterTask = null;
+                    previousCancellationToken = null;
+
                 }
                 _cancelFilterTask = new CancellationTokenSource();
                 _filterAction = Union(action, previousAction);
                 _filterTask = Reload(_clefViewModel.ClefLines, _clefViewModel.Clef, matchers, _clefViewModel.SelectedIndex, _filterAction,
-                    () => previousFilterTask?.Wait(),
+                    () =>
+                    {
+                        if (previousFilterTask != null && previousCancellationToken != null)
+                        {
+                            try
+                            {
+                                previousFilterTask.Wait(previousCancellationToken.Token);
+                            }
+                            catch (OperationCanceledException)
+                            {
+                                // task was cancelled, nothing to do
+                            }
+                        }
+                    },
                    onChanged,
                    _cancelFilterTask.Token);
             }

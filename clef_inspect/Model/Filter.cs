@@ -1,11 +1,16 @@
 ﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace clef_inspect.Model
 {
-    public class Filter : IFilter
+    public class Filter : IFilter, INotifyPropertyChanged
     {
         private readonly string _key;
         private bool _disableNotifyFilterChanged;
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+
         public Filter(string key, IEnumerable<KeyValuePair<string, int>> filter)
         {
             _disableNotifyFilterChanged = false;
@@ -13,7 +18,7 @@ namespace clef_inspect.Model
             List<FilterValue> values = new();
             foreach ((string value, int amount) in filter)
             {
-                FilterValue fi = new(value, amount, true);
+                FilterValue fi = new(value, amount, true, UiWhenEmpty());
                 fi.PropertyChanged += (sender, e) =>
                 {
                     if (e.PropertyName == nameof(fi.Enabled))
@@ -25,6 +30,19 @@ namespace clef_inspect.Model
             }
             values.Sort();
             Values = new ObservableCollection<FilterValue>(values);
+        }
+
+
+        private string UiWhenEmpty()
+        {
+            if (_key.Equals(Clef.LEVEL_KEY))
+            {
+                return Clef.LEVEL_EMPTY;
+            }
+            else
+            {
+                return "(empty)";
+            }
         }
 
         public class Matcher : IMatcher
@@ -44,7 +62,8 @@ namespace clef_inspect.Model
                 return _enabledValues.Contains(val);
             }
         }
-        public bool AccceptsAll => Values.All((f) => f.Enabled);
+        public bool AcceptsAll => Values.All((f) => f.Enabled);
+        public bool AcceptsNone => Values.All((f) => !f.Enabled);
 
         public IMatcher Create()
         {
@@ -78,7 +97,9 @@ namespace clef_inspect.Model
             {
                 return;
             }
-            FilterChanged?.Invoke();
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AcceptsAll)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AcceptsNone)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Values)));
         }
         public void Update(IEnumerable<KeyValuePair<string, int>> values)
         {
@@ -87,7 +108,7 @@ namespace clef_inspect.Model
                 FilterValue? filterValue = Values.FirstOrDefault((f) => (f.ValueMatcher == value));
                 if (filterValue == null)
                 {
-                    FilterValue newFilterValue = new(value, amount, true);
+                    FilterValue newFilterValue = new(value, amount, true, UiWhenEmpty());
                     int pos = 0;
                     foreach (FilterValue fi in Values)
                     {
@@ -141,8 +162,6 @@ namespace clef_inspect.Model
         }
 
         public ObservableCollection<FilterValue> Values { get; }
-
-        public event Action? FilterChanged;
     }
 
 }

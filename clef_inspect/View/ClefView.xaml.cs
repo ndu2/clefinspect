@@ -17,7 +17,7 @@ namespace clef_inspect.View
     /// </summary>
     public partial class ClefView : UserControl
     {
-        private readonly Dictionary<string, GridViewColumn> _customColumns = new Dictionary<string, GridViewColumn>();
+        private readonly Dictionary<string, GridViewColumn> _customColumns = new();
         private ScrollViewer? _listViewLogEntriesScrollViewer = null;
 
         public ClefView()
@@ -62,8 +62,7 @@ namespace clef_inspect.View
 
         public void RemoveColumn(string key)
         {
-            GridViewColumn? gvc;
-            if (_customColumns.TryGetValue(key, out gvc))
+            if (_customColumns.TryGetValue(key, out GridViewColumn? gvc))
             {
                 if (ListViewLogEntries.View is GridView gv)
                 {
@@ -90,7 +89,7 @@ namespace clef_inspect.View
                     _listViewLogEntriesScrollViewer.ScrollToVerticalOffset(viewModel.VerticalOffset);
                     _listViewLogEntriesScrollViewer.ScrollToHorizontalOffset(viewModel.HorizontalOffset);
                 }
-                viewModel.Settings.Settings.PropertyChanged += ListViewLogEntries_Update;
+                viewModel.Settings.SessionSettings.PropertyChanged += ListViewLogEntries_Update;
             }
         }
 
@@ -98,7 +97,7 @@ namespace clef_inspect.View
         {
             get
             {
-                FormattedText formattedText = new(Settings.PinWidthText, CultureInfo.CurrentCulture,
+                FormattedText formattedText = new(MainViewSettings.PinWidthText, CultureInfo.CurrentCulture,
                     FlowDirection, new Typeface(FontFamily, FontStyle, FontWeight, FontStretch),
                     FontSize, Brushes.Black,
                     VisualTreeHelper.GetDpi(this).PixelsPerDip);
@@ -110,7 +109,7 @@ namespace clef_inspect.View
         {
             get
             {
-                FormattedText formattedText = new(Settings.DateWidthText, CultureInfo.CurrentCulture,
+                FormattedText formattedText = new(MainViewSettings.DateWidthText, CultureInfo.CurrentCulture,
                     FlowDirection, new Typeface(FontFamily, FontStyle, FontWeight, FontStretch),
                     FontSize, Brushes.Black,
                     VisualTreeHelper.GetDpi(this).PixelsPerDip);
@@ -123,19 +122,7 @@ namespace clef_inspect.View
         {
             get
             {
-                FormattedText formattedText = new(Settings.LevelWidthText, CultureInfo.CurrentCulture,
-                        FlowDirection, new Typeface(FontFamily, FontStyle, FontWeight, FontStretch),
-                        FontSize, Brushes.Black,
-                        VisualTreeHelper.GetDpi(this).PixelsPerDip);
-                return formattedText.Width;
-            }
-        }
-
-        public double SourceContextWidth
-        {
-            get
-            {
-                FormattedText formattedText = new(Settings.SourceContextWidthText, CultureInfo.CurrentCulture,
+                FormattedText formattedText = new(MainViewSettings.LevelWidthText, CultureInfo.CurrentCulture,
                         FlowDirection, new Typeface(FontFamily, FontStyle, FontWeight, FontStretch),
                         FontSize, Brushes.Black,
                         VisualTreeHelper.GetDpi(this).PixelsPerDip);
@@ -147,7 +134,7 @@ namespace clef_inspect.View
         {
             get
             {
-                FormattedText formattedText = new(Settings.DeltaWidthText, CultureInfo.CurrentCulture,
+                FormattedText formattedText = new(MainViewSettings.DeltaWidthText, CultureInfo.CurrentCulture,
                         FlowDirection, new Typeface(FontFamily, FontStyle, FontWeight, FontStretch),
                         FontSize, Brushes.Black,
                         VisualTreeHelper.GetDpi(this).PixelsPerDip);
@@ -201,11 +188,12 @@ namespace clef_inspect.View
 
         private void CopySelected()
         {
+            List<string> columns = _customColumns.Keys.ToList();
             StringBuilder sb = new();
             IList<ClefLineView> sel = GetSelectedInOrder();
             foreach (ClefLineView line in sel)
             {
-                sb.AppendLine(line.ToString());
+                sb.AppendLine(line.ToString(columns));
             }
             if (sb.Length > 0)
             {
@@ -279,10 +267,7 @@ namespace clef_inspect.View
         {
             if (DataContext is ClefViewModel viewModel)
             {
-                if (_listViewLogEntriesScrollViewer == null)
-                {
-                    _listViewLogEntriesScrollViewer = GetScrollViewer(ListViewLogEntries);
-                }
+                _listViewLogEntriesScrollViewer ??= GetScrollViewer(ListViewLogEntries);
                 if (_listViewLogEntriesScrollViewer != null)
                 {
                     viewModel.VerticalOffset = _listViewLogEntriesScrollViewer.VerticalOffset;
@@ -295,7 +280,7 @@ namespace clef_inspect.View
             ListViewLogEntries_Update(ListViewLogEntries);
         }
 
-        private void ListViewLogEntries_Update(DependencyObject d)
+        private static void ListViewLogEntries_Update(DependencyObject d)
         {
             for (int i = 0; i < VisualTreeHelper.GetChildrenCount(d); i++)
             {

@@ -16,18 +16,14 @@ namespace clef_inspect.ViewModel.ClefView
         private int _selectedIndex;
         private bool _calculationRunning;
 
-        public ClefViewModel(string fileName, Settings settings)
+        public ClefViewModel(string fileName, MainViewSettings settings)
         {
             _settings = new ClefViewSettings(settings);
             _filters = new Dictionary<string, Filter>();
             _dataColumns = new ObservableCollection<DataColumnView>();
             _filterTaskManager = new FilterTaskManager(this, _settings);
             _calculationRunning = false;
-            settings.PropertyChanged += (s, e) =>
-            {
-                if (e.PropertyName == nameof(settings.LocalTime))
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DatePosition)));
-            };
+            PropertyChangedEventManager.AddHandler(_settings.SessionSettings, OnSettingsChanged, String.Empty);
             Clef = new Clef(new FileInfo(fileName));
             ClefLines = new FilteredClef(_settings);
             Filters = new ObservableCollection<ClefFilterViewModel>();
@@ -51,6 +47,14 @@ namespace clef_inspect.ViewModel.ClefView
             }
         }
 
+        private void OnSettingsChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(_settings.SessionSettings.LocalTime))
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DatePosition)));
+            }
+        }
+
         public event PropertyChangedEventHandler? PropertyChanged;
         public event Action? Reloaded;
         public event Action? DataColumnEnabledChanged;
@@ -68,8 +72,9 @@ namespace clef_inspect.ViewModel.ClefView
 
         public void DoClose()
         {
-            Clef.Dispose();
             Clef.LinesChanged -= Reload;
+            Clef.Dispose();
+            ClefLines.Clear();
         }
 
         private void Reload(object? sender, LinesChangedEventArgs e)
@@ -97,16 +102,10 @@ namespace clef_inspect.ViewModel.ClefView
                 if (!_filters.ContainsKey(p.Key))
                 {
                     Filter filter = new(p.Key, p.Value.Item2);
-                    filter.FilterChanged += Reload;
+                    PropertyChangedEventManager.AddHandler(filter, (s, e) => { Reload(); }, nameof(filter.Values));
                     _filters.Add(p.Key, filter);
                     ClefFilterViewModel clefFilterViewModel = new(p.Value.Item1, filter, true);
-                    clefFilterViewModel.PropertyChanged += (sender, e) =>
-                    {
-                        if (e.PropertyName == nameof(clefFilterViewModel.Visible))
-                        {
-                            NotifyVisibleFiltersChanged();
-                        }
-                    };
+                    PropertyChangedEventManager.AddHandler(clefFilterViewModel, (s, e) => { NotifyVisibleFiltersChanged(); }, nameof(clefFilterViewModel.Visible));
                     Filters.Add(clefFilterViewModel);
                     newFilters = true;
                 }
@@ -120,18 +119,14 @@ namespace clef_inspect.ViewModel.ClefView
                 if (!_filters.ContainsKey(p.Key))
                 {
                     Filter filter = new(p.Key, p.Value);
-                    filter.FilterChanged += Reload;
+                    PropertyChangedEventManager.AddHandler(filter, (s, e) => { Reload(); }, nameof(filter.Values));
                     _filters.Add(p.Key, filter);
-                    ClefFilterViewModel clefFilterViewModel = new(p.Key, filter, p.Key.Equals(nameof(ClefLine.SourceContext)));
-                    clefFilterViewModel.PropertyChanged += (sender, e) =>
-                    {
-                        if (e.PropertyName == nameof(clefFilterViewModel.Visible))
-                        {
-                            NotifyVisibleFiltersChanged();
-                        }
-                    };
+                    ClefFilterViewModel clefFilterViewModel = new(p.Key, filter, Settings.SessionSettings.IsVisibleFilterByDefault(p.Key));
+                    PropertyChangedEventManager.AddHandler(clefFilterViewModel, (s, e) => { NotifyVisibleFiltersChanged(); }, nameof(clefFilterViewModel.Visible));
                     Filters.Add(clefFilterViewModel);
-                    _dataColumns.Add(new DataColumnView(p.Key, false, NotifyDataColumnEnabledChanged));
+                    var dataColumnView = new DataColumnView(p.Key, Settings.SessionSettings.IsVisibleColumnByDefault(p.Key));
+                    PropertyChangedEventManager.AddHandler(dataColumnView, (s, e) => { NotifyDataColumnEnabledChanged(); }, nameof(dataColumnView.Enabled));
+                    _dataColumns.Add(dataColumnView);
                     newFilters = true;
                 }
                 else
@@ -142,6 +137,7 @@ namespace clef_inspect.ViewModel.ClefView
             if (newFilters)
             {
                 NotifyVisibleFiltersChanged();
+                NotifyDataColumnEnabledChanged();
             }
 
             List<IMatcher> matchers = CreateMatchers();
@@ -162,12 +158,12 @@ namespace clef_inspect.ViewModel.ClefView
             List<IMatcher> matchers = new();
             foreach (IFilter v in _filters.Values)
             {
-                if (!v.AccceptsAll)
+                if (!v.AcceptsAll)
                 {
                     matchers.Add(v.Create());
                 }
             }
-            if (null != _textFilter && !_textFilter.AccceptsAll)
+            if (null != _textFilter && !_textFilter.AcceptsAll)
             {
                 matchers.Add(_textFilter.Create());
             }
@@ -181,7 +177,7 @@ namespace clef_inspect.ViewModel.ClefView
         {
             get
             {
-                return $"Log Entries displayed: {ClefLines.Count} (Total {Clef.Count}, Size {_settings.FormatFileSize(Clef.SeekPos)})";
+                return $"Log Entries displayed: {ClefLines.Count} (Total {Clef.Count}, Size {ClefViewSettings.FormatFileSize(Clef.SeekPos)})";
             }
         }
         public string DateInfo
@@ -267,7 +263,7 @@ namespace clef_inspect.ViewModel.ClefView
         {
             get
             {
-                return _settings.Settings.Format(_settings.RefTimeStamp);
+                return _settings.SessionSettings.Format(_settings.RefTimeStamp);
             }
             set
             {

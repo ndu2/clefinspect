@@ -6,9 +6,9 @@ namespace clef_inspect.Model
     {
         private bool _enabled;
         private int _amount;
-        public FilterValue(string value, int amount, bool enabled)
+        public FilterValue(string value, int amount, bool enabled, string whenEmpty)
         {
-            Value = value.Length ==0? "(empty)" : value;
+            Value = value.Length ==0? whenEmpty : value;
             ValueMatcher = value;
             _amount = amount;
             Enabled = enabled;

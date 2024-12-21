@@ -8,7 +8,7 @@ namespace clef_inspect.ViewModel.MainView
     {
         public MainViewModel()
         {
-            Settings = new Settings();
+            Settings = new MainViewSettings();
 
             var args = Environment.GetCommandLineArgs();
             ClefTabs = new ObservableCollection<ClefTab>();
@@ -19,6 +19,10 @@ namespace clef_inspect.ViewModel.MainView
             }
             Exit = new ExitCommand();
             Open = new OpenCommand(this);
+            SaveViewDefaults = new SaveViewDefaultsCommand(this);
+            ApplyViewDefaults = new ApplyViewDefaultsCommand(this);
+            SaveSession = new SaveSessionCommand(this);
+            LoadSession = new LoadSessionCommand(this);
             CloseTab = new CloseTabCommand(this);
             CopySelected = new UserActionCommand(this, ClefView.ClefViewModel.UserAction.Copy);
             CopyClefSelected = new UserActionCommand(this, ClefView.ClefViewModel.UserAction.CopyClef);
@@ -28,8 +32,12 @@ namespace clef_inspect.ViewModel.MainView
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public Settings Settings { get; }
+        public MainViewSettings Settings { get; }
         public ICommand Open { get; set; }
+        public ICommand SaveViewDefaults { get; set; }
+        public ICommand ApplyViewDefaults { get; set; }
+        public ICommand SaveSession { get; set; }
+        public ICommand LoadSession { get; set; }
         public CloseTabCommand CloseTab { get; }
         public UserActionCommand CopySelected { get; }
         public UserActionCommand CopyClefSelected { get; }
@@ -45,7 +53,7 @@ namespace clef_inspect.ViewModel.MainView
             get => _activeTab;
             set
             {
-                if(_activeTab != value)
+                if (_activeTab != value)
                 {
                     _activeTab = value;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ActiveTab)));
@@ -66,11 +74,10 @@ namespace clef_inspect.ViewModel.MainView
 
         public void OpenFiles(string[] files)
         {
-            foreach(string file in files)
+            foreach (string file in files)
             {
                 OpenFile(file);
             }
         }
-
     }
 }

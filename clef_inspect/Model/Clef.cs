@@ -14,6 +14,8 @@ namespace clef_inspect.Model
         private const int FileRefreshDelayMs = 500;
         private const int BufferSize = 10 * 1024 * 1024;
         private const int UiRefreshDelayMs = 250;
+        public const string LEVEL_KEY = "@l";
+        public const string LEVEL_EMPTY = "Info";
         private bool _disposedValue;
         private readonly ClefLockedList _lines = new();
         private readonly ConcurrentDictionary<string, (string, ConcurrentDictionary<string, int>)> _properties = new();
@@ -23,13 +25,13 @@ namespace clef_inspect.Model
         private bool _autoUpdate;
         private bool _fileOk;
 
-        private readonly byte[] bytes = new byte[BufferSize];
-        private readonly byte[] temp = new byte[BufferSize];
+        private byte[] bytes = new byte[BufferSize];
+        private byte[] temp = new byte[BufferSize];
         private int _bytesAvail = 0;
 
         private readonly Dictionary<string, string> _indexableProperties = new()
         {
-            {"@l","Level"},
+            {LEVEL_KEY,"Level"},
             //{"@i","Event Id"}
         };
 
@@ -66,11 +68,13 @@ namespace clef_inspect.Model
                 if (disposing)
                 {
                     AutoUpdate = false;
-                    //_timer.Change(Timeout.Infinite, Timeout.Infinite);
+                    _timer.Dispose();
                 }
                 _lines.Clear();
                 _properties.Clear();
                 _data.Clear();
+                bytes = Array.Empty<byte>();
+                temp = Array.Empty<byte>();
                 _disposedValue = true;
             }
         }
@@ -123,6 +127,7 @@ namespace clef_inspect.Model
             }
         }
 
+
         private void Scan(object? _)
         {
             (bool fileok, bool tracking) = Scan( (args) => { LinesChanged?.Invoke(this, args); });
@@ -134,7 +139,14 @@ namespace clef_inspect.Model
             {
                 Application.Current?.Dispatcher?.Invoke(() => { FileOk = fileok; });
             }
-            _timer.Change(AutoUpdate? FileRefreshDelayMs:Timeout.Infinite, Timeout.Infinite);
+            try
+            {
+                _timer.Change(AutoUpdate ? FileRefreshDelayMs : Timeout.Infinite, Timeout.Infinite);
+            }
+            catch (ObjectDisposedException)
+            {
+                // timer can be disposed during Scan(), in this case _timer.Change will throw ObjectDisposedException
+            }
         }
 
         public class TimedUiUpdate
