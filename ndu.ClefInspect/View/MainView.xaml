@@ -1,0 +1,107 @@
+﻿<Window x:Class="ndu.ClefInspect.View.MainView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ndu.ClefInspect.View"
+        xmlns:viewmodel="clr-namespace:ndu.ClefInspect.ViewModel.MainView"
+        mc:Ignorable="d"
+        Title="CLEF Inspect" Height="800" Width="1200"
+        AllowDrop="True" Drop="OnDrop">
+    <Window.DataContext>
+        <viewmodel:MainViewModel></viewmodel:MainViewModel>
+    </Window.DataContext>
+    <Window.InputBindings>
+        <KeyBinding Command="{Binding Open}" Gesture="CTRL+O" />
+        <KeyBinding Command="{Binding CopySelected}" Gesture="CTRL+C" />
+        <KeyBinding Command="{Binding CopyClefSelected}" Gesture="CTRL+SHIFT+C" />
+        <KeyBinding Command="{Binding PinSelected}" Gesture="CTRL+P" />
+        <KeyBinding Command="{Binding UnpinSelected}" Gesture="CTRL+U" />
+        <KeyBinding Command="{Binding CloseTab}" Gesture="CTRL+W" />
+    </Window.InputBindings>
+    <Window.Resources>
+        <DataTemplate x:Key="tabControlHeaderTemplate" DataType="{x:Type viewmodel:ClefTab}">
+            <StackPanel Orientation="Horizontal">
+                <!--https://adamdawes.com/windows8/win8_segoeuisymbol.html-->
+                <TextBlock Text="{Binding Name}" />
+                <TextBlock FontFamily="Segoe UI Symbol" Text="(!)" Foreground="Red" Visibility="{Binding FileError}" Margin="5,0,2,0" />
+                <TextBlock FontFamily="Segoe UI Symbol" Text="&#xE117;" Visibility="{Binding CalculationRunning}" Margin="2,0,2,0" />
+                <ToggleButton FontFamily="Segoe UI Symbol" IsChecked="{Binding AutoUpdate, Mode=TwoWay}" Margin="2,0,2,0" >
+                    <ToggleButton.Style>
+                        <Style TargetType="ToggleButton">
+                            <Style.Triggers>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter Property="Content" Value="&#xE103;" />
+                                </Trigger>
+                                <Trigger Property="IsChecked" Value="False">
+                                    <Setter Property="Content" Value="&#xE102;" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ToggleButton.Style>
+                </ToggleButton>
+                <Button FontFamily="Segoe UI Symbol" Content="&#xE10A;" Command="{Binding Close}" Margin="2,0,5,0" />
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodel:ClefTab}">
+            <local:ClefView DataContext="{Binding ClefViewModel}" />
+        </DataTemplate>
+    </Window.Resources>
+
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <Menu.Resources>
+                <local:InverseBoolConverter x:Key="InverseBoolConverter" />
+                <local:CannotExecuteCommand x:Key="CannotExecuteCommand" />
+                <local:BooleanVisibilityCollapsedConverter x:Key="BooleanVisibilityCollapsedConverter" />
+            </Menu.Resources>
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open" Command="{Binding Open}" InputGestureText="Ctrl+O"/>
+                <MenuItem Header="_Close" Command="{Binding CloseTab}" InputGestureText="Ctrl+W"/>
+                <Separator />
+                <MenuItem Header="Save Session" Command="{Binding SaveSession}" Visibility="{Binding Settings.CanPersist, Converter={StaticResource BooleanVisibilityCollapsedConverter}}" />
+                <MenuItem Header="Load Session" Command="{Binding LoadSession}" Visibility="{Binding Settings.CanPersist, Converter={StaticResource BooleanVisibilityCollapsedConverter}}" />
+                <Separator Visibility="{Binding Settings.CanPersist, Converter={StaticResource BooleanVisibilityCollapsedConverter}}" />
+                <MenuItem Header="_Exit" Command="{Binding Exit}" InputGestureText="Alt+F4"/>
+            </MenuItem>
+            <MenuItem Header="_Tools">
+                <MenuItem Header="_Copy Selected Entries to Clipboard" Command="{Binding CopySelected}" InputGestureText="Ctrl+C" />
+                <MenuItem Header="Copy _Selected Entries to Clipboard (clef format)" Command="{Binding CopyClefSelected}" InputGestureText="Ctrl+Shift+C"/>
+                <MenuItem Header="_Pin Selected Entries" Command="{Binding PinSelected}"  InputGestureText="Ctrl+P"/>
+                <MenuItem Header="_Unpin Selected Entries" Command="{Binding UnpinSelected}" InputGestureText="Ctrl+U" />
+            </MenuItem>
+            <MenuItem Header="_Filter" ItemsSource="{Binding ActiveTab.ClefViewModel.Filters}" Command="{Binding ActiveTab.ClefViewModel.FiltersMenu, FallbackValue={StaticResource CannotExecuteCommand}}">
+                <MenuItem.ItemContainerStyle>
+                    <Style>
+                        <Setter Property="MenuItem.IsCheckable" Value="True"/>
+                        <Setter Property="MenuItem.Header" Value="{Binding Name}"/>
+                        <!--<Setter Property="MenuItem.IsChecked" Value="{Binding Visible}"/>-->
+                        <Setter Property="MenuItem.IsChecked" Value="{Binding Visible, Mode=OneWay}"/>
+                        <Setter Property="MenuItem.CommandParameter" Value="{Binding Visible, Converter={StaticResource InverseBoolConverter}}" />
+                        <Setter Property="MenuItem.Command" Value="{Binding ChangeVisibility}"/>
+                    </Style>
+                </MenuItem.ItemContainerStyle>
+            </MenuItem>
+            <MenuItem Header="_View">
+                <MenuItem Header="_One Line Only" IsCheckable="True" IsChecked="{Binding Settings.OneLineOnly}"/>
+                <MenuItem Header="_Local Time" IsCheckable="True" IsChecked="{Binding Settings.LocalTime}"/>
+                <Separator />
+                <MenuItem Header="Save View as Default" Command="{Binding SaveViewDefaults}" Visibility="{Binding Settings.CanPersist, Converter={StaticResource BooleanVisibilityCollapsedConverter}}" />
+                <MenuItem Header="Apply Default View" Command="{Binding ApplyViewDefaults}"  Visibility="{Binding Settings.CanPersist, Converter={StaticResource BooleanVisibilityCollapsedConverter}}" />
+                <Separator Visibility="{Binding Settings.CanPersist, Converter={StaticResource BooleanVisibilityCollapsedConverter}}" />
+                <MenuItem Header="_Columns" ItemsSource="{Binding ActiveTab.ClefViewModel.DataColumns}">
+                    <MenuItem.ItemContainerStyle>
+                        <Style>
+                            <Setter Property="MenuItem.IsCheckable" Value="True" />
+                            <Setter Property="MenuItem.Header" Value="{Binding Header}"/>
+                            <Setter Property="MenuItem.IsChecked" Value="{Binding Enabled, Mode=TwoWay}"/>
+                        </Style>
+                    </MenuItem.ItemContainerStyle>
+                </MenuItem>
+            </MenuItem>
+        </Menu>
+        <TabControl ItemsSource="{Binding ClefTabs}" SelectedItem="{Binding ActiveTab}" Name="ClefTabControl"
+            ItemTemplate="{StaticResource tabControlHeaderTemplate}">
+        </TabControl>
+    </DockPanel>
+</Window>
