@@ -1,4 +1,6 @@
-﻿namespace ndu.ClefInspect.ViewModel.MainView
+﻿using System.Windows;
+
+namespace ndu.ClefInspect.ViewModel.MainView
 {
     public partial class MainViewModel
     {
@@ -14,12 +16,19 @@
             public override void Execute(object? parameter)
             {
                 List<string> openFiles = new();
-                foreach(ClefTab c in _mainViewModel.ClefTabs)
+                foreach (ClefTab c in _mainViewModel.ClefTabs)
                 {
                     openFiles.Add(c.ClefViewModel.FilePath);
                 }
                 _mainViewModel.Settings.SetSessionFiles(openFiles);
-                _mainViewModel.Settings.Persist();
+                try
+                {
+                    _mainViewModel.Settings.Persist();
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.Message, "Error saving settings", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
     }

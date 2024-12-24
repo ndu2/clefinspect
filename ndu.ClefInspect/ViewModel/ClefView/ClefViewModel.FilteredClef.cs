@@ -1,5 +1,4 @@
-﻿using ndu.ClefInspect.ViewModel.ClefView;
-using System.Collections.Specialized;
+﻿using System.Collections.Specialized;
 
 namespace ndu.ClefInspect.ViewModel.ClefView
 {
@@ -13,7 +12,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
         public class FilteredClef : List<ClefLineView>, INotifyCollectionChanged
         {
             public FilteredClef(ClefViewSettings settings)
-                :base(settings.DefaultCapacity)
+                : base(settings.DefaultCapacity)
             {
             }
 

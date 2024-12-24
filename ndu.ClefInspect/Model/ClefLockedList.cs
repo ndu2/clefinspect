@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace ndu.ClefInspect.Model
+﻿namespace ndu.ClefInspect.Model
 {
     public class ClefLockedList
     {

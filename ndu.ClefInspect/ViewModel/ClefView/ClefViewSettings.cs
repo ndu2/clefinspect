@@ -1,5 +1,4 @@
-﻿using ndu.ClefInspect.ViewModel;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 namespace ndu.ClefInspect.ViewModel.ClefView
 {

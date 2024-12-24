@@ -1,5 +1,5 @@
-﻿using System.IO.Pipes;
-using System.IO;
+﻿using System.IO;
+using System.IO.Pipes;
 using System.Windows;
 using System.Windows.Threading;
 

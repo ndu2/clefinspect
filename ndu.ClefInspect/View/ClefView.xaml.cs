@@ -1,13 +1,13 @@
-﻿using ndu.ClefInspect.ViewModel.ClefView;
+﻿using ndu.ClefInspect.ViewModel;
+using ndu.ClefInspect.ViewModel.ClefView;
+using System.ComponentModel;
 using System.Globalization;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Data;
-using System.ComponentModel;
-using ndu.ClefInspect.ViewModel;
 
 namespace ndu.ClefInspect.View
 {
@@ -30,7 +30,7 @@ namespace ndu.ClefInspect.View
             {
                 foreach (ClefViewModel.DataColumnView dataColumn in viewModel.DataColumns)
                 {
-                    if(dataColumn.Enabled)
+                    if (dataColumn.Enabled)
                     {
                         AddColumn(dataColumn.Header);
                     }
@@ -83,7 +83,7 @@ namespace ndu.ClefInspect.View
                 viewModel.UserActionHandler += OnUserAction;
                 viewModel.DataColumnEnabledChanged += OnDataColumnEnabledChanged;
                 OnDataColumnEnabledChanged();
-                if(_listViewLogEntriesScrollViewer != null)
+                if (_listViewLogEntriesScrollViewer != null)
                 {
                     _listViewLogEntriesScrollViewer.ScrollToVerticalOffset(viewModel.VerticalOffset);
                     _listViewLogEntriesScrollViewer.ScrollToHorizontalOffset(viewModel.HorizontalOffset);

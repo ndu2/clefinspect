@@ -1,5 +1,4 @@
 ﻿using ndu.ClefInspect.Model;
-using System.Text.Json.Nodes;
 
 namespace ndu.ClefInspect.Tests.Model
 {

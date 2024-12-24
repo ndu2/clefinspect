@@ -5,7 +5,7 @@
         public class CloseTabCommand : AbstractRunExecuteWhenActiveTabSetCommand
         {
             public CloseTabCommand(MainViewModel mainViewModel)
-                :base(mainViewModel)
+                : base(mainViewModel)
             {
             }
 

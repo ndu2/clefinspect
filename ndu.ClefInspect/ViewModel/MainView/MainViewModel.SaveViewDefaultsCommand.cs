@@ -1,4 +1,5 @@
 ﻿using ndu.ClefInspect.ViewModel.ClefView;
+using System.Windows;
 
 namespace ndu.ClefInspect.ViewModel.MainView
 {
@@ -29,7 +30,14 @@ namespace ndu.ClefInspect.ViewModel.MainView
                     }
                     _mainViewModel.Settings.SetVisibleFilterDefaults(filters);
                 }
-                _mainViewModel.Settings.UserSettings.Write();
+                try
+                {
+                    _mainViewModel.Settings.UserSettings.Write();
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.Message, "Error saving settings", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
     }

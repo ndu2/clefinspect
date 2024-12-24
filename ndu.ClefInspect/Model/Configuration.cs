@@ -1,16 +1,12 @@
 ﻿using Microsoft.Extensions.Configuration;
-using System;
-using System.Configuration;
 using System.IO;
-using System.IO.Packaging;
-using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 namespace ndu.ClefInspect.Model
 {
     public class Configuration
     {
-        private const string DEFAULT_JSON = "clef_inspect.defaults.json";
+        private const string DEFAULT_JSON = "ClefInspect.defaults.json";
+        private string DEFAULT_JSON_PATH = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DEFAULT_JSON);
 
         public class ClefFeaturesOptions
         {
@@ -40,7 +36,7 @@ namespace ndu.ClefInspect.Model
             try
             {
                 IConfigurationRoot config = new ConfigurationBuilder()
-                .AddJsonFile(DEFAULT_JSON, optional: true)
+                .AddJsonFile(DEFAULT_JSON_PATH, optional: true)
                 .Build();
                 config.GetSection(ClefFeaturesOptions.ClefFeatures).Bind(ClefFeatures);
                 config.GetSection(ViewSettingsOptions.ViewSettings).Bind(ViewSettings);
@@ -62,7 +58,7 @@ namespace ndu.ClefInspect.Model
             {
                 Indented = true
             };
-            using var stream = new FileStream(DEFAULT_JSON, FileMode.Create, FileAccess.Write);
+            using var stream = new FileStream(DEFAULT_JSON_PATH, FileMode.Create, FileAccess.Write);
             using var writer = new Utf8JsonWriter(stream, options);
             writer.WriteStartObject();
             writer.WritePropertyName(ClefFeaturesOptions.ClefFeatures);

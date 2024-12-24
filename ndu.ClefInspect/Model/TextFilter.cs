@@ -1,8 +1,4 @@
-﻿using ndu.ClefInspect.Model;
-using System;
-using System.Text;
-
-namespace ndu.ClefInspect.Model
+﻿namespace ndu.ClefInspect.Model
 {
     public class TextFilter : IFilter
     {

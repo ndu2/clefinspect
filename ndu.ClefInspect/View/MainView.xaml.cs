@@ -13,7 +13,8 @@ namespace ndu.ClefInspect.View
         public MainView()
         {
             InitializeComponent();
-            this.Title += " "+ Assembly.GetExecutingAssembly().GetName().Version;
+            Version v = Assembly.GetExecutingAssembly().GetName().Version ?? new Version(0, 0, 0, 1);
+            this.Title += $" {v.Major}.{v.Minor}.{v.Build}";
         }
         public void OpenFiles(string[] files)
         {

@@ -1,5 +1,4 @@
 ﻿using ndu.ClefInspect.Model;
-using ndu.ClefInspect.ViewModel.ClefView;
 using System.Collections.Specialized;
 using System.Windows;
 using static ndu.ClefInspect.Model.LinesChangedEventArgs;
@@ -156,7 +155,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                         if (changedAlot)
                         {
                             clefLines.NotifyCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-                            
+
                         }
                         else
                         {

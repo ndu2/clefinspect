@@ -4,7 +4,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
 {
     public partial class ClefViewModel
     {
-        public class DataColumnView: INotifyPropertyChanged
+        public class DataColumnView : INotifyPropertyChanged
         {
             private bool _enabled;
 
@@ -22,7 +22,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                 get => _enabled;
                 set
                 {
-                    if(_enabled != value)
+                    if (_enabled != value)
                     {
                         _enabled = value;
                         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Enabled)));

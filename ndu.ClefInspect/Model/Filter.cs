@@ -1,5 +1,4 @@
-﻿using ndu.ClefInspect.Model;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 
 namespace ndu.ClefInspect.Model

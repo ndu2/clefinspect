@@ -9,7 +9,7 @@ namespace ndu.ClefInspect.ViewModel.MainView
             private readonly ClefViewModel.UserAction _action;
 
             public UserActionCommand(MainViewModel vm, ClefViewModel.UserAction action)
-                :base(vm)
+                : base(vm)
             {
                 _action = action;
             }

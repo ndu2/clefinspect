@@ -1,6 +1,6 @@
-﻿using System.ComponentModel;
+﻿using ndu.ClefInspect.Model;
+using System.ComponentModel;
 using System.Windows.Input;
-using ndu.ClefInspect.Model;
 
 namespace ndu.ClefInspect.ViewModel.ClefView
 {

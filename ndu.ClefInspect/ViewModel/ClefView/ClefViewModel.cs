@@ -1,6 +1,4 @@
 ﻿using ndu.ClefInspect.Model;
-using ndu.ClefInspect.ViewModel;
-using ndu.ClefInspect.ViewModel.ClefView;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
@@ -81,7 +79,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
 
         private void Reload(object? sender, LinesChangedEventArgs e)
         {
-            if(e.Action != LinesChangedEventArgs.LinesChangedEventArgsAction.None)
+            if (e.Action != LinesChangedEventArgs.LinesChangedEventArgsAction.None)
             {
                 Reload(e);
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DateInfo)));
@@ -236,7 +234,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
         {
             get
             {
-                if(SelectedIndex < 0 || SelectedIndex >= ClefLines.Count)
+                if (SelectedIndex < 0 || SelectedIndex >= ClefLines.Count)
                 {
                     return null;
                 }

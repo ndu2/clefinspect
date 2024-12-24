@@ -1,9 +1,8 @@
-﻿using System.ComponentModel;
+﻿using ndu.ClefInspect.Model;
+using ndu.ClefInspect.ViewModel.ClefView;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
-using ndu.ClefInspect.ViewModel.ClefView;
-using ndu.ClefInspect.Model;
-using ndu.ClefInspect.ViewModel;
 
 namespace ndu.ClefInspect.ViewModel.MainView
 {
@@ -61,11 +60,11 @@ namespace ndu.ClefInspect.ViewModel.MainView
         }
         public Visibility FileError
         {
-            get => ClefViewModel.Clef.FileOk ? Visibility.Hidden: Visibility.Visible;
+            get => ClefViewModel.Clef.FileOk ? Visibility.Hidden : Visibility.Visible;
         }
         public Visibility CalculationRunning
         {
-            get => ClefViewModel.CalculationRunning ? Visibility.Visible: Visibility.Hidden;
+            get => ClefViewModel.CalculationRunning ? Visibility.Visible : Visibility.Hidden;
         }
 
     }

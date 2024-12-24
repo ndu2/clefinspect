@@ -1,8 +1,7 @@
-﻿using System.Collections.ObjectModel;
+﻿using ndu.ClefInspect.Model;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Data;
 using System.Windows.Input;
-using ndu.ClefInspect.Model;
 
 namespace ndu.ClefInspect.ViewModel.ClefView
 {

@@ -1,5 +1,4 @@
 ﻿using ndu.ClefInspect.View;
-using ndu.ClefInspect;
 using System.Windows;
 
 namespace ndu.ClefInspect
