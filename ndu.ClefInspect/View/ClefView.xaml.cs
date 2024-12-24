@@ -157,6 +157,11 @@ namespace ndu.ClefInspect.View
                 TextDatePosition.GetBindingExpression(TextBox.TextProperty).UpdateSource();
             }
         }
+        private void ButtonApplyTextFilter_Click(object sender, RoutedEventArgs e)
+        {
+            TextFilter.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+            (DataContext as ClefViewModel)?.ApplyTextFilter.Execute(this);
+        }
 
         private List<ClefLineView> GetSelectedInOrder()
         {

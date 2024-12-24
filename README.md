@@ -17,6 +17,7 @@ Currently runs on Windows with .NET 6.0 only. Distributed as a zip archive.
  * Can follow (tail) log files while other processes write to it.
  * Tabs
  * Copy selected events to text or JSON.
+ * Limitation: Structured data in the logfile gets "stringified".
 
 ## Why ClefInspect?
 
@@ -25,7 +26,57 @@ There are amazing full featured log servers, analysers, and viewers for [CLEF](h
 My work with CLEF logfiles is mostly bug-hunting and timing analysis of extensive logfiles. The main task is to collect the revealing events and put them into a context. As none of the tools I found could fit my workflow perfectly, I created ClefInspect.
 
 
-With ClefInspect, you can crawl the logfiles and keep the important events very efficiently by using filter -> pin -> filter -> pin.
+With ClefInspect, you can crawl the logfiles and keep track of important events very efficiently by pining them. A typical workflow is *filter* -> *pin* -> *filter*.
+
+## Usage
+
+Use *File* -> *Open*, *open with* or *drag & drop* to open logfiles with ClefInspect.
+
+The text filter searches in the message only. It allows for multiple keywords (e.g. `users,login,logoff`) and quotes (`"a comma , here","   do not trim the spaces   "`).
+
+Events must match all filters to be displayed (pinned events are always displayed).
+
+Use timestamp field to browse to a event for a given time (enter a timestamp + `Enter`). This does not act as a filter, but just navigates the view to a given time.
+
+### Shortcuts
+
+ - `Ctrl+C`: Copy selected lines to clipboard (formatted, with the displayed columns)
+ - `Ctrl+Shift+C`: Copy selected lines to clipboard as CLEF Events
+ - `Ctrl+P`: Pin selected lines
+ - `Ctrl+U`: Unpin selected lines
+ - `Ctrl+A` (when in the Event list): Select all displayed events
+ - `Ctrl+O`: Open a logfile
+ - `Ctrl+W`: Close the active tab
+ - `Ctrl+Tab`: Switch the active tab
+
+## Installation
+
+ClefInspect is distributed with a zip. Just extract the zip to a folder of your choice (e.g. ClefInspect in your users directory).
+
+### Configuration (optional)
+
+You may want to put a file `ClefInspect.defaults.json` in the folder of `ClefInspect.exe`:
+
+	{
+	"clefFeatures": {
+		"WriteableConfig": false
+	},
+	"viewSettings": {
+		"LocalTime": true,
+		"OneLineOnly": true,
+		"DefaultFilterVisibility": [
+		"Level",
+		"SourceContext"
+		],
+		"DefaultColumnVisibility": []
+	},
+	"session": {
+		"Files": [
+		"C:\\temp\a.json",
+		"C:\\temp\b.json"
+		]
+	}
+	}
 
 
 ## Future

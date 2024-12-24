@@ -1,5 +1,6 @@
 ﻿using ndu.ClefInspect.Model;
 using ndu.ClefInspect.ViewModel.ClefView;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 
@@ -16,9 +17,12 @@ namespace ndu.ClefInspect.ViewModel
         {
             // load defaults
             _configuration = new Configuration();
+            _configuration.Session.Files.CollectionChanged += (sender, e) => { PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HasSessionData))); };
         }
+
         public Configuration UserSettings => _configuration;
         public bool CanPersist => _configuration.ClefFeatures.WriteableConfig;
+        public bool HasSessionData => _configuration.Session.Files.Count > 0;
 
         public void Persist()
         {
@@ -127,10 +131,13 @@ namespace ndu.ClefInspect.ViewModel
         public void SetSessionFiles(List<string> openFiles)
         {
             _configuration.Session.Files.Clear();
-            _configuration.Session.Files.AddRange(openFiles);
+            foreach (string file in openFiles)
+            {
+                _configuration.Session.Files.Add(file);
+            }
         }
 
-        public List<string> GetSessionFiles()
+        public ObservableCollection<string> GetSessionFiles()
         {
             return _configuration.Session.Files;
         }

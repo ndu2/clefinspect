@@ -18,7 +18,7 @@
                 {
                     c.Close.Execute(null);
                 }
-                List<string> files = _mainViewModel.Settings.GetSessionFiles();
+                IList<string> files = _mainViewModel.Settings.GetSessionFiles();
                 _mainViewModel.OpenFiles(files.ToArray());
             }
         }
