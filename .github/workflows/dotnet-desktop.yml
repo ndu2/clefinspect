@@ -41,7 +41,7 @@ name: .NET Core Desktop
 
 on:
   push:
-    branches: [ "main", "github-ci-tests" ]
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
   # Allows running workflow manually

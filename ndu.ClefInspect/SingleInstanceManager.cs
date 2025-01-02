@@ -41,9 +41,9 @@ namespace ndu.ClefInspect
                         {
                             while (true)
                             {
-                                using NamedPipeServerStream pipeServer = new(pipename.ToString(), PipeDirection.In);
                                 try
                                 {
+                                    using NamedPipeServerStream pipeServer = new(pipename.ToString(), PipeDirection.In);
                                     // Wait for a client to connect
                                     pipeServer.WaitForConnection();
                                     StreamReader r = new(pipeServer);
@@ -62,6 +62,9 @@ namespace ndu.ClefInspect
                                 }
                                 catch (Exception)
                                 {
+                                    // The pipe may still be busy because the previous instance will close the pipe
+                                    // later (when CLR exits) than releasing the mutex.
+                                    Thread.Sleep(100);
                                 }
                             }
                         });

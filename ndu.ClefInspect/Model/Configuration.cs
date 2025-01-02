@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Text.Json;
 namespace ndu.ClefInspect.Model
@@ -25,7 +26,7 @@ namespace ndu.ClefInspect.Model
         public class SessionOptions
         {
             public const string Session = "session";
-            public List<string> Files { get; set; } = new();
+            public ObservableCollection<string> Files { get; set; } = new();
         }
 
         public Configuration()
