@@ -147,6 +147,8 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                  (selectedIndex) =>
                  {
                      SelectedIndex = selectedIndex;
+                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DateInfo)));
+                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FileInfo)));
                      Reloaded?.Invoke();
                      CalculationRunning = false;
                  });
