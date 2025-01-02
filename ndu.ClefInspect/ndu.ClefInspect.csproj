@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-    <ApplicationIcon>clef_inspect.ico</ApplicationIcon>
+    <ApplicationIcon>ndu.ClefInspect.ico</ApplicationIcon>
     <AssemblyVersion>1.1.0.1</AssemblyVersion>
     <FileVersion>1.1.0.1</FileVersion>
     <RootNamespace>$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
@@ -14,7 +14,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="clef_inspect.ico" />
+    <Content Include="ndu.ClefInspect.ico" />
   </ItemGroup>
 
   <ItemGroup>
