@@ -24,6 +24,29 @@ namespace ndu.ClefInspect.View
             InitializeComponent();
             this.DataContextChanged += ClefView_DataContextChanged;
         }
+
+        private void OnDataColumnSetChanged()
+        {
+
+            if (DataContext is ClefViewModel viewModel)
+            {
+                // remove all colums not vailable in viewModel
+                List<string> surplusCols = new();
+                foreach (var cc in _customColumns)
+                {
+                    if (!viewModel.DataColumns.Any(col => col.Header == cc.Key))
+                    {
+                        surplusCols.Add(cc.Key);
+                    }
+                }
+                foreach (string s in surplusCols)
+                {
+                    RemoveColumn(s);
+                }
+            }
+            OnDataColumnEnabledChanged();
+        }
+
         private void OnDataColumnEnabledChanged()
         {
             if (DataContext is ClefViewModel viewModel)
@@ -82,7 +105,7 @@ namespace ndu.ClefInspect.View
                 };
                 viewModel.UserActionHandler += OnUserAction;
                 viewModel.DataColumnEnabledChanged += OnDataColumnEnabledChanged;
-                OnDataColumnEnabledChanged();
+                OnDataColumnSetChanged();
                 if (_listViewLogEntriesScrollViewer != null)
                 {
                     _listViewLogEntriesScrollViewer.ScrollToVerticalOffset(viewModel.VerticalOffset);

@@ -29,6 +29,10 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                     }
                 }
             }
+            public override string ToString()
+            {
+                return $"DataColumnView {Header} enabled = {Enabled}";
+            }
         }
     }
 }
