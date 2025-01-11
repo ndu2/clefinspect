@@ -74,11 +74,11 @@ namespace ndu.ClefInspect.ViewModel
         public static readonly string PinWidthText = "NNN";
         public static string DateWidthText { get; }
 
-        public string Format(DateTime? dt)
+        public string? Format(DateTime? dt)
         {
             if (dt == null)
             {
-                return "unknown";
+                return null;
             }
             if (LocalTime)
             {
