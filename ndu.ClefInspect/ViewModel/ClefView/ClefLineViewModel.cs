@@ -7,11 +7,11 @@ using System.Windows.Media;
 
 namespace ndu.ClefInspect.ViewModel.ClefView
 {
-    public class ClefLineView : INotifyPropertyChanged
+    public class ClefLineViewModel : INotifyPropertyChanged
     {
         private readonly ClefViewSettings _settings;
         private readonly string? _messageOneLine;
-        public ClefLineView(ClefLine line, ClefViewSettings settings)
+        public ClefLineViewModel(ClefLine line, ClefViewSettings settings)
         {
             ClefLine = line;
             int nl = line.Message?.IndexOf('\n') ?? -1;
@@ -24,19 +24,21 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                 _messageOneLine = line.Message;
             }
             _settings = settings;
-            PropertyChangedEventManager.AddHandler(settings, Settings_PropertyChanged, string.Empty);
         }
         public event PropertyChangedEventHandler? PropertyChanged;
-
-        private void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        public void NotifySettingsRefTimeStampChanged()
         {
-            if (e.PropertyName == nameof(_settings.SessionSettings))
-            {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Time)));
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DeltaTime)));
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Message)));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DeltaTime)));
         }
+        public void NotifySettingsLocalTimeChanged()
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Time)));
+        }
+        public void NotifySettingsOneLineOnlyChanged()
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Message)));
+        }
+
         public string? Time
         {
             get

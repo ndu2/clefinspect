@@ -89,11 +89,11 @@ namespace ndu.ClefInspect.ViewModel
                 return dt.Value.ToUniversalTime().ToString(utc);
             }
         }
-        public static string Format(ClefLineView line)
+        public static string Format(ClefLineViewModel line)
         {
             return string.Format(ClefLineFormatString, line.Time, line.Level, line.Message);
         }
-        public static string FormatNoLog(ClefLineView line)
+        public static string FormatNoLog(ClefLineViewModel line)
         {
             return string.Format(ClefLineNoLogFormatString, line.Time, line.Level);
         }

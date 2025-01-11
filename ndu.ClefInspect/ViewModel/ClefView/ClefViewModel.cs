@@ -23,7 +23,9 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             _dataColumns = new ObservableCollection<DataColumnView>();
             _filterTaskManager = new FilterTaskManager(this, _settings);
             _calculationRunning = false;
-            PropertyChangedEventManager.AddHandler(_settings.SessionSettings, OnSettingsChanged, String.Empty);
+            PropertyChangedEventManager.AddHandler(_settings.SessionSettings, OnSessionSettingsLocalTimeChanged, nameof(_settings.SessionSettings.LocalTime));
+            PropertyChangedEventManager.AddHandler(_settings.SessionSettings, OnSessionSettingsOneLineOnlyChanged, nameof(_settings.SessionSettings.OneLineOnly));
+            PropertyChangedEventManager.AddHandler(_settings, OnViewSettingsRefTimeStampChanged, nameof(_settings.RefTimeStamp));
             Clef = new Clef(new FileInfo(fileName));
             ClefLines = new FilteredClef(_settings);
             Filters = new ObservableCollection<ClefFilterViewModel>();
@@ -47,11 +49,29 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             }
         }
 
-        private void OnSettingsChanged(object? sender, PropertyChangedEventArgs e)
+        private void OnSessionSettingsLocalTimeChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(_settings.SessionSettings.LocalTime))
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DatePosition)));
+            foreach (ClefLineViewModel lvm in ClefLines)
             {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DatePosition)));
+                lvm.NotifySettingsLocalTimeChanged();
+            }
+        }
+
+        private void OnSessionSettingsOneLineOnlyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            foreach (ClefLineViewModel lvm in ClefLines)
+            {
+                lvm.NotifySettingsOneLineOnlyChanged();
+            }
+        }
+
+        private void OnViewSettingsRefTimeStampChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DatePosition)));
+            foreach (ClefLineViewModel lvm in ClefLines)
+            {
+                lvm.NotifySettingsRefTimeStampChanged();
             }
         }
 
@@ -232,7 +252,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
         public ICommand ApplyTextFilter { get; }
         public ICommand FiltersMenu { get; }
 
-        public ClefLineView? SelectedItem
+        public ClefLineViewModel? SelectedItem
         {
             get
             {
@@ -283,7 +303,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                     {
                         if (ClefLines[i].GetTime() > dt)
                         {
-                            break; ;
+                            break;
                         }
                     }
                     _selectedIndex = i - 1;
