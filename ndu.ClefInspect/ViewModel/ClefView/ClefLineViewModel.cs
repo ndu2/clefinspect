@@ -7,11 +7,11 @@ using System.Windows.Media;
 
 namespace ndu.ClefInspect.ViewModel.ClefView
 {
-    public class ClefLineView : INotifyPropertyChanged
+    public class ClefLineViewModel : INotifyPropertyChanged
     {
         private readonly ClefViewSettings _settings;
         private readonly string? _messageOneLine;
-        public ClefLineView(ClefLine line, ClefViewSettings settings)
+        public ClefLineViewModel(ClefLine line, ClefViewSettings settings)
         {
             ClefLine = line;
             int nl = line.Message?.IndexOf('\n') ?? -1;

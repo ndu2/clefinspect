@@ -9,7 +9,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
         /// a collection changed event for every item. in the most usecases (filtering a lot)
         /// changing the whole list with NotifyCollectionChangedAction.Reset seems to be faster
         /// </summary>
-        public class FilteredClef : List<ClefLineView>, INotifyCollectionChanged
+        public class FilteredClef : List<ClefLineViewModel>, INotifyCollectionChanged
         {
             public FilteredClef(ClefViewSettings settings)
                 : base(settings.DefaultCapacity)

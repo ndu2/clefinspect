@@ -186,13 +186,13 @@ namespace ndu.ClefInspect.View
             (DataContext as ClefViewModel)?.ApplyTextFilter.Execute(this);
         }
 
-        private List<ClefLineView> GetSelectedInOrder()
+        private List<ClefLineViewModel> GetSelectedInOrder()
         {
             System.Collections.IList list = ListViewLogEntries.SelectedItems;
-            List<ClefLineView> selected = new(list.Count);
+            List<ClefLineViewModel> selected = new(list.Count);
             foreach (object item in list)
             {
-                if (item is ClefLineView line)
+                if (item is ClefLineViewModel line)
                 {
                     selected.Add(line);
                 }
@@ -217,8 +217,8 @@ namespace ndu.ClefInspect.View
         {
             List<string> columns = _customColumns.Keys.ToList();
             StringBuilder sb = new();
-            IList<ClefLineView> sel = GetSelectedInOrder();
-            foreach (ClefLineView line in sel)
+            IList<ClefLineViewModel> sel = GetSelectedInOrder();
+            foreach (ClefLineViewModel line in sel)
             {
                 sb.AppendLine(line.ToString(columns));
             }
@@ -232,8 +232,8 @@ namespace ndu.ClefInspect.View
         private void CopySelectedClef()
         {
             StringBuilder sb = new();
-            IList<ClefLineView> sel = GetSelectedInOrder();
-            foreach (ClefLineView line in sel)
+            IList<ClefLineViewModel> sel = GetSelectedInOrder();
+            foreach (ClefLineViewModel line in sel)
             {
                 sb.AppendLine(line.Json);
             }
@@ -248,7 +248,7 @@ namespace ndu.ClefInspect.View
         {
             foreach (var item in ListViewLogEntries.SelectedItems)
             {
-                if (item is ClefLineView line)
+                if (item is ClefLineViewModel line)
                 {
                     line.Pin = true;
                 }
@@ -259,7 +259,7 @@ namespace ndu.ClefInspect.View
         {
             foreach (var item in ListViewLogEntries.SelectedItems)
             {
-                if (item is ClefLineView line)
+                if (item is ClefLineViewModel line)
                 {
                     line.Pin = false;
                 }

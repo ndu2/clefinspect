@@ -71,14 +71,14 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                     return Task.CompletedTask;
                 }
 
-                ClefLineView? selectedLine = clefLines.ElementAtOrDefault(selectedIndex);
+                ClefLineViewModel? selectedLine = clefLines.ElementAtOrDefault(selectedIndex);
                 DateTime? date = selectedLine?.GetTime();
                 selectedIndex = -1;
                 int selectedIndexExact = -1;
 
                 int sourceIdx = (action == LinesChangedEventArgsAction.Add && clefLines.Count > 0) ? _nextItemFromSource : 0;
                 int idx = (action == LinesChangedEventArgsAction.Add) ? clefLines.Count : 0;
-                List<ClefLineView> result = new(clefLines);
+                List<ClefLineViewModel> result = new(clefLines);
 
                 return Task.Run(() =>
                 {
@@ -99,7 +99,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                         bool ok = line.Pin || (filters.Count == 0 || filters.All(f => f.Accept(line)));
                         if (ok)
                         {
-                            ClefLineView item;
+                            ClefLineViewModel item;
                             if (result.Count > idx)
                             {
                                 if (line == result[idx].ClefLine)
@@ -108,14 +108,14 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                                 }
                                 else
                                 {
-                                    item = new ClefLineView(line, _settings);
+                                    item = new ClefLineViewModel(line, _settings);
                                     result[idx] = item;
                                     changedAlot = true;
                                 }
                             }
                             else
                             {
-                                item = new ClefLineView(line, _settings);
+                                item = new ClefLineViewModel(line, _settings);
                                 result.Add(item);
                                 if (added.Item1 == null)
                                 {

@@ -52,7 +52,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
         private void OnSessionSettingsLocalTimeChanged(object? sender, PropertyChangedEventArgs e)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DatePosition)));
-            foreach (ClefLineView lvm in ClefLines)
+            foreach (ClefLineViewModel lvm in ClefLines)
             {
                 lvm.NotifySettingsLocalTimeChanged();
             }
@@ -60,7 +60,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
 
         private void OnSessionSettingsOneLineOnlyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            foreach (ClefLineView lvm in ClefLines)
+            foreach (ClefLineViewModel lvm in ClefLines)
             {
                 lvm.NotifySettingsOneLineOnlyChanged();
             }
@@ -69,7 +69,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
         private void OnViewSettingsRefTimeStampChanged(object? sender, PropertyChangedEventArgs e)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DatePosition)));
-            foreach (ClefLineView lvm in ClefLines)
+            foreach (ClefLineViewModel lvm in ClefLines)
             {
                 lvm.NotifySettingsRefTimeStampChanged();
             }
@@ -252,7 +252,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
         public ICommand ApplyTextFilter { get; }
         public ICommand FiltersMenu { get; }
 
-        public ClefLineView? SelectedItem
+        public ClefLineViewModel? SelectedItem
         {
             get
             {
