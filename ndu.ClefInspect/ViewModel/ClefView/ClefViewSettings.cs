@@ -10,7 +10,6 @@ namespace ndu.ClefInspect.ViewModel.ClefView
         public ClefViewSettings(MainViewSettings settings)
         {
             _settings = settings;
-            PropertyChangedEventManager.AddHandler(_settings, (s, e) => { PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SessionSettings))); }, string.Empty);
         }
 
         public MainViewSettings SessionSettings => _settings;
@@ -48,7 +47,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             set
             {
                 _refTimeStamp = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SessionSettings)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RefTimeStamp)));
             }
         }
 

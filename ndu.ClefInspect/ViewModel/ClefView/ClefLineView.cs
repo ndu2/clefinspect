@@ -24,19 +24,21 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                 _messageOneLine = line.Message;
             }
             _settings = settings;
-            PropertyChangedEventManager.AddHandler(settings, Settings_PropertyChanged, string.Empty);
         }
         public event PropertyChangedEventHandler? PropertyChanged;
-
-        private void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        public void NotifySettingsRefTimeStampChanged()
         {
-            if (e.PropertyName == nameof(_settings.SessionSettings))
-            {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Time)));
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DeltaTime)));
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Message)));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DeltaTime)));
         }
+        public void NotifySettingsLocalTimeChanged()
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Time)));
+        }
+        public void NotifySettingsOneLineOnlyChanged()
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Message)));
+        }
+
         public string? Time
         {
             get
