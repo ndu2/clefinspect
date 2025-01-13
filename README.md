@@ -4,7 +4,7 @@ A lightweight Windows (.NET, WPF) desktop app for viewing [CLEF](https://clef-js
 
 ![ClefInspect Screenshot](screenshot.png)
 
-Currently runs on Windows with .NET 6.0 only. Distributed as a zip archive.
+Currently runs on Windows with .NET 6.0 only. Distributed as a zip archive. You need to install [.NET Desktop Runtime 6.0](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) to run ClefInspect.
 
 
 ## Features
