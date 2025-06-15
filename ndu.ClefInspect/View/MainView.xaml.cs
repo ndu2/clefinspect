@@ -26,7 +26,14 @@ namespace ndu.ClefInspect.View
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-                ((MainViewModel)this.DataContext).OpenFiles(files);
+                if (files.Length > 1)
+                {
+                    ((MainViewModel)this.DataContext).SelectedFiles = files;
+                }
+                else
+                {
+                    ((MainViewModel)this.DataContext).OpenFiles(files);
+                }
             }
         }
     }

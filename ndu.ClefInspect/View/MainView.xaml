@@ -1,5 +1,6 @@
 ﻿<Window x:Class="ndu.ClefInspect.View.MainView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:System="clr-namespace:System;assembly=mscorlib" 
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -46,6 +47,9 @@
         <DataTemplate DataType="{x:Type viewmodel:ClefTab}">
             <local:ClefView DataContext="{Binding ClefViewModel}" />
         </DataTemplate>
+        <System:String x:Key="OpenParamTabbed">Tabbed</System:String>
+        <System:String x:Key="OpenParamConcat">Concat</System:String>
+        <System:String x:Key="OpenParamCancel">Cancel</System:String>
     </Window.Resources>
 
     <DockPanel>
@@ -100,8 +104,19 @@
                 </MenuItem>
             </MenuItem>
         </Menu>
+        <Popup DockPanel.Dock="Bottom" IsOpen="{Binding Popup, Mode=OneWay}" Placement="Center" >
+            <Border BorderThickness="1">
+                <StackPanel>
+                    <TextBlock>Multiple Files to open</TextBlock>
+                    <Button Command="{Binding OpenFilesTabbed}" CommandParameter="{StaticResource OpenParamTabbed}">Tapped</Button>
+                    <Button Command="{Binding OpenFilesConcat}" CommandParameter="{StaticResource OpenParamConcat}">Concat</Button>
+                    <Button Command="{Binding OpenFilesCancel}" CommandParameter="{StaticResource OpenParamCancel}">Cancel</Button>
+                </StackPanel>
+            </Border>
+        </Popup>
         <TabControl ItemsSource="{Binding ClefTabs}" SelectedItem="{Binding ActiveTab}" Name="ClefTabControl"
             ItemTemplate="{StaticResource tabControlHeaderTemplate}">
         </TabControl>
     </DockPanel>
+
 </Window>

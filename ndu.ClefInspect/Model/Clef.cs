@@ -19,6 +19,8 @@ namespace ndu.ClefInspect.Model
         private readonly ClefLockedList _lines = new();
         private readonly ConcurrentDictionary<string, (string, ConcurrentDictionary<string, int>)> _properties = new();
         private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, int>> _data = new();
+
+        private int _filePos;
         private long _seekPos;
         private readonly Timer _timer;
         private bool _autoUpdate;
@@ -33,13 +35,26 @@ namespace ndu.ClefInspect.Model
             {LEVEL_KEY,"Level"},
             //{"@i","Event Id"}
         };
+        public static readonly char Fsep = '|';
 
-        public Clef(FileInfo file)
+        public static Clef Create(string fd)
         {
-            File = file;
+            string[] fds = fd.Split(Fsep);
+            List<FileInfo> fileInfos = new List<FileInfo>();
+            foreach(string ifd in fds)
+            {
+                fileInfos.Add(new FileInfo(ifd));
+            }
+            return new Clef(fileInfos);
+        }
+
+        public Clef(List<FileInfo> files)
+        {
+            File = files;
             _seekPos = 0;
             _autoUpdate = true;
             _fileOk = true;
+            _filePos = 0;
             _timer = new Timer(Scan, this, 0, Timeout.Infinite);
         }
 
@@ -48,11 +63,23 @@ namespace ndu.ClefInspect.Model
         public delegate void LinesChangedEventHandler(object? sender, LinesChangedEventArgs e);
         public event LinesChangedEventHandler? LinesChanged;
 
-        public FileInfo File { get; }
+        public List<FileInfo> File { get; }
 
-        public string FilePath { get => File.FullName; }
+        public string Title
+        {
+            get
+            {
+                if (File.Count == 1)
+                {
+                    return File[0].Name;
+                }
+                else
+                {
+                    return "multiple";
 
-        public string FileName { get => File.Name; }
+                }
+            }
+        }
 
         public long SeekPos { get => _seekPos; }
 
@@ -129,7 +156,15 @@ namespace ndu.ClefInspect.Model
 
         private void Scan(object? _)
         {
-            (bool fileok, bool tracking) = Scan((args) => { LinesChanged?.Invoke(this, args); });
+            // scan all files, refresh on the latest only
+            for (; _filePos < File.Count; ++_filePos)
+            {
+                _seekPos = 0;
+                _bytesAvail = 0;
+                Scan(File[_filePos], (args) => { LinesChanged?.Invoke(this, args); });
+            }
+            (bool fileok, bool tracking) = Scan(File[File.Count-1], (args) => { LinesChanged?.Invoke(this, args); });
+
             if (!tracking)
             {
                 Application.Current?.Dispatcher?.Invoke(() => { AutoUpdate = false; });
@@ -185,32 +220,33 @@ namespace ndu.ClefInspect.Model
             }
         }
 
-        private (bool, bool) Scan(Action<LinesChangedEventArgs> uiUpdate)
+        private (bool, bool) Scan(FileInfo file, Action<LinesChangedEventArgs> uiUpdate)
         {
             TimedUiUpdate uiUpdateTimer = new(UiRefreshDelayMs, uiUpdate);
             try
             {
-                File.Refresh();
-                if (File.Exists)
+                file.Refresh();
+                if (file.Exists)
                 {
-                    if (_seekPos == 0)
+                    if (_seekPos < 0)
                     {
+                        _seekPos = 0;
                         _lines.Clear();
                         uiUpdateTimer.Notify(LinesChangedEventArgsAction.Reset);
                     }
-                    if (File.Length == _seekPos)
+                    if (file.Length == _seekPos)
                     {
                         return (true, true);
                     }
-                    if (File.Length < _seekPos)
+                    if (file.Length < _seekPos)
                     {
-                        _seekPos = 0;
+                        _seekPos = -1;
                         _bytesAvail = 0;
                         return (true, false);
                     }
                     int bytesAvailPref = _bytesAvail;
 
-                    using FileStream fileStream = System.IO.File.Open(File.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    using FileStream fileStream = System.IO.File.Open(file.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                     fileStream.Seek(_seekPos, SeekOrigin.Begin);
                     int bytesRead;
                     int start = 0;

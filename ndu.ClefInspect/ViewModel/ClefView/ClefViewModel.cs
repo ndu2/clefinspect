@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using System.Text;
 using System.Windows.Input;
 
 namespace ndu.ClefInspect.ViewModel.ClefView
@@ -26,7 +27,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             PropertyChangedEventManager.AddHandler(_settings.SessionSettings, OnSessionSettingsLocalTimeChanged, nameof(_settings.SessionSettings.LocalTime));
             PropertyChangedEventManager.AddHandler(_settings.SessionSettings, OnSessionSettingsOneLineOnlyChanged, nameof(_settings.SessionSettings.OneLineOnly));
             PropertyChangedEventManager.AddHandler(_settings, OnViewSettingsRefTimeStampChanged, nameof(_settings.RefTimeStamp));
-            Clef = new Clef(new FileInfo(fileName));
+            Clef = Clef.Create(fileName);
             ClefLines = new FilteredClef(_settings);
             Filters = [];
             ClearTextFilter = new ClearTextFilterCommand(this);
@@ -194,12 +195,27 @@ namespace ndu.ClefInspect.ViewModel.ClefView
         }
 
         public Clef Clef { get; }
-        public string FilePath => Clef.FilePath;
+        public string FilePath
+        {
+            get
+            {
+                StringBuilder sb = new();
+                foreach (FileInfo fi in Clef.File)
+                {
+                    if (sb.Length > 0)
+                    {
+                        sb.Append("; ");
+                    }
+                    sb.Append(fi.FullName);
+                }
+                return sb.ToString();
+            }
+        }
         public string FileInfo
         {
             get
             {
-                return $"Log Entries displayed: {ClefLines.Count} (Total {Clef.Count}, Size {ClefViewSettings.FormatFileSize(Clef.SeekPos)})";
+                return $"Log Entries displayed: {ClefLines.Count} (Total {Clef.Count}, Files {Clef.File.Count}, Size last file {ClefViewSettings.FormatFileSize(Clef.SeekPos)})";
             }
         }
         public string DateInfo
