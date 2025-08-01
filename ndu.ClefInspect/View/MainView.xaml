@@ -7,6 +7,7 @@
         xmlns:local="clr-namespace:ndu.ClefInspect.View"
         xmlns:viewmodel="clr-namespace:ndu.ClefInspect.ViewModel.MainView"
         mc:Ignorable="d"
+        x:Name="mainView"
         Title="CLEF Inspect" Height="800" Width="1200"
         AllowDrop="True" Drop="OnDrop">
     <Window.DataContext>
@@ -104,19 +105,53 @@
                 </MenuItem>
             </MenuItem>
         </Menu>
-        <Popup DockPanel.Dock="Bottom" IsOpen="{Binding Popup, Mode=OneWay}" Placement="Center" >
-            <Border BorderThickness="1">
-                <StackPanel>
-                    <TextBlock>Multiple Files to open</TextBlock>
-                    <Button Command="{Binding OpenFilesTabbed}" CommandParameter="{StaticResource OpenParamTabbed}">Tapped</Button>
-                    <Button Command="{Binding OpenFilesConcat}" CommandParameter="{StaticResource OpenParamConcat}">Concat</Button>
-                    <Button Command="{Binding OpenFilesCancel}" CommandParameter="{StaticResource OpenParamCancel}">Cancel</Button>
-                </StackPanel>
+
+        <Popup DockPanel.Dock="Bottom" IsOpen="{Binding ShowOpenFileOptions, Mode=OneWay}" Placement="Center" >
+            <Border BorderThickness="1" BorderBrush="{Binding ShowOpenFileForeground}"
+                    Background="{Binding ShowOpenFileBackground}">
+                <Grid Margin="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3">Multiple files to open:</TextBlock>
+                    <ItemsControl Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="5"
+                        HorizontalContentAlignment="Stretch"
+                        VirtualizingPanel.VirtualizationMode="Recycling"
+                        ItemsSource="{Binding SelectedFiles}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Margin="2,0,0,0" Text="{Binding}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <Button Grid.Row="2" Grid.Column="0" Width="{Binding ElementName=mainView, Path=ButtonSize}" Padding="5"
+                            Command="{Binding OpenFilesTabbed}" CommandParameter="{StaticResource OpenParamTabbed}">
+                        <StackPanel>
+                            <Image Source="{StaticResource di_tabbed}" ></Image>
+                            <TextBlock HorizontalAlignment="Center">Open in individual Tabs</TextBlock>
+                        </StackPanel>
+                    </Button>
+                    <Button Grid.Row="2" Grid.Column="1" Width="{Binding ElementName=mainView, Path=ButtonSize}" Padding="5"
+                            Command="{Binding OpenFilesConcat}" CommandParameter="{StaticResource OpenParamConcat}">
+                        <StackPanel HorizontalAlignment="Center">
+                            <Image Source="{StaticResource di_concat}" ></Image>
+                            <TextBlock HorizontalAlignment="Center">Merge in one Tab</TextBlock>
+                        </StackPanel>
+                    </Button>
+                    <Button Grid.Row="2" Grid.Column="2" Width="{Binding ElementName=mainView, Path=ButtonSize}" Padding="5"
+                        Command="{Binding OpenFilesCancel}" CommandParameter="{StaticResource OpenParamCancel}">Cancel</Button>
+                </Grid>
             </Border>
         </Popup>
         <TabControl ItemsSource="{Binding ClefTabs}" SelectedItem="{Binding ActiveTab}" Name="ClefTabControl"
             ItemTemplate="{StaticResource tabControlHeaderTemplate}">
         </TabControl>
     </DockPanel>
-
 </Window>

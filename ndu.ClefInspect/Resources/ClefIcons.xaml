@@ -1,0 +1,79 @@
+<?xml version="1.0" ?>
+<ResourceDictionary xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+    <DrawingGroup x:Key="tabbed">
+        <DrawingGroup.ClipGeometry>
+            <RectangleGeometry Rect="0.0,0.0,12.7,12.7"/>
+        </DrawingGroup.ClipGeometry>
+        <GeometryDrawing>
+            <GeometryDrawing.Pen>
+                <Pen Brush="#ff000000" LineJoin="Round" Thickness="0.36" DashCap="Flat"/>
+            </GeometryDrawing.Pen>
+            <GeometryDrawing.Geometry>
+                <RectangleGeometry Rect="0.18462639,1.6184534,12.332012,10.898954"/>
+            </GeometryDrawing.Geometry>
+        </GeometryDrawing>
+        <GeometryDrawing Brush="#ff000000">
+            <GeometryDrawing.Pen>
+                <Pen Brush="#ff000000" LineJoin="Round" Thickness="0.367813" DashCap="Flat"/>
+            </GeometryDrawing.Pen>
+            <GeometryDrawing.Geometry>
+                <RectangleGeometry Rect="0.18841586,0.19016765,3.8472321,1.4198158"/>
+            </GeometryDrawing.Geometry>
+        </GeometryDrawing>
+        <GeometryDrawing Brush="#ffbfbfbf">
+            <GeometryDrawing.Pen>
+                <Pen Brush="#ff000000" Thickness="0.282272" DashCap="Flat"/>
+            </GeometryDrawing.Pen>
+            <GeometryDrawing.Geometry>
+                <RectangleGeometry Rect="4.06953,0.51670671,2.8445108,1.1309677"/>
+            </GeometryDrawing.Geometry>
+        </GeometryDrawing>
+        <GeometryDrawing Brush="#ffd9d9d9">
+            <GeometryDrawing.Pen>
+                <Pen Brush="#ff000000" LineJoin="Round" Thickness="0.282272" DashCap="Flat"/>
+            </GeometryDrawing.Pen>
+            <GeometryDrawing.Geometry>
+                <RectangleGeometry Rect="6.9144301,0.51626861,2.8445108,1.1309677"/>
+            </GeometryDrawing.Geometry>
+        </GeometryDrawing>
+    </DrawingGroup>
+    <DrawingImage Drawing="{StaticResource tabbed}" x:Key="di_tabbed"/>
+    <DrawingGroup x:Key="concat">
+        <DrawingGroup.ClipGeometry>
+            <RectangleGeometry Rect="0.0,0.0,12.7,12.7"/>
+        </DrawingGroup.ClipGeometry>
+        <GeometryDrawing>
+            <GeometryDrawing.Pen>
+                <Pen Brush="#ff000000" LineJoin="Round" Thickness="0.357987" DashCap="Flat"/>
+            </GeometryDrawing.Pen>
+            <GeometryDrawing.Geometry>
+                <RectangleGeometry Rect="0.1819413,1.6164817,12.332012,3.3043306"/>
+            </GeometryDrawing.Geometry>
+        </GeometryDrawing>
+        <GeometryDrawing Brush="#ffd9d9d9">
+            <GeometryDrawing.Pen>
+                <Pen Brush="#ff000000" LineJoin="Round" Thickness="0.358153" DashCap="Flat"/>
+            </GeometryDrawing.Pen>
+            <GeometryDrawing.Geometry>
+                <RectangleGeometry Rect="0.1820765,9.2221804,12.331846,3.3912992"/>
+            </GeometryDrawing.Geometry>
+        </GeometryDrawing>
+        <GeometryDrawing Brush="#ffbfbfbf">
+            <GeometryDrawing.Pen>
+                <Pen Brush="#ff000000" LineJoin="Round" Thickness="0.358" DashCap="Flat"/>
+            </GeometryDrawing.Pen>
+            <GeometryDrawing.Geometry>
+                <RectangleGeometry Rect="0.1822494,4.8690825,12.331501,4.3645649"/>
+            </GeometryDrawing.Geometry>
+        </GeometryDrawing>
+        <GeometryDrawing Brush="#ff000000">
+            <GeometryDrawing.Pen>
+                <Pen Brush="#ff000000" LineJoin="Round" Thickness="0.367813" DashCap="Flat"/>
+            </GeometryDrawing.Pen>
+            <GeometryDrawing.Geometry>
+                <RectangleGeometry Rect="0.19007607,0.18874504,3.8472321,1.4198158"/>
+            </GeometryDrawing.Geometry>
+        </GeometryDrawing>
+    </DrawingGroup>
+    <DrawingImage Drawing="{StaticResource concat}" x:Key="di_concat"/>
+</ResourceDictionary>

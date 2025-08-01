@@ -1,7 +1,10 @@
 ﻿using ndu.ClefInspect.Model;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
+using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace ndu.ClefInspect.ViewModel.MainView
 {
@@ -86,6 +89,7 @@ namespace ndu.ClefInspect.ViewModel.MainView
                 OpenFile(file);
             }
         }
+
         public void OpenSelectedFilesTabbed()
         {
             if (SelectedFiles == null || SelectedFiles.Length == 0)
@@ -103,14 +107,18 @@ namespace ndu.ClefInspect.ViewModel.MainView
             if (SelectedFiles == null || SelectedFiles.Length == 0) {
                 return;
             }
-            string[] sorted = new string[SelectedFiles.Length];
-            Array.Copy(SelectedFiles, sorted, sorted.Length);
-            Array.Sort(sorted);
-            OpenFile(string.Join(Clef.Fsep, sorted));
+            OpenFile(string.Join(Clef.Fsep, SelectedFiles));
             SelectedFiles = null;
         }
 
         private string[]? _selectedFiles = null;
+        public void SetSelectedFilesSorted(string[] fileNames)
+        {
+            string[] sorted = new string[fileNames.Length];
+            Array.Copy(fileNames, sorted, sorted.Length);
+            Array.Sort(sorted);
+            SelectedFiles = sorted;
+        }
         public string[]? SelectedFiles
         {
             get => _selectedFiles;
@@ -118,9 +126,12 @@ namespace ndu.ClefInspect.ViewModel.MainView
             {
                 _selectedFiles = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectedFiles)));
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Popup)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ShowOpenFileOptions)));
             }
         }
-        public bool Popup => _selectedFiles != null && _selectedFiles.Length > 0;
+        public bool ShowOpenFileOptions => _selectedFiles != null && _selectedFiles.Length > 0;
+        public static Brush ShowOpenFileForeground => SystemColors.WindowTextBrush;
+        public static Brush ShowOpenFileBackground => SystemColors.WindowBrush;
+
     }
 }

@@ -1,5 +1,4 @@
-﻿
-namespace ndu.ClefInspect.ViewModel.MainView
+﻿namespace ndu.ClefInspect.ViewModel.MainView
 {
     public partial class MainViewModel
     {
@@ -24,7 +23,7 @@ namespace ndu.ClefInspect.ViewModel.MainView
                     }
                     else
                     {
-                        this.mainViewModel.SelectedFiles = dialog.FileNames;
+                        this.mainViewModel.SetSelectedFilesSorted(dialog.FileNames);
                     }
                 }
             }
