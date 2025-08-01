@@ -120,7 +120,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             bool newFilters = false;
             foreach (var p in Clef.Properties)
             {
-                if (!_filters.ContainsKey(p.Key))
+                if (!_filters.TryGetValue(p.Key, out Filter? value))
                 {
                     Filter filter = new(p.Key, p.Value.Item2);
                     PropertyChangedEventManager.AddHandler(filter, (s, e) => { Reload(); }, nameof(filter.Values));
@@ -132,12 +132,12 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                 }
                 else
                 {
-                    _filters[p.Key].Update(p.Value.Item2);
+                    value.Update(p.Value.Item2);
                 }
             }
             foreach (var p in Clef.Data)
             {
-                if (!_filters.ContainsKey(p.Key))
+                if (!_filters.TryGetValue(p.Key, out Filter? value))
                 {
                     Filter filter = new(p.Key, p.Value);
                     PropertyChangedEventManager.AddHandler(filter, (s, e) => { Reload(); }, nameof(filter.Values));
@@ -152,7 +152,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                 }
                 else
                 {
-                    _filters[p.Key].Update(p.Value);
+                    value.Update(p.Value);
                 }
             }
             if (newFilters)

@@ -40,7 +40,7 @@ namespace ndu.ClefInspect.Model
         public static Clef Create(string fd)
         {
             string[] fds = fd.Split(Fsep);
-            List<FileInfo> fileInfos = new List<FileInfo>();
+            List<FileInfo> fileInfos = [];
             foreach(string ifd in fds)
             {
                 fileInfos.Add(new FileInfo(ifd));
@@ -163,7 +163,7 @@ namespace ndu.ClefInspect.Model
                 _bytesAvail = 0;
                 Scan(File[_filePos], (args) => { LinesChanged?.Invoke(this, args); });
             }
-            (bool fileok, bool tracking) = Scan(File[File.Count-1], (args) => { LinesChanged?.Invoke(this, args); });
+            (bool fileok, bool tracking) = Scan(File[^1], (args) => { LinesChanged?.Invoke(this, args); });
 
             if (!tracking)
             {
