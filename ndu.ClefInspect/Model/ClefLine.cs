@@ -1,10 +1,26 @@
 ﻿using System.Text;
+using System.Text.Encodings.Web;
+using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.Unicode;
 
 namespace ndu.ClefInspect.Model
 {
     public class ClefLine(long sort, JsonObject? line)
     {
+
+        private static readonly JsonSerializerOptions _showUnicode = new()
+        {
+            Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+            WriteIndented = false
+        };
+
+        private static readonly JsonSerializerOptions _escapeUnicode = new()
+        {
+            Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin),
+            WriteIndented = false
+        };
+
         private readonly JsonObject? _line = line;
 
         private static string? Render(JsonObject? line)
@@ -41,7 +57,7 @@ namespace ndu.ClefInspect.Model
                         {
                             state = ParseState.Text;
                             string t1 = mt.Substring(i1 + 1, i - i1 - 1);
-                            outString.Append(line[t1]?.ToJsonString() ?? $"{{{t1}}}");
+                            outString.Append(line[t1]?.ToJsonString(_showUnicode) ?? $"{{{t1}}}");
                             i1 = i + 1;
                         }
                         break;
@@ -92,7 +108,7 @@ namespace ndu.ClefInspect.Model
         {
             get
             {
-                return _line?.ToJsonString();
+                return _line?.ToJsonString(_escapeUnicode);
             }
         }
 

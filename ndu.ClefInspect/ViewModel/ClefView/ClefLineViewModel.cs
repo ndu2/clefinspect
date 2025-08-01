@@ -1,7 +1,10 @@
 ﻿using ndu.ClefInspect.Model;
 using System.ComponentModel;
 using System.Text;
+using System.Text.Encodings.Web;
+using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.Unicode;
 using System.Windows;
 using System.Windows.Media;
 
@@ -11,6 +14,20 @@ namespace ndu.ClefInspect.ViewModel.ClefView
     {
         private readonly ClefViewSettings _settings;
         private readonly string? _messageOneLine;
+
+
+        private static readonly JsonSerializerOptions _propFormatOneLine = new()
+        {
+            Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+            WriteIndented = false
+        };
+
+        private static readonly JsonSerializerOptions _propFormatMultiLine = new()
+        {
+            Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+            WriteIndented = true
+        };
+
         public ClefLineViewModel(ClefLine line, ClefViewSettings settings)
         {
             ClefLine = line;
@@ -100,7 +117,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             {
                 if (ClefLine?.JsonObject?.TryGetPropertyValue(key, out JsonNode? jsonNode) ?? false)
                 {
-                    return _settings.SessionSettings.OneLineOnly ? jsonNode?.ToJsonString() : jsonNode?.ToString();
+                    return jsonNode?.ToJsonString(_settings.SessionSettings.OneLineOnly ? _propFormatOneLine : _propFormatMultiLine);
                 }
                 else
                 {
