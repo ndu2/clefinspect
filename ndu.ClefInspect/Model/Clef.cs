@@ -410,7 +410,7 @@ namespace ndu.ClefInspect.Model
                             }
                         }
                         {
-                            if (!(kv.Key[0] == '@') && kv.Value != null)
+                            if (((kv.Key.Length >= 1 && kv.Key[0] != '@') || (kv.Key.Length >= 2 && kv.Key[1] == '@')) && kv.Value != null)
                             {
                                 ConcurrentDictionary<string, int> values = _data.GetOrAdd(kv.Key, (k) =>
                                 {
