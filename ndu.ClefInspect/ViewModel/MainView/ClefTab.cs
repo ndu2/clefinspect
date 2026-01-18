@@ -49,7 +49,7 @@ namespace ndu.ClefInspect.ViewModel.MainView
 
         public ICommand Close { get; set; }
 
-        public string Name => ClefViewModel.Clef.FileName;
+        public string Name => ClefViewModel.Clef.Title;
 
         public ClefViewModel ClefViewModel { get; }
 

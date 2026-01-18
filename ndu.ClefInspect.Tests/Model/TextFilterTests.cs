@@ -31,33 +31,33 @@ namespace ndu.ClefInspect.Tests.Model
         [TestMethod]
         public void Accept_IsCaseInsensitive()
         {
-            TextFilter textFilter = new TextFilter("HalIhaLo");
+            TextFilter textFilter = new("HalIhaLo");
             Assert.IsTrue(textFilter.Create().Accept(testLogLine2));
             Assert.IsTrue(textFilter.Create().Accept(testLogLine3));
         }
         [TestMethod]
         public void Accept_Trims_Whitespaces()
         {
-            TextFilter textFilter = new TextFilter("a ,b, kv  ");
+            TextFilter textFilter = new("a ,b, kv  ");
             Assert.IsTrue(textFilter.Create().Accept(testLogLine1));
         }
         [TestMethod]
         public void Accept_Handles_Quotes1()
         {
-            TextFilter textFilter = new TextFilter("my, message");
+            TextFilter textFilter = new("my, message");
             Assert.IsTrue(textFilter.Create().Accept(testLogLine2));
         }
         [TestMethod]
         public void Accept_Handles_Quotes2()
         {
-            TextFilter textFilter = new TextFilter("\"my, message\"");
+            TextFilter textFilter = new("\"my, message\"");
             Assert.IsTrue(textFilter.Create().Accept(testLogLine2));
         }
 
         [TestMethod]
         public void Accept_Handles_Quotes3()
         {
-            TextFilter textFilter = new TextFilter("\"messag \"");
+            TextFilter textFilter = new("\"messag \"");
             Assert.IsFalse(textFilter.Create().Accept(testLogLine2));
             Assert.IsFalse(textFilter.Create().Accept(testLogLine3));
         }
@@ -65,20 +65,20 @@ namespace ndu.ClefInspect.Tests.Model
         [TestMethod]
         public void Accept_Uses_Formatted_Message()
         {
-            TextFilter textFilter = new TextFilter("\"halihalo\"");
+            TextFilter textFilter = new("\"halihalo\"");
             Assert.IsTrue(textFilter.Create().Accept(testLogLine2));
             Assert.IsTrue(textFilter.Create().Accept(testLogLine3));
         }
         [TestMethod]
         public void Accept_IgnoresData1()
         {
-            TextFilter textFilter = new TextFilter("Debug");
+            TextFilter textFilter = new("Debug");
             Assert.IsFalse(textFilter.Create().Accept(testLogLine1));
         }
         [TestMethod]
         public void Accept_IgnoresData2()
         {
-            TextFilter textFilter = new TextFilter("test");
+            TextFilter textFilter = new("test");
             Assert.IsFalse(textFilter.Create().Accept(testLogLine2));
         }
     }

@@ -1,6 +1,9 @@
-﻿using ndu.ClefInspect.ViewModel.MainView;
+﻿using ndu.ClefInspect.ViewModel;
+using ndu.ClefInspect.ViewModel.MainView;
+using System.Globalization;
 using System.Reflection;
 using System.Windows;
+using System.Windows.Media;
 using static ndu.ClefInspect.SingleInstanceManager;
 
 namespace ndu.ClefInspect.View
@@ -26,7 +29,27 @@ namespace ndu.ClefInspect.View
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-                ((MainViewModel)this.DataContext).OpenFiles(files);
+                if (files.Length > 1)
+                {
+                    ((MainViewModel)this.DataContext).SetSelectedFilesSorted(files);
+                }
+                else
+                {
+                    ((MainViewModel)this.DataContext).OpenFiles(files);
+                }
+            }
+        }
+
+
+        public double ButtonSize
+        {
+            get
+            {
+                FormattedText formattedText = new("WWOpen in individual TabsWW", CultureInfo.CurrentCulture,
+                        FlowDirection, new Typeface(FontFamily, FontStyle, FontWeight, FontStretch),
+                        FontSize, Brushes.Black,
+                        VisualTreeHelper.GetDpi(this).PixelsPerDip);
+                return formattedText.Width;
             }
         }
     }

@@ -10,16 +10,23 @@
             {
                 var dialog = new Microsoft.Win32.OpenFileDialog
                 {
-                    Filter = @"all supported logs|*.json;*.clef|Json only (.json)|*.json|Clef only (.clef)|*.clef|All|*.*"
+                    Filter = @"all supported logs|*.json;*.clef|Json only (.json)|*.json|Clef only (.clef)|*.clef|All|*.*",
+                    Multiselect = true
                 };
                 bool? result = dialog.ShowDialog();
                 // Process open file dialog box results
                 if (result == true)
                 {
-                    this.mainViewModel.OpenFile(dialog.FileName);
+                    if (dialog.FileNames.Length == 1)
+                    {
+                        this.mainViewModel.OpenFiles(dialog.FileNames);
+                    }
+                    else
+                    {
+                        this.mainViewModel.SetSelectedFilesSorted(dialog.FileNames);
+                    }
                 }
             }
         }
-
     }
 }

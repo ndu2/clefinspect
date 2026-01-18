@@ -1,6 +1,10 @@
-﻿using System.Collections.ObjectModel;
+﻿using ndu.ClefInspect.Model;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
+using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace ndu.ClefInspect.ViewModel.MainView
 {
@@ -19,6 +23,9 @@ namespace ndu.ClefInspect.ViewModel.MainView
             }
             Exit = new ExitCommand();
             Open = new OpenCommand(this);
+            OpenFilesTabbed = new OpenFilesTabbedCommand(this);
+            OpenFilesConcat = new OpenFilesConcatCommand(this);
+            OpenFilesCancel = new OpenFilesCancelCommand(this);
             SaveViewDefaults = new SaveViewDefaultsCommand(this);
             ApplyViewDefaults = new ApplyViewDefaultsCommand(this);
             SaveSession = new SaveSessionCommand(this);
@@ -34,6 +41,9 @@ namespace ndu.ClefInspect.ViewModel.MainView
 
         public MainViewSettings Settings { get; }
         public ICommand Open { get; set; }
+        public ICommand OpenFilesTabbed { get; set; }
+        public ICommand OpenFilesConcat { get; set; }
+        public ICommand OpenFilesCancel { get; set; }
         public ICommand SaveViewDefaults { get; set; }
         public ICommand ApplyViewDefaults { get; set; }
         public ICommand SaveSession { get; set; }
@@ -79,5 +89,49 @@ namespace ndu.ClefInspect.ViewModel.MainView
                 OpenFile(file);
             }
         }
+
+        public void OpenSelectedFilesTabbed()
+        {
+            if (SelectedFiles == null || SelectedFiles.Length == 0)
+            {
+                return;
+            }
+            foreach (string file in SelectedFiles)
+            {
+                OpenFile(file);
+            }
+            SelectedFiles = null;
+        }
+        public void OpenSelectedFilesConcat()
+        {
+            if (SelectedFiles == null || SelectedFiles.Length == 0) {
+                return;
+            }
+            OpenFile(string.Join(Clef.Fsep, SelectedFiles));
+            SelectedFiles = null;
+        }
+
+        private string[]? _selectedFiles = null;
+        public void SetSelectedFilesSorted(string[] fileNames)
+        {
+            string[] sorted = new string[fileNames.Length];
+            Array.Copy(fileNames, sorted, sorted.Length);
+            Array.Sort(sorted);
+            SelectedFiles = sorted;
+        }
+        public string[]? SelectedFiles
+        {
+            get => _selectedFiles;
+            set
+            {
+                _selectedFiles = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectedFiles)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ShowOpenFileOptions)));
+            }
+        }
+        public bool ShowOpenFileOptions => _selectedFiles != null && _selectedFiles.Length > 0;
+        public static Brush ShowOpenFileForeground => SystemColors.WindowTextBrush;
+        public static Brush ShowOpenFileBackground => SystemColors.WindowBrush;
+
     }
 }

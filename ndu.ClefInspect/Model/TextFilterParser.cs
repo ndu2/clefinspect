@@ -15,7 +15,7 @@ namespace ndu.ClefInspect.Model
         {
             // parse
             List<string> textFilter = [];
-            StringBuilder outs = new StringBuilder();
+            StringBuilder outs = new();
             ParseState ps = ParseState.Init;
             int quotepos = -1;
             for (int i = 0; i < text?.Length; ++i)
