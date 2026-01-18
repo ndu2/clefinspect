@@ -292,6 +292,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                     _selectedIndex = value;
                     _settings.RefTimeStamp = ClefLines.ElementAtOrDefault(_selectedIndex)?.GetTime();
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectedIndex)));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectedItem)));
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DatePosition)));
                 }
             }

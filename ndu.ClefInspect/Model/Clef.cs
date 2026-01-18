@@ -15,6 +15,8 @@ namespace ndu.ClefInspect.Model
         private const int UiRefreshDelayMs = 250;
         public const string LEVEL_KEY = "@l";
         public const string LEVEL_EMPTY = "Info";
+        public const string EXCEPTION_KEY = "@x";
+        public const string EXCEPTION_EMPTY = "";
         private bool _disposedValue;
         private readonly ClefLockedList _lines = new();
         private readonly ConcurrentDictionary<string, (string, ConcurrentDictionary<string, int>)> _properties = new();

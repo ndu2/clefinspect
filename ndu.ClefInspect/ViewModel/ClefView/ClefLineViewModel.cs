@@ -95,6 +95,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             }
         }
         public string? Message => _settings.SessionSettings.OneLineOnly ? _messageOneLine : ClefLine.Message;
+        public string? Exception => ClefLine.Exception;
         public JsonObject? JsonObject => ClefLine.JsonObject;
         public string? Json => ClefLine.Json;
 

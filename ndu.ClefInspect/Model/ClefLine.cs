@@ -98,6 +98,13 @@ namespace ndu.ClefInspect.Model
         public DateTime? Time { get; } = GetTime(line);
 
         public string? Message { get; } = Render(line);
+        public string? Exception
+        {
+            get
+            {
+                return _line?[Clef.EXCEPTION_KEY]?.ToString() ?? Clef.EXCEPTION_EMPTY;
+            }
+        }
 
         public JsonObject? JsonObject
         {
