@@ -55,13 +55,41 @@ namespace ndu.ClefInspect.ViewModel
                 }
             }
         }
-
+        public bool DetailView
+        {
+            get => _configuration.ViewSettings.DetailView;
+            set
+            {
+                if (_configuration.ViewSettings.DetailView != value)
+                {
+                    _configuration.ViewSettings.DetailView = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DetailView)));
+                }
+            }
+        }
+        public double DetailViewFraction
+        {
+            get => _configuration.ViewSettings.DetailViewFraction;
+            set
+            {
+                if (_configuration.ViewSettings.DetailViewFraction != value)
+                {
+                    _configuration.ViewSettings.DetailViewFraction = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DetailViewFraction)));
+                }
+            }
+        }
         public static string LevelWidthText => "WARNINGW";
         public static string DefaultColWidthText => "WWWWWWWWWWWWWWWWWWWWWW";
         public static string DeltaWidthText => "WWWWWW";
         private static string ClefLineFormatString { get; }
         private static string ClefLineNoLogFormatString { get; }
         private static string ClefColFormatString { get; }
+        public static String HeaderTime => "Date";
+        public static String HeaderLevel => "Level";
+        public static String HeaderMessage => "Log";
+        public static String HeaderException => "Exception";
+        public static String HeaderJson => "Json";
 
         static MainViewSettings()
         {

@@ -14,6 +14,11 @@ namespace ndu.ClefInspect.Model
             Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
             WriteIndented = false
         };
+        private static readonly JsonSerializerOptions _showUnicodeMultiline = new()
+        {
+            Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+            WriteIndented = true
+        };
 
         private static readonly JsonSerializerOptions _escapeUnicode = new()
         {
@@ -102,7 +107,7 @@ namespace ndu.ClefInspect.Model
         {
             get
             {
-                return _line?[Clef.EXCEPTION_KEY]?.ToString() ?? Clef.EXCEPTION_EMPTY;
+                return _line?[Clef.EXCEPTION_KEY]?.ToString();
             }
         }
 
@@ -116,6 +121,13 @@ namespace ndu.ClefInspect.Model
             get
             {
                 return _line?.ToJsonString(_escapeUnicode);
+            }
+        }
+        public string? JsonFormatted
+        {
+            get
+            {
+                return _line?.ToJsonString(_showUnicodeMultiline);
             }
         }
 

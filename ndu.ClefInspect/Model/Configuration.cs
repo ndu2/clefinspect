@@ -21,6 +21,8 @@ namespace ndu.ClefInspect.Model
             public bool OneLineOnly { get; set; }
             public HashSet<string> DefaultFilterVisibility { get; set; } = [];
             public HashSet<string> DefaultColumnVisibility { get; set; } = [];
+            public double DetailViewFraction { get; set; } = 0.33;
+            public bool DetailView { get; set; } = false;
         }
 
         public class SessionOptions

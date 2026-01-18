@@ -62,14 +62,10 @@
 
         <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="5">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="70*"/>
+                <ColumnDefinition Width="{Binding ColWidthEvtList}"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="30*"/>
+                <ColumnDefinition Width="{Binding ColWidthDetails}"/>
             </Grid.ColumnDefinitions>
-
-
-
-
             <ListView Grid.Column="0"
                   ScrollViewer.VerticalScrollBarVisibility="Visible" 
                   ScrollViewer.ScrollChanged="ListViewLogEntries_ScrollChanged"
@@ -140,9 +136,22 @@
                 </ListView.ContextMenu>
             </ListView>
             <GridSplitter Grid.Column="1" ResizeBehavior="PreviousAndNext" VerticalAlignment="Stretch" Width="4" />
-            <TextBox Grid.Column="2" IsReadOnly="True"
-                     ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" 
-                     Text="{Binding SelectedItem.Exception, Mode=OneWay}" />
+            <Grid Grid.Column="2" Visibility="{Binding DetailsVisibility}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" FontWeight="Bold" Text="Event Details" />
+                <ScrollViewer Grid.Row="1">
+                <ItemsControl  ItemsSource="{Binding SelectedItem.Details}" Visibility="{Binding DetailsVisibility}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <local:ClefDetailView DataContext="{Binding}" Margin="2,2,2,2" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
         </Grid>
     </Grid>
 </UserControl>
