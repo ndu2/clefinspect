@@ -44,7 +44,7 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <local:ClefViewFilter DataContext="{Binding}" Margin="2,2,2,2" />
+                    <local:ClefFilterView DataContext="{Binding}" Margin="2,2,2,2" />
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
