@@ -3,11 +3,11 @@
 namespace ndu.ClefInspect.View
 {
     /// <summary>
-    /// Interaction logic for ClefViewFilter.xaml
+    /// Interaction logic for ClefFilterView.xaml
     /// </summary>
-    public partial class ClefViewFilter : UserControl
+    public partial class ClefFilterView : UserControl
     {
-        public ClefViewFilter()
+        public ClefFilterView()
         {
             InitializeComponent();
         }

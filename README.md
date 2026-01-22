@@ -59,7 +59,7 @@ You may want to put a file `ClefInspect.defaults.json` in the folder of `ClefIns
 
 	{
 	"clefFeatures": {
-		"WriteableConfig": false
+		"WriteableConfig": true
 	},
 	"viewSettings": {
 		"LocalTime": true,
@@ -68,12 +68,16 @@ You may want to put a file `ClefInspect.defaults.json` in the folder of `ClefIns
 		"Level",
 		"SourceContext"
 		],
-		"DefaultColumnVisibility": []
+		"DefaultColumnVisibility": [
+			"ThreadId"
+		],
+		"DetailViewFraction": 0.33,
+		"DetailView": false
 	},
 	"session": {
 		"Files": [
-		"C:\\temp\a.json",
-		"C:\\temp\b.json"
+		"C:\\temp\\a.json",
+		"C:\\temp\\b.json"
 		]
 	}
 	}
@@ -81,8 +85,6 @@ You may want to put a file `ClefInspect.defaults.json` in the folder of `ClefIns
 
 ## Future
 
-I use ClefInspect 1.2 actively, thus i will enhance and fix every now and then. Feel free to report bugs or wishes on github.
+I use ClefInspect 1.3 actively, thus i will enhance and fix every now and then. Feel free to report bugs or wishes on github.
 
 Commercial support is available via my employer (see my github profile).
-
-There are ideas to develop ClefInspect 2.0 for cross-platform by rewriting the WPF UI using Avalonia UI. Please contact my if you are interested to collaborate.

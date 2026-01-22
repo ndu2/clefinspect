@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Text;
+using System.Windows;
 using System.Windows.Input;
 
 namespace ndu.ClefInspect.ViewModel.ClefView
@@ -16,6 +17,8 @@ namespace ndu.ClefInspect.ViewModel.ClefView
         private TextFilter? _textFilter;
         private int _selectedIndex;
         private bool _calculationRunning;
+        private GridLength _colWidthEvtList;
+        private GridLength _colWidthDetails;
 
         public ClefViewModel(string fileName, MainViewSettings settings)
         {
@@ -24,8 +27,11 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             _dataColumns = [];
             _filterTaskManager = new FilterTaskManager(this, _settings);
             _calculationRunning = false;
+            DetailViewInit();
             PropertyChangedEventManager.AddHandler(_settings.SessionSettings, OnSessionSettingsLocalTimeChanged, nameof(_settings.SessionSettings.LocalTime));
             PropertyChangedEventManager.AddHandler(_settings.SessionSettings, OnSessionSettingsOneLineOnlyChanged, nameof(_settings.SessionSettings.OneLineOnly));
+            PropertyChangedEventManager.AddHandler(_settings.SessionSettings, OnSessionSettingsDetailViewChanged, nameof(_settings.SessionSettings.DetailView));
+            PropertyChangedEventManager.AddHandler(_settings.SessionSettings, OnSessionSettingsDetailViewChanged, nameof(_settings.SessionSettings.DetailViewFraction));
             PropertyChangedEventManager.AddHandler(_settings, OnViewSettingsRefTimeStampChanged, nameof(_settings.RefTimeStamp));
             Clef = Clef.Create(fileName);
             ClefLines = new FilteredClef(_settings);
@@ -35,6 +41,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             FiltersMenu = new FiltersMenuCommand(this);
             Clef.LinesChanged += Reload;
         }
+
         public ClefViewSettings Settings => _settings;
 
         public bool CalculationRunning
@@ -74,6 +81,20 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             {
                 lvm.NotifySettingsRefTimeStampChanged();
             }
+        }
+        private void OnSessionSettingsDetailViewChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            DetailViewInit();
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DetailsVisibility)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ColWidthEvtList)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ColWidthDetails)));
+        }
+
+        private void DetailViewInit()
+        {
+            double eventSize = _settings.SessionSettings.DetailView ? (1.0 - _settings.SessionSettings.DetailViewFraction) : 1.0;
+            _colWidthEvtList = new GridLength(eventSize, GridUnitType.Star);
+            _colWidthDetails = new GridLength(1.0 - eventSize, GridUnitType.Star);
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -262,6 +283,9 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                 }
             }
         }
+        public GridLength ColWidthEvtList => _colWidthEvtList;
+        public GridLength ColWidthDetails => _colWidthDetails;
+        public Visibility DetailsVisibility => _settings.SessionSettings.DetailView ? Visibility.Visible: Visibility.Collapsed;
 
         public ICommand ClearTextFilter { get; }
 
@@ -279,6 +303,14 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                 return ClefLines[SelectedIndex];
             }
         }
+        public IEnumerable<ClefLineViewDetailModel> SelectedItemDetails
+        {
+            get
+            {
+                return SelectedItem?.Details(DataColumns) ?? [];
+            }
+        }
+
         public double VerticalOffset { get; set; }
         public double HorizontalOffset { get; set; }
 
@@ -292,6 +324,8 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                     _selectedIndex = value;
                     _settings.RefTimeStamp = ClefLines.ElementAtOrDefault(_selectedIndex)?.GetTime();
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectedIndex)));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectedItem)));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectedItemDetails)));
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DatePosition)));
                 }
             }

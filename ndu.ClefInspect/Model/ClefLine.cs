@@ -14,7 +14,6 @@ namespace ndu.ClefInspect.Model
             Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
             WriteIndented = false
         };
-
         private static readonly JsonSerializerOptions _escapeUnicode = new()
         {
             Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin),
@@ -98,6 +97,13 @@ namespace ndu.ClefInspect.Model
         public DateTime? Time { get; } = GetTime(line);
 
         public string? Message { get; } = Render(line);
+        public string? Exception
+        {
+            get
+            {
+                return _line?[Clef.EXCEPTION_KEY]?.ToString();
+            }
+        }
 
         public JsonObject? JsonObject
         {

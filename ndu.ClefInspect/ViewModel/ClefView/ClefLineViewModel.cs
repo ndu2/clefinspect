@@ -95,6 +95,27 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             }
         }
         public string? Message => _settings.SessionSettings.OneLineOnly ? _messageOneLine : ClefLine.Message;
+
+        public string? Exception => ClefLine.Exception;
+
+        public string? JsonFormatted
+        {
+            get
+            {
+                return ClefLine?.JsonObject?.ToJsonString(_propFormatMultiLine);
+            }
+        }
+
+        public IEnumerable<ClefLineViewDetailModel> Details(IEnumerable<ClefViewModel.DataColumnView> properties)
+        {
+            List<ClefLineViewDetailModel> details = [];
+            foreach(ClefViewModel.DataColumnView property in properties)
+            {
+                details.Add(new ClefLineViewDetailModel(property.Header, this[property.Header]));
+            }
+            return details;
+        }
+
         public JsonObject? JsonObject => ClefLine.JsonObject;
         public string? Json => ClefLine.Json;
 
