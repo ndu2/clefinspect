@@ -85,11 +85,6 @@ namespace ndu.ClefInspect.ViewModel
         private static string ClefLineFormatString { get; }
         private static string ClefLineNoLogFormatString { get; }
         private static string ClefColFormatString { get; }
-        public static String HeaderTime => "Date";
-        public static String HeaderLevel => "Level";
-        public static String HeaderMessage => "Log";
-        public static String HeaderException => "Exception";
-        public static String HeaderJson => "Json";
 
         static MainViewSettings()
         {

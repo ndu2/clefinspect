@@ -96,23 +96,24 @@ namespace ndu.ClefInspect.ViewModel.ClefView
         }
         public string? Message => _settings.SessionSettings.OneLineOnly ? _messageOneLine : ClefLine.Message;
 
-        public IEnumerable<ClefLineViewDetailModel> Details
+        public string? Exception => ClefLine.Exception;
+
+        public string? JsonFormatted
         {
             get
             {
-                List<ClefLineViewDetailModel> _det =
-                [
-                    new ClefLineViewDetailModel(MainViewSettings.HeaderTime, Time, SystemColors.WindowBrush),
-                    new ClefLineViewDetailModel(MainViewSettings.HeaderLevel, Level, LevelBackground),
-                    new ClefLineViewDetailModel(MainViewSettings.HeaderMessage, ClefLine.Message, SystemColors.WindowBrush),
-                ];
-                if (ClefLine.Exception != null)
-                {
-                    _det.Add(new ClefLineViewDetailModel(MainViewSettings.HeaderException, ClefLine.Exception, SystemColors.WindowBrush));
-                }
-                _det.Add(new ClefLineViewDetailModel(MainViewSettings.HeaderJson, ClefLine.JsonFormatted, SystemColors.WindowBrush));
-                return _det;
+                return ClefLine?.JsonObject?.ToJsonString(_propFormatMultiLine);
             }
+        }
+
+        public IEnumerable<ClefLineViewDetailModel> Details(IEnumerable<ClefViewModel.DataColumnView> properties)
+        {
+            List<ClefLineViewDetailModel> details = [];
+            foreach(ClefViewModel.DataColumnView property in properties)
+            {
+                details.Add(new ClefLineViewDetailModel(property.Header, this[property.Header]));
+            }
+            return details;
         }
 
         public JsonObject? JsonObject => ClefLine.JsonObject;

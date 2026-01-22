@@ -141,15 +141,9 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" FontWeight="Bold" Text="Event Details" />
-                <ScrollViewer Grid.Row="1">
-                <ItemsControl  ItemsSource="{Binding SelectedItem.Details}" Visibility="{Binding DetailsVisibility}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <local:ClefDetailView DataContext="{Binding}" Margin="2,2,2,2" />
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                <TextBlock Grid.Row="0" FontWeight="Bold" Text="Event Details" Margin="2" />
+                <ScrollViewer Grid.Row="1" Margin="2">
+                    <local:ClefDetailView />
                 </ScrollViewer>
             </Grid>
         </Grid>
