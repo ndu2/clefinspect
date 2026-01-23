@@ -30,7 +30,7 @@
                    Text="{Binding SelectedItem.Level}" Background="{Binding SelectedItem.LevelBackground}" />
         <TextBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
                  ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" IsReadOnly="True"
-                 Text="{Binding SelectedItem.Message, Mode=OneWay}" />
+                 Text="{Binding SelectedItem.MessageMultiline, Mode=OneWay}" />
         <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Text="Exception" FontWeight="Bold" />
         <TextBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
                                  IsReadOnly="True"

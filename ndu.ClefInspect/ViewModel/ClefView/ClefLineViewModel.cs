@@ -96,6 +96,8 @@ namespace ndu.ClefInspect.ViewModel.ClefView
         }
         public string? Message => _settings.SessionSettings.OneLineOnly ? _messageOneLine : ClefLine.Message;
 
+        public string? MessageMultiline => ClefLine.Message;
+
         public string? Exception => ClefLine.Exception;
 
         public string? JsonFormatted
@@ -111,7 +113,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             List<ClefLineViewDetailModel> details = [];
             foreach(ClefViewModel.DataColumnView property in properties)
             {
-                details.Add(new ClefLineViewDetailModel(property.Header, this[property.Header]));
+                details.Add(new ClefLineViewDetailModel(property.Header, this.PropertyMultiline(property.Header)));
             }
             return details;
         }
@@ -146,6 +148,19 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                 }
             }
         }
+
+        public string? PropertyMultiline(string key)
+        {
+            if (ClefLine?.JsonObject?.TryGetPropertyValue(key, out JsonNode? jsonNode) ?? false)
+            {
+                return jsonNode?.ToJsonString(_propFormatMultiLine);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         public override string ToString()
         {
             return MainViewSettings.Format(this);
