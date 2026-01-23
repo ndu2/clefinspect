@@ -30,7 +30,7 @@
             FontWeight="Bold" Text="{Binding Name}" />
         <Button Grid.Row="0" Grid.Column="1" Command="{Binding CheckAll}" >All</Button>
         <Button Grid.Row="0" Grid.Column="2" Command="{Binding CheckNone}" >None</Button>
-        <Button Grid.Row="0" Grid.Column="3" FontFamily="Segoe UI Symbol" Content="&#xE10A;" Command="{Binding ChangeVisibility}" CommandParameter="{StaticResource FalseValue}" />
+        <Button Grid.Row="0" Grid.Column="3" Content="{StaticResource icon_close}" Command="{Binding ChangeVisibility}" CommandParameter="{StaticResource FalseValue}" />
         <ListBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" HorizontalContentAlignment="Stretch" VirtualizingPanel.VirtualizationMode="Recycling"
             ItemsSource="{Binding FilterValues}" >
             <ListBox.ItemTemplate>
