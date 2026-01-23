@@ -5,7 +5,15 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary x:Name="ClefIcons" Source="/Resources/ClefIcons.xaml"></ResourceDictionary>
+                <ResourceDictionary  Source="/Resources/ClefIcons.xaml" />
+                <ResourceDictionary Source="/Resources/Close.xaml" />
+                <ResourceDictionary Source="/Resources/Pin.xaml" />
+                <ResourceDictionary Source="/Resources/DeleteFilter.xaml" />
+                <ResourceDictionary Source="/Resources/Download.xaml" />
+                <ResourceDictionary Source="/Resources/Filter.xaml" />
+                <ResourceDictionary Source="/Resources/Pause.xaml" />
+                <ResourceDictionary Source="/Resources/QuickRefresh.xaml" />
+                <ResourceDictionary Source="/Resources/StatusErrorNoColor.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

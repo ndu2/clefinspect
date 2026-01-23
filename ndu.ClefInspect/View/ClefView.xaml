@@ -50,11 +50,11 @@
         </ItemsControl>
 
         <Button Grid.Row="3" Grid.Column="0" Padding="2,0,0,0" Name="ButtonApplyTextFilter"
-                FontFamily="Segoe UI Symbol" Content="&#xE11A;" Margin="5,0,5,0" Click="ButtonApplyTextFilter_Click" />
+                Content="{StaticResource icon_filter}" Margin="5,0,5,0" Click="ButtonApplyTextFilter_Click" />
         <TextBox Grid.Row="3" Grid.Column="1" Name="TextFilter"
                  Text="{Binding TextFilter, ValidatesOnExceptions=True, UpdateSourceTrigger=Explicit}" KeyDown="TextFilter_KeyDown" ></TextBox>
         <Button Grid.Row="3" Grid.Column="2" Padding="0,0,2,0"
-                FontFamily="Segoe UI Symbol" Content="&#xE10A;" Command="{Binding ClearTextFilter}" Margin="5,0,5,0" />
+                Content="{StaticResource icon_deleteFilter}" Command="{Binding ClearTextFilter}" Margin="5,0,5,0" />
 
         <TextBox Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="2" Margin="2,2,2,2" Width="{Binding ElementName=clefView, Path=DateWidth}"
                  Name="TextDatePosition" Text="{Binding DatePosition, ValidatesOnExceptions=True, UpdateSourceTrigger=Explicit}" KeyDown="TextDatePosition_KeyDown" />
@@ -81,12 +81,12 @@
                     </Style>
                 </ListView.ItemContainerStyle>
                 <ListView.Resources>
-                    <local:PinSymbolConverter x:Key="PinSymbolConverter" />
+                    <local:BooleanVisibilityHiddenConverter x:Key="BooleanVisibilityHiddenConverter" />
                     <GridView x:Key="User">
                         <GridViewColumn Header="Pin" Width="{Binding ElementName=clefView, Path=PinWidth}">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock FontFamily="Segoe UI Symbol" Text="{Binding Pin, Mode=OneWay, Converter={StaticResource PinSymbolConverter}}" />
+                                    <ContentControl Content="{StaticResource icon_pin}" Visibility="{Binding Pin, Mode=OneWay, Converter={StaticResource BooleanVisibilityHiddenConverter}}" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
