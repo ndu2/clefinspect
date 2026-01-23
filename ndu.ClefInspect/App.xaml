@@ -3,6 +3,17 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              Startup="Clef_Startup" Exit="Clef_Exit">
     <Application.Resources>
-         
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Resources/Close.xaml" />
+                <ResourceDictionary Source="/Resources/Pin.xaml" />
+                <ResourceDictionary Source="/Resources/DeleteFilter.xaml" />
+                <ResourceDictionary Source="/Resources/Download.xaml" />
+                <ResourceDictionary Source="/Resources/Filter.xaml" />
+                <ResourceDictionary Source="/Resources/Pause.xaml" />
+                <ResourceDictionary Source="/Resources/QuickRefresh.xaml" />
+                <ResourceDictionary Source="/Resources/StatusErrorNoColor.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

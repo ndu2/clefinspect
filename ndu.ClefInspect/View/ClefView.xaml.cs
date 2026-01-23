@@ -96,13 +96,16 @@ namespace ndu.ClefInspect.View
 
         private void ClefView_DataContextChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
         {
-
+            if (e.OldValue is ClefViewModel oldViewModel)
+            {
+                oldViewModel.Reloaded -= OnReloaded;
+                oldViewModel.UserActionHandler -= OnUserAction;
+                oldViewModel.DataColumnEnabledChanged -= OnDataColumnEnabledChanged;
+                oldViewModel.Settings.SessionSettings.PropertyChanged -= ListViewLogEntries_Update;
+            }
             if (DataContext is ClefViewModel viewModel)
             {
-                viewModel.Reloaded += () =>
-                {
-                    ListViewLogEntries.ScrollIntoView(viewModel.SelectedItem);
-                };
+                viewModel.Reloaded += OnReloaded;
                 viewModel.UserActionHandler += OnUserAction;
                 viewModel.DataColumnEnabledChanged += OnDataColumnEnabledChanged;
                 OnDataColumnSetChanged();
@@ -267,6 +270,14 @@ namespace ndu.ClefInspect.View
         }
         private void UnpinSelected_Click(object sender, System.Windows.RoutedEventArgs e) => UnpinSelected();
 
+
+        private void OnReloaded()
+        {
+            if (DataContext is ClefViewModel viewModel)
+            {
+                ListViewLogEntries.ScrollIntoView(viewModel.SelectedItem);
+            }
+        }
 
         public static ScrollViewer? GetScrollViewer(DependencyObject o)
         {
