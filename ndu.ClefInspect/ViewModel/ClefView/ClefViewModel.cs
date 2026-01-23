@@ -84,6 +84,11 @@ namespace ndu.ClefInspect.ViewModel.ClefView
         }
         private void OnSessionSettingsDetailViewChanged(object? sender, PropertyChangedEventArgs e)
         {
+            OnSessionSettingsDetailViewChanged();
+        }
+
+        private void OnSessionSettingsDetailViewChanged()
+        {
             DetailViewInit();
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DetailsVisibility)));
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ColWidthEvtList)));
@@ -95,6 +100,27 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             double eventSize = _settings.SessionSettings.DetailView ? (1.0 - _settings.SessionSettings.DetailViewFraction) : 1.0;
             _colWidthEvtList = new GridLength(eventSize, GridUnitType.Star);
             _colWidthDetails = new GridLength(1.0 - eventSize, GridUnitType.Star);
+        }
+        public void DetailViewUpdate(double value)
+        {
+            if (value < 0.1)
+            {
+                if (_settings.SessionSettings.DetailView)
+                {
+                    _settings.SessionSettings.DetailView = false;
+                }
+                else if(value > 0.0)
+                {
+                    // completely close details view
+                    OnSessionSettingsDetailViewChanged();
+                }
+            }
+            else
+            {
+                if (value > 1.0) value = 1.0;
+                _settings.SessionSettings.DetailView = true;
+                _settings.SessionSettings.DetailViewFraction = value;
+            }
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

@@ -30,7 +30,7 @@ namespace ndu.ClefInspect.View
 
             if (DataContext is ClefViewModel viewModel)
             {
-                // remove all colums not vailable in viewModel
+                // remove all columns not available in viewModel
                 List<string> surplusCols = [];
                 foreach (var cc in _customColumns)
                 {
@@ -102,6 +102,7 @@ namespace ndu.ClefInspect.View
                 oldViewModel.UserActionHandler -= OnUserAction;
                 oldViewModel.DataColumnEnabledChanged -= OnDataColumnEnabledChanged;
                 oldViewModel.Settings.SessionSettings.PropertyChanged -= ListViewLogEntries_Update;
+                oldViewModel.PropertyChanged -= ViewModel_PropertyChanged;
             }
             if (DataContext is ClefViewModel viewModel)
             {
@@ -115,6 +116,30 @@ namespace ndu.ClefInspect.View
                     _listViewLogEntriesScrollViewer.ScrollToHorizontalOffset(viewModel.HorizontalOffset);
                 }
                 viewModel.Settings.SessionSettings.PropertyChanged += ListViewLogEntries_Update;
+                viewModel.PropertyChanged += ViewModel_PropertyChanged;
+                Layout(viewModel);
+            }
+        }
+
+        private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if(sender is ClefViewModel viewModel && e.PropertyName == nameof(ClefViewModel.ColWidthDetails))
+            {
+                Layout(viewModel);
+            }
+        }
+
+        private void Layout(ClefViewModel viewModel)
+        {
+            ColDetails.Width = viewModel.ColWidthDetails;
+            ColEvtList.Width = viewModel.ColWidthEvtList;
+        }
+
+        private void GridSplitter_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+        {
+            if (DataContext is ClefViewModel viewModel)
+            {
+                viewModel.DetailViewUpdate(1.0 / (ColDetails.Width.Value + ColEvtList.Width.Value) * ColDetails.Width.Value);
             }
         }
 
