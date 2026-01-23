@@ -66,8 +66,8 @@ namespace ndu.ClefInspect.ViewModel.ClefView
 
                 ClefLineViewModel? selectedLine = clefLines.ElementAtOrDefault(selectedIndex);
                 DateTime? date = selectedLine?.GetTime();
+                int selectedIndexExact = (action == LinesChangedEventArgsAction.Add && selectedIndex < clefLines.Count)?selectedIndex: -1;
                 selectedIndex = -1;
-                int selectedIndexExact = -1;
 
                 int sourceIdx = (action == LinesChangedEventArgsAction.Add && clefLines.Count > 0) ? _nextItemFromSource : 0;
                 int idx = (action == LinesChangedEventArgsAction.Add) ? clefLines.Count : 0;
