@@ -4,7 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ndu.ClefInspect.View" 
-             xmlns:viewmodel="clr-namespace:ndu.ClefInspect.ViewModel.ClefView" 
+             xmlns:viewmodel="clr-namespace:ndu.ClefInspect.ViewModel.ClefView"
+             xmlns:helper="clr-namespace:ndu.ClefInspect.ViewModel.Helper"
              d:DataContext="{d:DesignInstance Type=viewmodel:ClefViewModel}"
              mc:Ignorable="d" 
              x:Name="clefView"
@@ -51,7 +52,7 @@
 
         <Button Grid.Row="3" Grid.Column="0" Padding="2,0,0,0" Name="ButtonApplyTextFilter"
                 Content="{StaticResource icon_filter}" Margin="5,0,5,0" Click="ButtonApplyTextFilter_Click" />
-        <TextBox Grid.Row="3" Grid.Column="1" Name="TextFilter"
+        <TextBox Grid.Row="3" Grid.Column="1" Name="TextFilter" helper:TextBoxHelper.Placeholder="Text Filter"
                  Text="{Binding TextFilter, ValidatesOnExceptions=True, UpdateSourceTrigger=Explicit}" KeyDown="TextFilter_KeyDown" ></TextBox>
         <Button Grid.Row="3" Grid.Column="2" Padding="0,0,2,0"
                 Content="{StaticResource icon_deleteFilter}" Command="{Binding ClearTextFilter}" Margin="5,0,5,0" />
