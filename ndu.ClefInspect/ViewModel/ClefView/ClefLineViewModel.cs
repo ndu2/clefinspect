@@ -15,7 +15,6 @@ namespace ndu.ClefInspect.ViewModel.ClefView
         private readonly ClefViewSettings _settings;
         private readonly string? _messageOneLine;
 
-
         private static readonly JsonSerializerOptions _propFormatOneLine = new()
         {
             Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
@@ -130,6 +129,18 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                 {
                     ClefLine.Pin = value;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Pin)));
+                }
+            }
+        }
+        public Brush PinForeground
+        {
+            get => ClefLine.PinForeground;
+            set
+            {
+                if (ClefLine.PinForeground != value)
+                {
+                    ClefLine.PinForeground = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PinForeground)));
                 }
             }
         }

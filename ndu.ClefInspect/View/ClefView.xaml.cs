@@ -236,7 +236,7 @@ namespace ndu.ClefInspect.View
             {
                 case ClefViewModel.UserAction.Copy: CopySelected(); break;
                 case ClefViewModel.UserAction.CopyClef: CopySelectedClef(); break;
-                case ClefViewModel.UserAction.Pin: PinSelected(); break;
+                case ClefViewModel.UserAction.Pin: PinSelected(SystemColors.GrayTextBrush); break;
                 case ClefViewModel.UserAction.Unpin: UnpinSelected(); break;
             }
         }
@@ -271,18 +271,25 @@ namespace ndu.ClefInspect.View
             }
         }
         private void CopySelectedClef_Click(object sender, System.Windows.RoutedEventArgs e) => CopySelectedClef();
-
-        private void PinSelected()
+        private void PinSelected(Brush? fg)
         {
             foreach (var item in ListViewLogEntries.SelectedItems)
             {
                 if (item is ClefLineViewModel line)
                 {
                     line.Pin = true;
+                    if (fg != null)
+                    {
+                        line.PinForeground = fg;
+                    }
                 }
             }
         }
-        private void PinSelected_Click(object sender, System.Windows.RoutedEventArgs e) => PinSelected();
+        private void PinSelected_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            Control? c = sender as Control;
+            PinSelected(c?.Foreground);
+        }
         private void UnpinSelected()
         {
             foreach (var item in ListViewLogEntries.SelectedItems)

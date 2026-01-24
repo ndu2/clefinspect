@@ -28,20 +28,7 @@
                 <TextBlock Text="{Binding Name}" />
                 <ContentControl Content="{StaticResource icon_error}" Visibility="{Binding FileError}" Margin="5,0,2,0" />
                 <ContentControl Content="{StaticResource icon_quickRefresh}" Visibility="{Binding CalculationRunning}" Margin="2,0,2,0" />
-                <ToggleButton IsChecked="{Binding AutoUpdate, Mode=TwoWay}" Margin="2,0,2,0" >
-                    <ToggleButton.Style>
-                        <Style TargetType="ToggleButton">
-                            <Style.Triggers>
-                                <Trigger Property="IsChecked" Value="True">
-                                    <Setter Property="Content" Value="{StaticResource icon_download}" />
-                                </Trigger>
-                                <Trigger Property="IsChecked" Value="False">
-                                    <Setter Property="Content" Value="{StaticResource icon_pause}" />
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ToggleButton.Style>
-                </ToggleButton>
+                <ToggleButton IsChecked="{Binding AutoUpdate, Mode=TwoWay}" Margin="2,0,2,0" Style="{StaticResource TailToggleButton}" />
                 <Button Content="{StaticResource icon_close}" Command="{Binding Close}" /><!-- Margin="2,0,5,0" />-->
             </StackPanel>
         </DataTemplate>

@@ -9,7 +9,7 @@
              d:DataContext="{d:DesignInstance Type=viewmodel:ClefViewModel}"
              mc:Ignorable="d" 
              x:Name="clefView"
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="800"> 
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
@@ -25,8 +25,6 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-
-
         <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" 
                    Padding="2,2,0,0" 
                    Text="{Binding FilePath}" />
@@ -35,7 +33,6 @@
             <TextBlock Padding="2,2,0,10" Text="{Binding FileInfo}" />
             <TextBlock Padding="10,2,0,10" Text="{Binding DateInfo}" />
         </StackPanel>
-
         <ItemsControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="5"
             ItemsSource="{Binding VisibleFilters}" >
             <ItemsControl.ItemsPanel>
@@ -49,18 +46,14 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-
         <Button Grid.Row="3" Grid.Column="0" Padding="2,0,0,0" Name="ButtonApplyTextFilter"
                 Content="{StaticResource icon_filter}" Margin="5,0,5,0" Click="ButtonApplyTextFilter_Click" />
         <TextBox Grid.Row="3" Grid.Column="1" Name="TextFilter" helper:TextBoxHelper.Placeholder="Text Filter"
                  Text="{Binding TextFilter, ValidatesOnExceptions=True, UpdateSourceTrigger=Explicit}" KeyDown="TextFilter_KeyDown" ></TextBox>
         <Button Grid.Row="3" Grid.Column="2" Padding="0,0,2,0"
                 Content="{StaticResource icon_deleteFilter}" Command="{Binding ClearTextFilter}" Margin="5,0,5,0" />
-
         <TextBox Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="2" Margin="2,2,2,2" Width="{Binding ElementName=clefView, Path=DateWidth}"
                  Name="TextDatePosition" Text="{Binding DatePosition, ValidatesOnExceptions=True, UpdateSourceTrigger=Explicit}" KeyDown="TextDatePosition_KeyDown" />
-
-
         <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="5">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Name="ColEvtList" Width="*"/>
@@ -87,7 +80,7 @@
                         <GridViewColumn Header="Pin" Width="{Binding ElementName=clefView, Path=PinWidth}">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <ContentControl Content="{StaticResource icon_pin}" Visibility="{Binding Pin, Mode=OneWay, Converter={StaticResource BooleanVisibilityHiddenConverter}}" />
+                                    <ToggleButton IsChecked="{Binding Pin, Mode=TwoWay}" Style="{StaticResource PinToggleButton}" Foreground="{Binding PinForeground}"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
@@ -127,11 +120,26 @@
                     </Style>
                 </ListView.Style>
                 <ListView.ContextMenu>
-
                     <ContextMenu>
                         <MenuItem Header="Copy Selected Entries to Clipboard" Click="CopySelected_Click" InputGestureText="Ctrl+C" />
                         <MenuItem Header="Copy Selected Entries to Clipboard (clef format)" Click="CopySelectedClef_Click" InputGestureText="Ctrl+Shift+C" />
-                        <MenuItem Header="Pin Selected Entries" Click="PinSelected_Click" InputGestureText="Ctrl+P" />
+                        <MenuItem Header="Pin Selected Entries">
+                            <MenuItem Header="{StaticResource icon_pin}" Click="PinSelected_Click" Foreground="{x:Static SystemColors.GrayTextBrush}" InputGestureText="Ctrl+P" />
+                            <MenuItem Header="{StaticResource icon_pin}" Click="PinSelected_Click" Foreground="{x:Static Brushes.White}" />
+                            <MenuItem Header="{StaticResource icon_pin}" Click="PinSelected_Click" Foreground="{x:Static Brushes.Black}" />
+                            <MenuItem Header="{StaticResource icon_pin}" Click="PinSelected_Click" Foreground="{x:Static Brushes.Yellow}" />
+                            <MenuItem Header="{StaticResource icon_pin}" Click="PinSelected_Click" Foreground="{x:Static Brushes.GreenYellow}" />
+                            <MenuItem Header="{StaticResource icon_pin}" Click="PinSelected_Click" Foreground="{x:Static Brushes.LimeGreen}" />
+                            <MenuItem Header="{StaticResource icon_pin}" Click="PinSelected_Click" Foreground="{x:Static Brushes.Red}" />
+                            <MenuItem Header="{StaticResource icon_pin}" Click="PinSelected_Click" Foreground="{x:Static Brushes.DeepPink}" />
+                            <MenuItem Header="{StaticResource icon_pin}" Click="PinSelected_Click" Foreground="{x:Static Brushes.Orange}" />
+                            <MenuItem Header="{StaticResource icon_pin}" Click="PinSelected_Click" Foreground="{x:Static Brushes.Salmon}" />
+                            <MenuItem Header="{StaticResource icon_pin}" Click="PinSelected_Click" Foreground="{x:Static Brushes.Aqua}" />
+                            <MenuItem Header="{StaticResource icon_pin}" Click="PinSelected_Click" Foreground="{x:Static Brushes.DarkTurquoise}" />
+                            <MenuItem Header="{StaticResource icon_pin}" Click="PinSelected_Click" Foreground="{x:Static Brushes.DodgerBlue}" />
+                            <MenuItem Header="{StaticResource icon_pin}" Click="PinSelected_Click" Foreground="{x:Static Brushes.Teal}" />
+                            <MenuItem Header="{StaticResource icon_pin}" Click="PinSelected_Click" Foreground="{x:Static Brushes.DarkViolet}" />
+                        </MenuItem>
                         <MenuItem Header="Unpin Selected Entries" Click="UnpinSelected_Click" InputGestureText="Ctrl+U" />
                     </ContextMenu>
                 </ListView.ContextMenu>

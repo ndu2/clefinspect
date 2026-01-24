@@ -14,7 +14,38 @@
                 <ResourceDictionary Source="/Resources/Pause.xaml" />
                 <ResourceDictionary Source="/Resources/QuickRefresh.xaml" />
                 <ResourceDictionary Source="/Resources/StatusErrorNoColor.xaml" />
+                <ResourceDictionary Source="/Resources/Empty.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <Style x:Key="TailToggleButton" TargetType="ToggleButton">
+                <Style.Setters>
+                    <Setter Property="Content" Value="{StaticResource icon_download}" />
+                </Style.Setters>
+                <Style.Triggers>
+                    <Trigger Property="IsChecked" Value="True">
+                        <Setter Property="Content" Value="{StaticResource icon_download}" />
+                    </Trigger>
+                    <Trigger Property="IsChecked" Value="False">
+                        <Setter Property="Content" Value="{StaticResource icon_pause}" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <Style x:Key="PinToggleButton" TargetType="ToggleButton">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ToggleButton">
+                            <ContentControl x:Name="PinToggleButtonContent" Content="{StaticResource icon_pin}"/>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter TargetName="PinToggleButtonContent" Property="Content" Value="{StaticResource icon_pin}" />
+                                </Trigger>
+                                <Trigger Property="IsChecked" Value="False">
+                                    <Setter TargetName="PinToggleButtonContent" Property="Content" Value="{StaticResource icon_empty}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

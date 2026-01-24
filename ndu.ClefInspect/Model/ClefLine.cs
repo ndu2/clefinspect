@@ -3,6 +3,8 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Unicode;
+using System.Windows;
+using System.Windows.Media;
 
 namespace ndu.ClefInspect.Model
 {
@@ -119,7 +121,7 @@ namespace ndu.ClefInspect.Model
         }
 
         public bool Pin { get; set; } = false;
-
+        public Brush PinForeground { get; set; } = SystemColors.WindowTextBrush;
         public override string ToString()
         {
             return $"{Time};{Level};{Message}";
