@@ -2,6 +2,8 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Text.Json;
+using System.Windows;
+using System.Windows.Media;
 namespace ndu.ClefInspect.Model
 {
     public class Configuration
@@ -30,12 +32,20 @@ namespace ndu.ClefInspect.Model
             public const string Session = "session";
             public ObservableCollection<string> Files { get; set; } = [];
         }
+        public class PinPresetOptions
+        {
+            public const string PinPresets = "pinPresets";
+            public string Name { get; set; } = String.Empty;
+            public Color Color { get; set; }
+            public ObservableCollection<string> SearchText { get; set; } = [];
+        }
 
         public Configuration()
         {
             ClefFeatures = new ClefFeaturesOptions();
             ViewSettings = new ViewSettingsOptions();
             Session = new SessionOptions();
+            PinPresets = new ObservableCollection<PinPresetOptions>();
             try
             {
                 IConfigurationRoot config = new ConfigurationBuilder()
@@ -44,9 +54,22 @@ namespace ndu.ClefInspect.Model
                 config.GetSection(ClefFeaturesOptions.ClefFeatures).Bind(ClefFeatures);
                 config.GetSection(ViewSettingsOptions.ViewSettings).Bind(ViewSettings);
                 config.GetSection(SessionOptions.Session).Bind(Session);
+                config.GetSection(PinPresetOptions.PinPresets).Bind(PinPresets);
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                string err = e.Message;
+                if(e.InnerException != null)
+                {
+                    err += "\n\n";
+                    err += e.InnerException.Message;
+                }
+                if (e.InnerException?.InnerException != null)
+                {
+                    err += "\n\n";
+                    err += e.InnerException.InnerException.Message;
+                }
+                MessageBox.Show(err, "Invalid ClefInspect.defaults.json", MessageBoxButton.OK);
                 ClefFeatures.WriteableConfig = false;
             }
 
@@ -55,6 +78,8 @@ namespace ndu.ClefInspect.Model
         public ClefFeaturesOptions ClefFeatures { get; }
         public ViewSettingsOptions ViewSettings { get; }
         public SessionOptions Session { get; }
+        public ObservableCollection<PinPresetOptions> PinPresets { get; }
+
         public void Write()
         {
             var options = new JsonWriterOptions
