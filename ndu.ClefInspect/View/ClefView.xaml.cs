@@ -230,13 +230,13 @@ namespace ndu.ClefInspect.View
         }
 
 
-        private void OnUserAction(ClefViewModel.UserAction userAction)
+        private void OnUserAction(ClefViewModel.UserAction userAction, object? parameter)
         {
             switch (userAction)
             {
                 case ClefViewModel.UserAction.Copy: CopySelected(); break;
                 case ClefViewModel.UserAction.CopyClef: CopySelectedClef(); break;
-                case ClefViewModel.UserAction.Pin: PinSelected(SystemColors.GrayTextBrush); break;
+                case ClefViewModel.UserAction.Pin: PinSelected(parameter as Brush ?? SystemColors.GrayTextBrush); break;
                 case ClefViewModel.UserAction.Unpin: UnpinSelected(); break;
             }
         }

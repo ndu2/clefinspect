@@ -4,14 +4,14 @@ A lightweight Windows (.NET, WPF) desktop app for viewing [CLEF](https://clef-js
 
 ![ClefInspect Screenshot](screenshot.png)
 
-Currently runs on Windows with .NET 8.0 only. Distributed as a zip archive. You need to install [.NET Desktop Runtime 8.0](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) to run ClefInspect.
-
+Currently runs on Windows with .NET 8.0 only. Distributed as a zip archive.
 
 ## Features
 
  * Displays CLEF events.
- * Add columns based on the properties available in your logfiles.
+ * Show columns based on the properties available in your logfiles.
  * Filter events (text and properties) and pin (always display) individual events.
+ * Auto Pin based on Pin Presets (see [Configuration](#configuration)).
  * Scroll to events by timestamp, switch between local and UTC timestamps.
  * Show the time difference between events.
  * Can follow (tail) log files while other processes write to it.
@@ -79,7 +79,20 @@ You may want to put a file `ClefInspect.defaults.json` in the folder of `ClefIns
 		"C:\\temp\\a.json",
 		"C:\\temp\\b.json"
 		]
-	}
+	},
+	"pinPresets": [
+		{
+			"Name": "Pin Preset 1",
+			"Color": "#4DA84D",
+			"Enabled": true,
+			"SearchText": ["booting","connecting"]
+		},
+		{
+			"Name": "Pin Preset 2",
+			"Color": "#B83579",
+			"SearchText": ["some log message"]
+		}
+	]
 	}
 
 

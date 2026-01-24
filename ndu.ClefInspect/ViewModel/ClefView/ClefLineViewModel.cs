@@ -144,6 +144,14 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                 }
             }
         }
+        public bool PinPreset
+        {
+            get => ClefLine.PinPreset.Any(p => p.Enabled);
+        }
+        public Brush PinPresetForeground
+        {
+            get => ClefLine.PinPreset.FirstOrDefault(p => p.Enabled)?.Color ?? SystemColors.GrayTextBrush;
+        }
 
         public string? this[string key]
         {

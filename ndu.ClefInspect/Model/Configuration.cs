@@ -21,7 +21,7 @@ namespace ndu.ClefInspect.Model
             public const string ViewSettings = "viewSettings";
             public bool LocalTime { get; set; } = true;
             public bool OneLineOnly { get; set; }
-            public HashSet<string> DefaultFilterVisibility { get; set; } = [];
+            public HashSet<string> DefaultFilterVisibility { get; set; } = ["Level"];
             public HashSet<string> DefaultColumnVisibility { get; set; } = [];
             public double DetailViewFraction { get; set; } = 0.33;
             public bool DetailView { get; set; } = false;
@@ -35,9 +35,10 @@ namespace ndu.ClefInspect.Model
         public class PinPresetOptions
         {
             public const string PinPresets = "pinPresets";
-            public string Name { get; set; } = String.Empty;
-            public Color Color { get; set; }
-            public ObservableCollection<string> SearchText { get; set; } = [];
+            public string Name { get; set; } = string.Empty;
+            public Brush Color { get; set; } = SystemColors.GrayTextBrush;
+            public bool Enabled { get; set; } = false;
+            public List<string> SearchText { get; set; } = [];
         }
 
         public Configuration()
@@ -45,7 +46,7 @@ namespace ndu.ClefInspect.Model
             ClefFeatures = new ClefFeaturesOptions();
             ViewSettings = new ViewSettingsOptions();
             Session = new SessionOptions();
-            PinPresets = new ObservableCollection<PinPresetOptions>();
+            PinPresets = [];
             try
             {
                 IConfigurationRoot config = new ConfigurationBuilder()

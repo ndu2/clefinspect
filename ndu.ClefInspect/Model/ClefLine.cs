@@ -119,9 +119,13 @@ namespace ndu.ClefInspect.Model
                 return _line?.ToJsonString(_escapeUnicode);
             }
         }
-
+        public bool HasPin()
+        {
+            return Pin || PinPreset.Any(p => p.Enabled);
+        }
         public bool Pin { get; set; } = false;
         public Brush PinForeground { get; set; } = SystemColors.WindowTextBrush;
+        public HashSet<PinPreset> PinPreset { get; } = [];
         public override string ToString()
         {
             return $"{Time};{Level};{Message}";

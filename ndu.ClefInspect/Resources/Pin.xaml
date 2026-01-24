@@ -18,7 +18,8 @@
                                 <DrawingGroup Opacity="{DynamicResource cls-1}">
                                     <GeometryDrawing Brush="{DynamicResource light-defaultgrey}" Geometry="F1M8,10v5H7V10Z" />
                                 </DrawingGroup>
-                                <GeometryDrawing Brush="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}" Geometry="F1M10.5,1.5v8h-6v-8Z" />
+                                <GeometryDrawing Brush="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control},
+                                    FallbackValue={x:Static SystemColors.GrayTextBrush}}" Geometry="F1M10.5,1.5v8h-6v-8Z" />
                                 <GeometryDrawing Brush="{DynamicResource light-defaultgrey}" Geometry="F1M11,9V1.5L10.5,1h-6L4,1.5V9H3v1h9V9ZM5,9V2h5V9Z" />
                             </DrawingGroup>
                         </DrawingGroup>

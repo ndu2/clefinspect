@@ -33,7 +33,7 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="ToggleButton">
-                            <ContentControl x:Name="PinToggleButtonContent" Content="{StaticResource icon_pin}"/>
+                            <ContentControl x:Name="PinToggleButtonContent" Content="{StaticResource icon_empty}"/>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsChecked" Value="True">
                                     <Setter TargetName="PinToggleButtonContent" Property="Content" Value="{StaticResource icon_pin}" />

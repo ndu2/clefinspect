@@ -80,7 +80,14 @@
                         <GridViewColumn Header="Pin" Width="{Binding ElementName=clefView, Path=PinWidth}">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <ToggleButton IsChecked="{Binding Pin, Mode=TwoWay}" Style="{StaticResource PinToggleButton}" Foreground="{Binding PinForeground}"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <ToggleButton Grid.Column="0" IsChecked="{Binding Pin, Mode=TwoWay}" Style="{StaticResource PinToggleButton}" Foreground="{Binding PinForeground}"/>
+                                        <ContentControl Grid.Column="1" Content="{StaticResource icon_pin}" Foreground="{Binding PinPresetForeground}" Visibility="{Binding PinPreset, Mode=OneWay, Converter={StaticResource BooleanVisibilityHiddenConverter}}" />
+                                    </Grid>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
@@ -123,7 +130,7 @@
                     <ContextMenu>
                         <MenuItem Header="Copy Selected Entries to Clipboard" Click="CopySelected_Click" InputGestureText="Ctrl+C" />
                         <MenuItem Header="Copy Selected Entries to Clipboard (clef format)" Click="CopySelectedClef_Click" InputGestureText="Ctrl+Shift+C" />
-                        <MenuItem Header="Pin Selected Entries">
+                        <MenuItem Header="Pin Selected Entries" Icon="{StaticResource icon_pin}">
                             <MenuItem Header="{StaticResource icon_pin}" Click="PinSelected_Click" Foreground="{x:Static SystemColors.GrayTextBrush}" InputGestureText="Ctrl+P" />
                             <MenuItem Header="{StaticResource icon_pin}" Click="PinSelected_Click" Foreground="{x:Static Brushes.White}" />
                             <MenuItem Header="{StaticResource icon_pin}" Click="PinSelected_Click" Foreground="{x:Static Brushes.Black}" />
