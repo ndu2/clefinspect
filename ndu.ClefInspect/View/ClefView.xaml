@@ -128,8 +128,8 @@
                 </ListView.Style>
                 <ListView.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="Copy Selected Entries to Clipboard" Click="CopySelected_Click" InputGestureText="Ctrl+C" />
-                        <MenuItem Header="Copy Selected Entries to Clipboard (clef format)" Click="CopySelectedClef_Click" InputGestureText="Ctrl+Shift+C" />
+                        <MenuItem Header="Copy Selected Entries to Clipboard" Icon="{StaticResource icon_copy}" Click="CopySelected_Click" InputGestureText="Ctrl+C" />
+                        <MenuItem Header="Copy Selected Entries to Clipboard (clef format)" Icon="{StaticResource icon_json}" Click="CopySelectedClef_Click" InputGestureText="Ctrl+Shift+C" />
                         <MenuItem Header="Pin Selected Entries" Icon="{StaticResource icon_pin}">
                             <MenuItem Header="{StaticResource icon_pin}" Click="PinSelected_Click" Foreground="{x:Static SystemColors.GrayTextBrush}" InputGestureText="Ctrl+P" />
                             <MenuItem Header="{StaticResource icon_pin}" Click="PinSelected_Click" Foreground="{x:Static Brushes.White}" />
@@ -147,7 +147,7 @@
                             <MenuItem Header="{StaticResource icon_pin}" Click="PinSelected_Click" Foreground="{x:Static Brushes.Teal}" />
                             <MenuItem Header="{StaticResource icon_pin}" Click="PinSelected_Click" Foreground="{x:Static Brushes.DarkViolet}" />
                         </MenuItem>
-                        <MenuItem Header="Unpin Selected Entries" Click="UnpinSelected_Click" InputGestureText="Ctrl+U" />
+                        <MenuItem Header="Unpin Selected Entries" Icon="{StaticResource icon_unpin}" Click="UnpinSelected_Click" InputGestureText="Ctrl+U" />
                     </ContextMenu>
                 </ListView.ContextMenu>
             </ListView>

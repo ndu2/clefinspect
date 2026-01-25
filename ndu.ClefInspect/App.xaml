@@ -15,6 +15,12 @@
                 <ResourceDictionary Source="/Resources/QuickRefresh.xaml" />
                 <ResourceDictionary Source="/Resources/StatusErrorNoColor.xaml" />
                 <ResourceDictionary Source="/Resources/Empty.xaml" />
+                <ResourceDictionary Source="/Resources/Copy.xaml" />
+                <ResourceDictionary Source="/Resources/JSONScript.xaml" />
+                <ResourceDictionary Source="/Resources/OpenFile.xaml" />
+                <ResourceDictionary Source="/Resources/RestoreDefaultView.xaml" />
+                <ResourceDictionary Source="/Resources/SaveAll.xaml" />
+                <ResourceDictionary Source="/Resources/Unpin.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <Style x:Key="TailToggleButton" TargetType="ToggleButton">
                 <Style.Setters>
