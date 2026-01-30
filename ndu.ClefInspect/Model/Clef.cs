@@ -5,18 +5,16 @@ using System.IO;
 using System.Text;
 using System.Text.Json.Nodes;
 using System.Windows;
+using static ndu.ClefInspect.Model.IClef;
 using static ndu.ClefInspect.Model.LinesChangedEventArgs;
 
 namespace ndu.ClefInspect.Model
 {
-    public partial class Clef : IDisposable, INotifyPropertyChanged
+    public partial class Clef : IClef
     {
         private const int FileRefreshDelayMs = 500;
         private const int BufferSize = 10 * 1024 * 1024;
         private const int UiRefreshDelayMs = 250;
-        public const string LEVEL_KEY = "@l";
-        public const string LEVEL_EMPTY = "Info";
-        public const string EXCEPTION_KEY = "@x";
         private bool _disposedValue;
         private readonly ClefLockedList _lines = new();
         private readonly ConcurrentDictionary<string, (string, ConcurrentDictionary<string, int>)> _properties = new();
@@ -34,21 +32,9 @@ namespace ndu.ClefInspect.Model
 
         private readonly Dictionary<string, string> _indexableProperties = new()
         {
-            {LEVEL_KEY,"Level"},
+            {ClefSchema.LEVEL_KEY,"Level"},
             //{"@i","Event Id"}
         };
-        public static readonly char Fsep = '|';
-
-        public static Clef Create(string fd, ReadOnlyCollection<PinPreset> pinPresets)
-        {
-            string[] fds = fd.Split(Fsep);
-            List<FileInfo> fileInfos = [];
-            foreach(string ifd in fds)
-            {
-                fileInfos.Add(new FileInfo(ifd));
-            }
-            return new Clef(fileInfos, pinPresets);
-        }
 
         public Clef(List<FileInfo> files, ReadOnlyCollection<PinPreset> pinPresets)
         {
@@ -63,7 +49,6 @@ namespace ndu.ClefInspect.Model
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public delegate void LinesChangedEventHandler(object? sender, LinesChangedEventArgs e);
         public event LinesChangedEventHandler? LinesChanged;
 
         public List<FileInfo> File { get; }

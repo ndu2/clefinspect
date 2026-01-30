@@ -1,6 +1,6 @@
-﻿using ndu.ClefInspect.Model;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -18,13 +18,14 @@ namespace ndu.ClefInspect.ViewModel.MainView
 
             for (int i = 1; i < args.Length; i++)
             {
-                OpenFile(args[i]);
+                OpenFile(new FileInfo(args[i]));
             }
             Exit = new ExitCommand();
             Open = new OpenCommand(this);
             OpenFilesTabbed = new OpenFilesTabbedCommand(this);
             OpenFilesConcat = new OpenFilesConcatCommand(this);
             OpenFilesCancel = new OpenFilesCancelCommand(this);
+            OpenFromClipboard = new OpenFromClipboardCommand(this);
             SaveViewDefaults = new SaveViewDefaultsCommand(this);
             ApplyViewDefaults = new ApplyViewDefaultsCommand(this);
             SaveSession = new SaveSessionCommand(this);
@@ -43,6 +44,7 @@ namespace ndu.ClefInspect.ViewModel.MainView
         public ICommand OpenFilesTabbed { get; set; }
         public ICommand OpenFilesConcat { get; set; }
         public ICommand OpenFilesCancel { get; set; }
+        public ICommand OpenFromClipboard { get; set; }
         public ICommand SaveViewDefaults { get; set; }
         public ICommand ApplyViewDefaults { get; set; }
         public ICommand SaveSession { get; set; }
@@ -70,9 +72,19 @@ namespace ndu.ClefInspect.ViewModel.MainView
             }
         }
 
-        public void OpenFile(string fileName)
+        public void OpenFile(FileInfo fileName)
         {
             ClefTab tab = new(fileName, Settings);
+            ClefTabs.Add(tab);
+            tab.Closing += () =>
+            {
+                ClefTabs.Remove(tab);
+            };
+            ActiveTab = tab;
+        }
+        public void OpenFile(List<FileInfo> fileNames)
+        {
+            ClefTab tab = new(fileNames, Settings);
             ClefTabs.Add(tab);
             tab.Closing += () =>
             {
@@ -85,8 +97,19 @@ namespace ndu.ClefInspect.ViewModel.MainView
         {
             foreach (string file in files)
             {
-                OpenFile(file);
+                OpenFile(new FileInfo(file));
             }
+        }
+
+        public void OpenText(string text)
+        {
+            ClefTab tab = new(text, Settings);
+            ClefTabs.Add(tab);
+            tab.Closing += () =>
+            {
+                ClefTabs.Remove(tab);
+            };
+            ActiveTab = tab;
         }
 
         public void OpenSelectedFilesTabbed()
@@ -97,7 +120,7 @@ namespace ndu.ClefInspect.ViewModel.MainView
             }
             foreach (string file in SelectedFiles)
             {
-                OpenFile(file);
+                OpenFile(new FileInfo(file));
             }
             SelectedFiles = null;
         }
@@ -106,7 +129,12 @@ namespace ndu.ClefInspect.ViewModel.MainView
             if (SelectedFiles == null || SelectedFiles.Length == 0) {
                 return;
             }
-            OpenFile(string.Join(Clef.Fsep, SelectedFiles));
+            List<FileInfo> files = new List<FileInfo>();
+            foreach(string file in SelectedFiles)
+            {
+                files.Add(new FileInfo(file));
+            }
+            OpenFile(files);
             SelectedFiles = null;
         }
 
@@ -131,6 +159,5 @@ namespace ndu.ClefInspect.ViewModel.MainView
         public bool ShowOpenFileOptions => _selectedFiles != null && _selectedFiles.Length > 0;
         public static Brush ShowOpenFileForeground => SystemColors.WindowTextBrush;
         public static Brush ShowOpenFileBackground => SystemColors.WindowBrush;
-
     }
 }

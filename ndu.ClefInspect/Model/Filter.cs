@@ -35,9 +35,9 @@ namespace ndu.ClefInspect.Model
 
         private string UiWhenEmpty()
         {
-            if (_key.Equals(Clef.LEVEL_KEY))
+            if (_key.Equals(ClefSchema.LEVEL_KEY))
             {
-                return Clef.LEVEL_EMPTY;
+                return ClefSchema.LEVEL_EMPTY;
             }
             else
             {

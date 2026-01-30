@@ -1,6 +1,7 @@
 ﻿using ndu.ClefInspect.Model;
 using ndu.ClefInspect.ViewModel.ClefView;
 using System.ComponentModel;
+using System.IO;
 using System.Windows;
 using System.Windows.Input;
 
@@ -9,9 +10,21 @@ namespace ndu.ClefInspect.ViewModel.MainView
     public partial class ClefTab : INotifyPropertyChanged
     {
 
-        public ClefTab(string fileName, MainViewSettings settings)
+        public ClefTab(string jsonString, MainViewSettings settings)
+            : this(new ClefViewModel(jsonString, settings))
         {
-            ClefViewModel = new ClefViewModel(fileName, settings);
+        }
+        public ClefTab(FileInfo fileInfo, MainViewSettings settings)
+            : this(new ClefViewModel([fileInfo], settings))
+        {
+        }
+        public ClefTab(List<FileInfo> fileInfos, MainViewSettings settings)
+            :this(new ClefViewModel(fileInfos, settings))
+        {
+        }
+        private ClefTab(ClefViewModel clefViewModel)
+        {
+            ClefViewModel = clefViewModel;
             Close = new CloseTabCommand(this);
             ClefViewModel.PropertyChanged += OnClefViewModelPropertyChanged;
             ClefViewModel.Clef.PropertyChanged += OnClefPropertyChanged;
