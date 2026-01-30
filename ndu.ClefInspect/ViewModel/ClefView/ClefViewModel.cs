@@ -23,7 +23,15 @@ namespace ndu.ClefInspect.ViewModel.ClefView
         private GridLength _colWidthEvtList;
         private GridLength _colWidthDetails;
 
-        public ClefViewModel(string fileName, MainViewSettings settings)
+        public ClefViewModel(List<FileInfo> fileInfos, MainViewSettings settings)
+            : this((pinPresets) => new Clef(fileInfos, pinPresets), settings)
+        {
+        }
+        public ClefViewModel(string json, MainViewSettings settings)
+            : this((pinPresets) => new ClefString(json, pinPresets), settings)
+        {
+        }
+        private ClefViewModel(Func<ReadOnlyCollection<PinPreset>, IClef> clefFactoryMethod, MainViewSettings settings)
         {
             _settings = new ClefViewSettings(settings);
 
@@ -44,7 +52,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             PropertyChangedEventManager.AddHandler(_settings.SessionSettings, OnSessionSettingsDetailViewChanged, nameof(_settings.SessionSettings.DetailView));
             PropertyChangedEventManager.AddHandler(_settings.SessionSettings, OnSessionSettingsDetailViewChanged, nameof(_settings.SessionSettings.DetailViewFraction));
             PropertyChangedEventManager.AddHandler(_settings, OnViewSettingsRefTimeStampChanged, nameof(_settings.RefTimeStamp));
-            Clef = Clef.Create(fileName, new ReadOnlyCollection<PinPreset>(pinPresets));
+            Clef = clefFactoryMethod(new ReadOnlyCollection<PinPreset>(pinPresets));
             ClefLines = new FilteredClef(_settings);
             Filters = [];
             ClearTextFilter = new ClearTextFilterCommand(this);
@@ -251,7 +259,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             return matchers;
         }
 
-        public Clef Clef { get; }
+        public IClef Clef { get; }
         public string FilePath
         {
             get

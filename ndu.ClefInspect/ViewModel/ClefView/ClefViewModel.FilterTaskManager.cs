@@ -58,7 +58,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
 
 
             public Task Reload(FilteredClef clefLines,
-                Clef clef, List<IMatcher> filters, int selectedIndex, LinesChangedEventArgsAction action, bool pinPresetChanged,
+                IClef clef, List<IMatcher> filters, int selectedIndex, LinesChangedEventArgsAction action, bool pinPresetChanged,
                 Action onRun, Action<int> onChanged,
                 CancellationToken cancellationToken)
             {

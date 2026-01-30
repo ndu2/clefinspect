@@ -21,6 +21,7 @@
                 <ResourceDictionary Source="/Resources/RestoreDefaultView.xaml" />
                 <ResourceDictionary Source="/Resources/SaveAll.xaml" />
                 <ResourceDictionary Source="/Resources/Unpin.xaml" />
+                <ResourceDictionary Source="/Resources/PasteTable.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <Style x:Key="TailToggleButton" TargetType="ToggleButton">
                 <Style.Setters>
