@@ -93,7 +93,7 @@ namespace ndu.ClefInspect.Model
         {
             get
             {
-                return _line?[Clef.LEVEL_KEY]?.ToString() ?? Clef.LEVEL_EMPTY;
+                return _line?[ClefSchema.LEVEL_KEY]?.ToString() ?? ClefSchema.LEVEL_EMPTY;
             }
         }
         public DateTime? Time { get; } = GetTime(line);
@@ -103,7 +103,7 @@ namespace ndu.ClefInspect.Model
         {
             get
             {
-                return _line?[Clef.EXCEPTION_KEY]?.ToString();
+                return _line?[ClefSchema.EXCEPTION_KEY]?.ToString();
             }
         }
 

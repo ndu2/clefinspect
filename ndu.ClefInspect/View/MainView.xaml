@@ -20,6 +20,7 @@
         <KeyBinding Command="{Binding PinSelected}" Gesture="CTRL+P" />
         <KeyBinding Command="{Binding UnpinSelected}" Gesture="CTRL+U" />
         <KeyBinding Command="{Binding CloseTab}" Gesture="CTRL+W" />
+        <KeyBinding Command="{Binding OpenFromClipboard}" Gesture="CTRL+V" />
     </Window.InputBindings>
     <Window.Resources>
         <DataTemplate x:Key="tabControlHeaderTemplate" DataType="{x:Type viewmodel:ClefTab}">
@@ -49,6 +50,7 @@
             </Menu.Resources>
             <MenuItem Header="_File">
                 <MenuItem Header="_Open" Command="{Binding Open}" Icon="{StaticResource icon_openfile}" InputGestureText="Ctrl+O"/>
+                <MenuItem Header="Open from Clipboard" Command="{Binding OpenFromClipboard}" Icon="{StaticResource icon_pastetable}" InputGestureText="Ctrl+V"/>
                 <MenuItem Header="_Close" Command="{Binding CloseTab}" Icon="{StaticResource icon_close}" InputGestureText="Ctrl+W"/>
                 <Separator />
                 <MenuItem Header="Save Session" Command="{Binding SaveSession}" Icon="{StaticResource icon_saveall}" Visibility="{Binding Settings.CanPersist, Converter={StaticResource BooleanVisibilityCollapsedConverter}}" />
