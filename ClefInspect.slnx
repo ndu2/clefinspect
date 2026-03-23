@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="ndu.ClefInspect.Tests/ndu.ClefInspect.Tests.csproj" />
+  <Project Path="ndu.ClefInspect/ndu.ClefInspect.csproj" />
+</Solution>

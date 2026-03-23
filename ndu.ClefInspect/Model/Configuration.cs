@@ -60,7 +60,7 @@ namespace ndu.ClefInspect.Model
             catch (Exception e)
             {
                 string err = e.Message;
-                if(e.InnerException != null)
+                if (e.InnerException != null)
                 {
                     err += "\n\n";
                     err += e.InnerException.Message;

@@ -126,11 +126,12 @@ namespace ndu.ClefInspect.ViewModel.MainView
         }
         public void OpenSelectedFilesConcat()
         {
-            if (SelectedFiles == null || SelectedFiles.Length == 0) {
+            if (SelectedFiles == null || SelectedFiles.Length == 0)
+            {
                 return;
             }
             List<FileInfo> files = new List<FileInfo>();
-            foreach(string file in SelectedFiles)
+            foreach (string file in SelectedFiles)
             {
                 files.Add(new FileInfo(file));
             }

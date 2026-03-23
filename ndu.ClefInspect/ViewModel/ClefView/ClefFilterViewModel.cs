@@ -67,9 +67,9 @@ namespace ndu.ClefInspect.ViewModel.ClefView
 
         private void FilterCollectionChanged(object? s, NotifyCollectionChangedEventArgs e)
         {
-            if(e.Action == NotifyCollectionChangedAction.Add)
+            if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                for(int i = _filterValues.Count; i < _filter.Count; ++i)
+                for (int i = _filterValues.Count; i < _filter.Count; ++i)
                 {
                     _filterValues.Add(new ClefFilterView(this, _filter[i]));
                 }

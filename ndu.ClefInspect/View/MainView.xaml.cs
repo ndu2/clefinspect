@@ -1,5 +1,4 @@
-﻿using ndu.ClefInspect.ViewModel;
-using ndu.ClefInspect.ViewModel.MainView;
+﻿using ndu.ClefInspect.ViewModel.MainView;
 using System.Globalization;
 using System.Reflection;
 using System.Windows;

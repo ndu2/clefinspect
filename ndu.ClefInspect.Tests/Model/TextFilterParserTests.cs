@@ -124,12 +124,12 @@ namespace ndu.ClefInspect.Tests.Model
         [TestMethod]
         public void Parse_InvalidQuote_ThrowsException()
         {
-            Assert.ThrowsException<ArgumentException>(() => TextFilterParser.Parse("\""));
+            Assert.Throws<ArgumentException>(() => TextFilterParser.Parse("\""));
         }
         [TestMethod]
         public void Parse_InvalidQuote2_ThrowsException()
         {
-            Assert.ThrowsException<ArgumentException>(() => TextFilterParser.Parse("\"2132\",\""));
+            Assert.Throws<ArgumentException>(() => TextFilterParser.Parse("\"2132\",\""));
         }
     }
 }

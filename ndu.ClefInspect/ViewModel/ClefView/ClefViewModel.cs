@@ -36,7 +36,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             _settings = new ClefViewSettings(settings);
 
             List<PinPreset> pinPresets = [];
-            foreach(Configuration.PinPresetOptions p in _settings.SessionSettings.UserSettings.PinPresets)
+            foreach (Configuration.PinPresetOptions p in _settings.SessionSettings.UserSettings.PinPresets)
             {
                 PinPreset pp = new(p);
                 PropertyChangedEventManager.AddHandler(pp, (s, e) => Reload(new LinesChangedEventArgs(LinesChangedEventArgs.LinesChangedEventArgsAction.Reset), true), nameof(pp.Enabled));
@@ -128,7 +128,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                 {
                     _settings.SessionSettings.DetailView = false;
                 }
-                else if(value > 0.0)
+                else if (value > 0.0)
                 {
                     // completely close details view
                     OnSessionSettingsDetailViewChanged();
@@ -329,7 +329,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
         }
         public GridLength ColWidthEvtList => _colWidthEvtList;
         public GridLength ColWidthDetails => _colWidthDetails;
-        public Visibility DetailsVisibility => _settings.SessionSettings.DetailView ? Visibility.Visible: Visibility.Collapsed;
+        public Visibility DetailsVisibility => _settings.SessionSettings.DetailView ? Visibility.Visible : Visibility.Collapsed;
 
         public ICommand ClearTextFilter { get; }
 
