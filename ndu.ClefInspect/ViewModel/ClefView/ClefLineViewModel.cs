@@ -110,7 +110,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
         public IEnumerable<ClefLineViewDetailModel> Details(IEnumerable<ClefViewModel.DataColumnView> properties)
         {
             List<ClefLineViewDetailModel> details = [];
-            foreach(ClefViewModel.DataColumnView property in properties)
+            foreach (ClefViewModel.DataColumnView property in properties)
             {
                 details.Add(new ClefLineViewDetailModel(property.Header, this.PropertyMultiline(property.Header)));
             }

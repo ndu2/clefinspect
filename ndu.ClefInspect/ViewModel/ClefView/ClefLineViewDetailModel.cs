@@ -1,6 +1,4 @@
-﻿using System.Windows.Media;
-
-namespace ndu.ClefInspect.ViewModel.ClefView
+﻿namespace ndu.ClefInspect.ViewModel.ClefView
 {
     public class ClefLineViewDetailModel(string header, string? text)
     {

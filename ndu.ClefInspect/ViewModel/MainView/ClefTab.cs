@@ -19,7 +19,7 @@ namespace ndu.ClefInspect.ViewModel.MainView
         {
         }
         public ClefTab(List<FileInfo> fileInfos, MainViewSettings settings)
-            :this(new ClefViewModel(fileInfos, settings))
+            : this(new ClefViewModel(fileInfos, settings))
         {
         }
         private ClefTab(ClefViewModel clefViewModel)

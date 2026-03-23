@@ -123,7 +123,7 @@ namespace ndu.ClefInspect.View
 
         private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if(sender is ClefViewModel viewModel && e.PropertyName == nameof(ClefViewModel.ColWidthDetails))
+            if (sender is ClefViewModel viewModel && e.PropertyName == nameof(ClefViewModel.ColWidthDetails))
             {
                 Layout(viewModel);
             }
