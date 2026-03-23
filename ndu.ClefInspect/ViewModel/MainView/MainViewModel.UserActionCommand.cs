@@ -8,7 +8,7 @@ namespace ndu.ClefInspect.ViewModel.MainView
         {
             private readonly ClefViewModel.UserAction _action = action;
 
-            public override void Execute(object? parameter) => _mainViewModel.ActiveTab?.ClefViewModel?.DoUserAction(_action);
+            public override void Execute(object? parameter) => _mainViewModel.ActiveTab?.ClefViewModel?.DoUserAction(_action, parameter);
         }
 
     }

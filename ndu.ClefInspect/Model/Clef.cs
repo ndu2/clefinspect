@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Text;
@@ -38,7 +39,7 @@ namespace ndu.ClefInspect.Model
         };
         public static readonly char Fsep = '|';
 
-        public static Clef Create(string fd)
+        public static Clef Create(string fd, ReadOnlyCollection<PinPreset> pinPresets)
         {
             string[] fds = fd.Split(Fsep);
             List<FileInfo> fileInfos = [];
@@ -46,12 +47,13 @@ namespace ndu.ClefInspect.Model
             {
                 fileInfos.Add(new FileInfo(ifd));
             }
-            return new Clef(fileInfos);
+            return new Clef(fileInfos, pinPresets);
         }
 
-        public Clef(List<FileInfo> files)
+        public Clef(List<FileInfo> files, ReadOnlyCollection<PinPreset> pinPresets)
         {
             File = files;
+            PinPresets = pinPresets;
             _seekPos = 0;
             _autoUpdate = true;
             _fileOk = true;
@@ -154,6 +156,7 @@ namespace ndu.ClefInspect.Model
             }
         }
 
+        public ReadOnlyCollection<PinPreset> PinPresets { get; internal set; }
 
         private void Scan(object? _)
         {
@@ -270,7 +273,7 @@ namespace ndu.ClefInspect.Model
                                     if (bytesAvailPref != endline)
                                     {
                                         JsonObject? logline = Scan(bytes, start, endline);
-                                        _lines.ReplaceLast(new ClefLine(pos + i, logline));
+                                        _lines.ReplaceLast(CreateClefLine(pos + i, logline));
                                         uiUpdateTimer.Notify(LinesChangedEventArgsAction.Reset);
                                     }
                                     bytesAvailPref = 0;
@@ -278,7 +281,7 @@ namespace ndu.ClefInspect.Model
                                 else
                                 {
                                     JsonObject? logline = Scan(bytes, start, endline);
-                                    _lines.Add(new ClefLine(pos + i, logline));
+                                    _lines.Add(CreateClefLine(pos + i, logline));
                                     uiUpdateTimer.Notify(LinesChangedEventArgsAction.Add);
                                 }
                                 start = i + 1;
@@ -433,5 +436,24 @@ namespace ndu.ClefInspect.Model
                 ];
             }
         }
+
+        private ClefLine CreateClefLine(long pos, JsonObject? logline)
+        {
+            ClefLine clefLine = new(pos, logline);
+
+            foreach (PinPreset pinPreset in PinPresets)
+            {
+                foreach (string s in pinPreset.SearchText)
+                {
+                    if (clefLine.Message?.Contains(s, StringComparison.InvariantCultureIgnoreCase) ?? false)
+                    {
+                        clefLine.PinPreset.Add(pinPreset);
+                        break;
+                    }
+                }
+            }
+            return clefLine;
+        }
+
     }
 }

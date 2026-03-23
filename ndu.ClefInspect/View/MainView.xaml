@@ -28,20 +28,7 @@
                 <TextBlock Text="{Binding Name}" />
                 <ContentControl Content="{StaticResource icon_error}" Visibility="{Binding FileError}" Margin="5,0,2,0" />
                 <ContentControl Content="{StaticResource icon_quickRefresh}" Visibility="{Binding CalculationRunning}" Margin="2,0,2,0" />
-                <ToggleButton IsChecked="{Binding AutoUpdate, Mode=TwoWay}" Margin="2,0,2,0" >
-                    <ToggleButton.Style>
-                        <Style TargetType="ToggleButton">
-                            <Style.Triggers>
-                                <Trigger Property="IsChecked" Value="True">
-                                    <Setter Property="Content" Value="{StaticResource icon_download}" />
-                                </Trigger>
-                                <Trigger Property="IsChecked" Value="False">
-                                    <Setter Property="Content" Value="{StaticResource icon_pause}" />
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ToggleButton.Style>
-                </ToggleButton>
+                <ToggleButton IsChecked="{Binding AutoUpdate, Mode=TwoWay}" Margin="2,0,2,0" Style="{StaticResource TailToggleButton}" />
                 <Button Content="{StaticResource icon_close}" Command="{Binding Close}" /><!-- Margin="2,0,5,0" />-->
             </StackPanel>
         </DataTemplate>
@@ -52,28 +39,57 @@
         <System:String x:Key="OpenParamConcat">Concat</System:String>
         <System:String x:Key="OpenParamCancel">Cancel</System:String>
     </Window.Resources>
-
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <Menu.Resources>
                 <local:InverseBoolConverter x:Key="InverseBoolConverter" />
                 <local:CannotExecuteCommand x:Key="CannotExecuteCommand" />
+                <local:IntegerZeroIsCollapsedConverter x:Key="IntegerZeroIsCollapsedConverter" />
                 <local:BooleanVisibilityCollapsedConverter x:Key="BooleanVisibilityCollapsedConverter" />
             </Menu.Resources>
             <MenuItem Header="_File">
-                <MenuItem Header="_Open" Command="{Binding Open}" InputGestureText="Ctrl+O"/>
-                <MenuItem Header="_Close" Command="{Binding CloseTab}" InputGestureText="Ctrl+W"/>
+                <MenuItem Header="_Open" Command="{Binding Open}" Icon="{StaticResource icon_openfile}" InputGestureText="Ctrl+O"/>
+                <MenuItem Header="_Close" Command="{Binding CloseTab}" Icon="{StaticResource icon_close}" InputGestureText="Ctrl+W"/>
                 <Separator />
-                <MenuItem Header="Save Session" Command="{Binding SaveSession}" Visibility="{Binding Settings.CanPersist, Converter={StaticResource BooleanVisibilityCollapsedConverter}}" />
-                <MenuItem Header="Load Session" Command="{Binding LoadSession}" Visibility="{Binding Settings.HasSessionData, Converter={StaticResource BooleanVisibilityCollapsedConverter}}" />
+                <MenuItem Header="Save Session" Command="{Binding SaveSession}" Icon="{StaticResource icon_saveall}" Visibility="{Binding Settings.CanPersist, Converter={StaticResource BooleanVisibilityCollapsedConverter}}" />
+                <MenuItem Header="Load Session" Command="{Binding LoadSession}" Icon="{StaticResource icon_restoredefaultview}" Visibility="{Binding Settings.HasSessionData, Converter={StaticResource BooleanVisibilityCollapsedConverter}}" />
                 <Separator Visibility="{Binding Settings.CanPersist, Converter={StaticResource BooleanVisibilityCollapsedConverter}}" />
                 <MenuItem Header="_Exit" Command="{Binding Exit}" InputGestureText="Alt+F4"/>
             </MenuItem>
             <MenuItem Header="_Tools">
-                <MenuItem Header="_Copy Selected Entries to Clipboard" Command="{Binding CopySelected}" InputGestureText="Ctrl+C" />
-                <MenuItem Header="Copy _Selected Entries to Clipboard (clef format)" Command="{Binding CopyClefSelected}" InputGestureText="Ctrl+Shift+C"/>
-                <MenuItem Header="_Pin Selected Entries" Command="{Binding PinSelected}"  InputGestureText="Ctrl+P"/>
-                <MenuItem Header="_Unpin Selected Entries" Command="{Binding UnpinSelected}" InputGestureText="Ctrl+U" />
+                <MenuItem Header="_Copy Selected Entries to Clipboard" Icon="{StaticResource icon_copy}" Command="{Binding CopySelected}" InputGestureText="Ctrl+C" />
+                <MenuItem Header="Copy _Selected Entries to Clipboard (clef format)" Icon="{StaticResource icon_json}" Command="{Binding CopyClefSelected}" InputGestureText="Ctrl+Shift+C"/>
+                <MenuItem Header="_Pin Selected Entries" Icon="{StaticResource icon_pin}" >
+                    <MenuItem Header="{StaticResource icon_pin}" Command="{Binding PinSelected}" CommandParameter="{x:Static SystemColors.GrayTextBrush}" Foreground="{x:Static SystemColors.GrayTextBrush}" InputGestureText="Ctrl+P" />
+                    <MenuItem Header="{StaticResource icon_pin}" Command="{Binding PinSelected}" CommandParameter="{x:Static Brushes.White}" Foreground="{x:Static Brushes.White}" />
+                    <MenuItem Header="{StaticResource icon_pin}" Command="{Binding PinSelected}" CommandParameter="{x:Static Brushes.Black}" Foreground="{x:Static Brushes.Black}" />
+                    <MenuItem Header="{StaticResource icon_pin}" Command="{Binding PinSelected}" CommandParameter="{x:Static Brushes.Yellow}" Foreground="{x:Static Brushes.Yellow}" />
+                    <MenuItem Header="{StaticResource icon_pin}" Command="{Binding PinSelected}" CommandParameter="{x:Static Brushes.GreenYellow}" Foreground="{x:Static Brushes.GreenYellow}" />
+                    <MenuItem Header="{StaticResource icon_pin}" Command="{Binding PinSelected}" CommandParameter="{x:Static Brushes.LimeGreen}" Foreground="{x:Static Brushes.LimeGreen}" />
+                    <MenuItem Header="{StaticResource icon_pin}" Command="{Binding PinSelected}" CommandParameter="{x:Static Brushes.Red}" Foreground="{x:Static Brushes.Red}" />
+                    <MenuItem Header="{StaticResource icon_pin}" Command="{Binding PinSelected}" CommandParameter="{x:Static Brushes.DeepPink}" Foreground="{x:Static Brushes.DeepPink}" />
+                    <MenuItem Header="{StaticResource icon_pin}" Command="{Binding PinSelected}" CommandParameter="{x:Static Brushes.Orange}" Foreground="{x:Static Brushes.Orange}" />
+                    <MenuItem Header="{StaticResource icon_pin}" Command="{Binding PinSelected}" CommandParameter="{x:Static Brushes.Salmon}" Foreground="{x:Static Brushes.Salmon}" />
+                    <MenuItem Header="{StaticResource icon_pin}" Command="{Binding PinSelected}" CommandParameter="{x:Static Brushes.Aqua}" Foreground="{x:Static Brushes.Aqua}" />
+                    <MenuItem Header="{StaticResource icon_pin}" Command="{Binding PinSelected}" CommandParameter="{x:Static Brushes.DarkTurquoise}" Foreground="{x:Static Brushes.DarkTurquoise}" />
+                    <MenuItem Header="{StaticResource icon_pin}" Command="{Binding PinSelected}" CommandParameter="{x:Static Brushes.DodgerBlue}" Foreground="{x:Static Brushes.DodgerBlue}" />
+                    <MenuItem Header="{StaticResource icon_pin}" Command="{Binding PinSelected}" CommandParameter="{x:Static Brushes.Teal}" Foreground="{x:Static Brushes.Teal}" />
+                    <MenuItem Header="{StaticResource icon_pin}" Command="{Binding PinSelected}" CommandParameter="{x:Static Brushes.DarkViolet}" Foreground="{x:Static Brushes.DarkViolet}" />
+                </MenuItem>
+                <MenuItem Header="_Unpin Selected Entries" Icon="{StaticResource icon_unpin}" Command="{Binding UnpinSelected}" InputGestureText="Ctrl+U" />
+                <MenuItem Header="Pin Presets" ItemsSource="{Binding ActiveTab.ClefViewModel.PinPresets}" Visibility="{Binding ActiveTab.ClefViewModel.PinPresets.Count, Converter={StaticResource IntegerZeroIsCollapsedConverter}, FallbackValue=Collapsed}" >
+                    <MenuItem.Icon>
+                        <ContentControl Content="{StaticResource icon_pin}"></ContentControl>
+                    </MenuItem.Icon>
+                    <MenuItem.ItemContainerStyle>
+                        <Style>
+                            <Setter Property="MenuItem.IsCheckable" Value="True" />
+                            <Setter Property="MenuItem.Foreground" Value="{Binding Color}" />
+                            <Setter Property="MenuItem.Header" Value="{Binding Name}" />
+                            <Setter Property="MenuItem.IsChecked" Value="{Binding Enabled}" />
+                        </Style>
+                    </MenuItem.ItemContainerStyle>
+                </MenuItem>
             </MenuItem>
             <MenuItem Header="_Filter" ItemsSource="{Binding ActiveTab.ClefViewModel.Filters}" Command="{Binding ActiveTab.ClefViewModel.FiltersMenu, FallbackValue={StaticResource CannotExecuteCommand}}">
                 <MenuItem.ItemContainerStyle>
@@ -93,7 +109,7 @@
                 <MenuItem Header="_Details" IsCheckable="True" IsChecked="{Binding Settings.DetailView}"/>
                 <Separator />
                 <MenuItem Header="Save View as Default" Command="{Binding SaveViewDefaults}" Visibility="{Binding Settings.CanPersist, Converter={StaticResource BooleanVisibilityCollapsedConverter}}" />
-                <MenuItem Header="Reset View to Default" Command="{Binding ApplyViewDefaults}" />
+                <MenuItem Header="Reset View to Default" Command="{Binding ApplyViewDefaults}" Icon="{StaticResource icon_restoredefaultview}" />
                 <Separator />
                 <MenuItem Header="_Columns" ItemsSource="{Binding ActiveTab.ClefViewModel.DataColumns}">
                     <MenuItem.ItemContainerStyle>

@@ -11,6 +11,9 @@ namespace ndu.ClefInspect.ViewModel.ClefView
     public partial class ClefViewModel : INotifyPropertyChanged
     {
         private readonly ClefViewSettings _settings;
+
+        public ReadOnlyCollection<PinPreset> PinPresets => Clef.PinPresets;
+
         private readonly Dictionary<string, Filter> _filters;
         private readonly ObservableCollection<DataColumnView> _dataColumns;
         private readonly FilterTaskManager _filterTaskManager;
@@ -23,6 +26,14 @@ namespace ndu.ClefInspect.ViewModel.ClefView
         public ClefViewModel(string fileName, MainViewSettings settings)
         {
             _settings = new ClefViewSettings(settings);
+
+            List<PinPreset> pinPresets = [];
+            foreach(Configuration.PinPresetOptions p in _settings.SessionSettings.UserSettings.PinPresets)
+            {
+                PinPreset pp = new(p);
+                PropertyChangedEventManager.AddHandler(pp, (s, e) => Reload(new LinesChangedEventArgs(LinesChangedEventArgs.LinesChangedEventArgsAction.Reset), true), nameof(pp.Enabled));
+                pinPresets.Add(pp);
+            }
             _filters = [];
             _dataColumns = [];
             _filterTaskManager = new FilterTaskManager(this, _settings);
@@ -33,7 +44,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             PropertyChangedEventManager.AddHandler(_settings.SessionSettings, OnSessionSettingsDetailViewChanged, nameof(_settings.SessionSettings.DetailView));
             PropertyChangedEventManager.AddHandler(_settings.SessionSettings, OnSessionSettingsDetailViewChanged, nameof(_settings.SessionSettings.DetailViewFraction));
             PropertyChangedEventManager.AddHandler(_settings, OnViewSettingsRefTimeStampChanged, nameof(_settings.RefTimeStamp));
-            Clef = Clef.Create(fileName);
+            Clef = Clef.Create(fileName, new ReadOnlyCollection<PinPreset>(pinPresets));
             ClefLines = new FilteredClef(_settings);
             Filters = [];
             ClearTextFilter = new ClearTextFilterCommand(this);
@@ -131,11 +142,11 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             DataColumnEnabledChanged?.Invoke();
         }
         public enum UserAction { Copy, CopyClef, Pin, Unpin };
-        public delegate void UserActionEvent(UserAction userAction);
+        public delegate void UserActionEvent(UserAction userAction, object? parameter);
         public event UserActionEvent? UserActionHandler;
-        public void DoUserAction(UserAction userAction)
+        public void DoUserAction(UserAction userAction, object? parameter)
         {
-            UserActionHandler?.Invoke(userAction);
+            UserActionHandler?.Invoke(userAction, parameter);
         }
 
         public void DoClose()
@@ -149,7 +160,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
         {
             if (e.Action != LinesChangedEventArgs.LinesChangedEventArgsAction.None)
             {
-                Reload(e);
+                Reload(e, false);
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DateInfo)));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FileInfo)));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DataColumns)));
@@ -159,10 +170,10 @@ namespace ndu.ClefInspect.ViewModel.ClefView
 
         private void Reload()
         {
-            Reload(new LinesChangedEventArgs(LinesChangedEventArgs.LinesChangedEventArgsAction.Reset));
+            Reload(new LinesChangedEventArgs(LinesChangedEventArgs.LinesChangedEventArgsAction.Reset), false);
         }
 
-        private void Reload(LinesChangedEventArgs e)
+        private void Reload(LinesChangedEventArgs e, bool pinPresetChanged)
         {
             bool newFilters = false;
             foreach (var p in Clef.Properties)
@@ -210,8 +221,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
 
             List<IMatcher> matchers = CreateMatchers();
             CalculationRunning = true;
-
-            _filterTaskManager.Filter(matchers, e.Action,
+            _filterTaskManager.Filter(matchers, e.Action, pinPresetChanged,
                  (selectedIndex) =>
                  {
                      SelectedIndex = selectedIndex;

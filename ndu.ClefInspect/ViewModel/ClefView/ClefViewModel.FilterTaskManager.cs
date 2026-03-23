@@ -13,28 +13,31 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             private CancellationTokenSource? _cancelFilterTask;
             private readonly ClefViewModel _clefViewModel = clefViewModel;
             private LinesChangedEventArgsAction _filterAction = LinesChangedEventArgsAction.None;
+            private bool _pinPresetChanged = false;
             private readonly ClefViewSettings _settings = settings;
             private int _nextItemFromSource = 0;
 
-            public void Filter(List<IMatcher> matchers, LinesChangedEventArgsAction action, Action<int> onChanged)
+            public void Filter(List<IMatcher> matchers, LinesChangedEventArgsAction action, bool pinPresetChanged, Action<int> onChanged)
             {
                 Task? previousFilterTask = _filterTask;
                 LinesChangedEventArgsAction previousAction = LinesChangedEventArgsAction.None;
+                bool previousPinPresetChanged = false;
                 CancellationTokenSource? previousCancellationToken = _cancelFilterTask;
                 if (previousFilterTask != null && previousCancellationToken != null && previousFilterTask.Status != TaskStatus.RanToCompletion)
                 {
                     previousCancellationToken.Cancel();
                     previousAction = _filterAction;
+                    previousPinPresetChanged = _pinPresetChanged;
                 }
                 else
                 {
                     previousFilterTask = null;
                     previousCancellationToken = null;
-
                 }
                 _cancelFilterTask = new CancellationTokenSource();
                 _filterAction = Union(action, previousAction);
-                _filterTask = Reload(_clefViewModel.ClefLines, _clefViewModel.Clef, matchers, _clefViewModel.SelectedIndex, _filterAction,
+                _pinPresetChanged = previousPinPresetChanged | pinPresetChanged;
+                _filterTask = Reload(_clefViewModel.ClefLines, _clefViewModel.Clef, matchers, _clefViewModel.SelectedIndex, _filterAction, _pinPresetChanged,
                     () =>
                     {
                         if (previousFilterTask != null && previousCancellationToken != null)
@@ -55,7 +58,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
 
 
             public Task Reload(FilteredClef clefLines,
-                Clef clef, List<IMatcher> filters, int selectedIndex, LinesChangedEventArgsAction action,
+                Clef clef, List<IMatcher> filters, int selectedIndex, LinesChangedEventArgsAction action, bool pinPresetChanged,
                 Action onRun, Action<int> onChanged,
                 CancellationToken cancellationToken)
             {
@@ -72,7 +75,6 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                 int sourceIdx = (action == LinesChangedEventArgsAction.Add && clefLines.Count > 0) ? _nextItemFromSource : 0;
                 int idx = (action == LinesChangedEventArgsAction.Add) ? clefLines.Count : 0;
                 List<ClefLineViewModel> result = new(clefLines);
-
                 return Task.Run(() =>
                 {
                     onRun();
@@ -89,7 +91,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
 
                         ClefLine line = lines[i];
                         _nextItemFromSource = sourceIdx + i + 1;
-                        bool ok = line.Pin || (filters.Count == 0 || filters.All(f => f.Accept(line)));
+                        bool ok = line.HasPin() || (filters.Count == 0 || filters.All(f => f.Accept(line)));
                         if (ok)
                         {
                             ClefLineViewModel item;
@@ -145,10 +147,9 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                     {
                         clefLines.Clear();
                         clefLines.AddRange(result);
-                        if (changedAlot)
+                        if (changedAlot || pinPresetChanged)
                         {
                             clefLines.NotifyCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-
                         }
                         else
                         {
@@ -161,7 +162,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                     });
                 }, cancellationToken);
             }
-        }
 
+        }
     }
 }

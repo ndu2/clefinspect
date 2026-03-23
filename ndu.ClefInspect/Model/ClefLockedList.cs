@@ -7,7 +7,7 @@
 
         public ClefLockedList()
         {
-            _lines = new List<ClefLine>(100000);
+            _lines = new List<ClefLine>(10000);
         }
         public IList<ClefLine> ViewFrom(int first)
         {
