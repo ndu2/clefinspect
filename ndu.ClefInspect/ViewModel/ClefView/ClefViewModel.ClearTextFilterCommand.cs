@@ -30,7 +30,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             public void Execute(object? parameter)
             {
                 clefViewModel.TextFilter = "";
-                clefViewModel.ApplyTextFilter.Execute(this);
+                clefViewModel.ApplyFilter.Execute(this);
             }
         }
     }

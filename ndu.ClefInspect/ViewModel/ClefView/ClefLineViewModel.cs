@@ -54,6 +54,11 @@ namespace ndu.ClefInspect.ViewModel.ClefView
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Message)));
         }
+        public void NotifyHiddenChanged()
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Hide)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Hidden)));
+        }
 
         public string? Time
         {
@@ -132,6 +137,35 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                 }
             }
         }
+        public bool Hide
+        {
+            get => ClefLine.Hide;
+            set
+            {
+                if (ClefLine.Hide != value)
+                {
+                    ClefLine.Hide = value;
+                    NotifyHiddenChanged();
+                }
+            }
+        }
+        public bool Hidden
+        {
+            get => ClefLine.Hide || ClefLine.Ignore;
+            set
+            {
+                if (ClefLine.Hide != value)
+                {
+                    ClefLine.Hide = value;
+                    NotifyHiddenChanged();
+                }
+                if (!value && ClefLine.Ignore && EventId != null)
+                {
+                    _settings.IgnoredEventId.Remove(this.ClefLine.EventId);
+                }
+            }
+        }
+
         public Brush PinForeground
         {
             get => ClefLine.PinForeground;

@@ -19,8 +19,13 @@
         <KeyBinding Command="{Binding CopyClefSelected}" Gesture="CTRL+SHIFT+C" />
         <KeyBinding Command="{Binding PinSelected}" Gesture="CTRL+P" />
         <KeyBinding Command="{Binding UnpinSelected}" Gesture="CTRL+U" />
+        <KeyBinding Command="{Binding HideSelected}" Gesture="Del" />
         <KeyBinding Command="{Binding CloseTab}" Gesture="CTRL+W" />
         <KeyBinding Command="{Binding OpenFromClipboard}" Gesture="CTRL+V" />
+        <KeyBinding Command="{Binding ToggleIgnoreFilter}" Gesture="F5" />
+        <KeyBinding Command="{Binding ToggleIgnorePinned}" Gesture="F6" />
+        <KeyBinding Command="{Binding ToggleShowHiddenEvents}" Gesture="F7" />
+        <KeyBinding Command="{Binding ToggleFilterAll}" Gesture="F8" />
     </Window.InputBindings>
     <Window.Resources>
         <DataTemplate x:Key="tabControlHeaderTemplate" DataType="{x:Type viewmodel:ClefTab}">
@@ -47,6 +52,8 @@
                 <local:CannotExecuteCommand x:Key="CannotExecuteCommand" />
                 <local:IntegerZeroIsCollapsedConverter x:Key="IntegerZeroIsCollapsedConverter" />
                 <local:BooleanVisibilityCollapsedConverter x:Key="BooleanVisibilityCollapsedConverter" />
+                <local:StringFormatConverter x:Key="StringFormatConverter" />
+                <local:NullVisibilityCollapsedConverter x:Key="NullVisibilityCollapsedConverter" />
             </Menu.Resources>
             <MenuItem Header="_File">
                 <MenuItem Header="_Open" Command="{Binding Open}" Icon="{StaticResource icon_openfile}" InputGestureText="Ctrl+O"/>
@@ -79,6 +86,11 @@
                     <MenuItem Header="{StaticResource icon_pin}" Command="{Binding PinSelected}" CommandParameter="{x:Static Brushes.DarkViolet}" Foreground="{x:Static Brushes.DarkViolet}" />
                 </MenuItem>
                 <MenuItem Header="_Unpin Selected Entries" Icon="{StaticResource icon_unpin}" Command="{Binding UnpinSelected}" InputGestureText="Ctrl+U" />
+                <MenuItem Header="_Hide Selected Entries" Icon="{StaticResource icon_cloakOrHide}" Command="{Binding HideSelected}" InputGestureText="Del" />
+                <MenuItem Visibility="{Binding ActiveTab.ClefViewModel.SelectedItem.ClefLine.EventId, Converter={StaticResource NullVisibilityCollapsedConverter}, FallbackValue=Collapsed}"
+                          Header="{Binding ActiveTab.ClefViewModel.SelectedItem.ClefLine.EventId, Converter={StaticResource StringFormatConverter}, ConverterParameter=Hide All Entries with Id {0}, FallbackValue=Hide All Entries of the selected Events Types}"
+                          Icon="{StaticResource icon_cloakOrHide}" Command="{Binding HideAllFromSelected}" />
+                <MenuItem Header="Show Selected Entries" Command="{Binding ShowSelected}" />
                 <MenuItem Header="Pin Presets" ItemsSource="{Binding ActiveTab.ClefViewModel.PinPresets}" Visibility="{Binding ActiveTab.ClefViewModel.PinPresets.Count, Converter={StaticResource IntegerZeroIsCollapsedConverter}, FallbackValue=Collapsed}" >
                     <MenuItem.Icon>
                         <ContentControl Content="{StaticResource icon_pin}"></ContentControl>
@@ -109,6 +121,11 @@
                 <MenuItem Header="_One Line Only" IsCheckable="True" IsChecked="{Binding Settings.OneLineOnly}"/>
                 <MenuItem Header="_Local Time" IsCheckable="True" IsChecked="{Binding Settings.LocalTime}"/>
                 <MenuItem Header="_Details" IsCheckable="True" IsChecked="{Binding Settings.DetailView}"/>
+                <Separator />
+                <MenuItem Header="Show Filtered Entries" IsCheckable="True" IsChecked="{Binding ActiveTab.ClefViewModel.Settings.ShowFiltered}" InputGestureText="F5"/>
+                <MenuItem Header="Show Pinned Entries" IsCheckable="True" IsChecked="{Binding ActiveTab.ClefViewModel.Settings.ShowPinned}" InputGestureText="F6"/>
+                <MenuItem Header="Show Hidden Entries" IsCheckable="True" IsChecked="{Binding ActiveTab.ClefViewModel.Settings.ShowHiddenEvents}" InputGestureText="F7"/>
+                <MenuItem Header="Filter All" IsCheckable="True" IsChecked="{Binding ActiveTab.ClefViewModel.Settings.FilterAll}" InputGestureText="F8"/>
                 <Separator />
                 <MenuItem Header="Save View as Default" Command="{Binding SaveViewDefaults}" Visibility="{Binding Settings.CanPersist, Converter={StaticResource BooleanVisibilityCollapsedConverter}}" />
                 <MenuItem Header="Reset View to Default" Command="{Binding ApplyViewDefaults}" Icon="{StaticResource icon_restoredefaultview}" />

@@ -198,7 +198,7 @@ namespace ndu.ClefInspect.View
             if (e.Key == Key.Enter)
             {
                 TextFilter.GetBindingExpression(TextBox.TextProperty).UpdateSource();
-                (DataContext as ClefViewModel)?.ApplyTextFilter.Execute(this);
+                (DataContext as ClefViewModel)?.ApplyFilter.Execute(this);
             }
         }
         private void TextDatePosition_KeyDown(object sender, KeyEventArgs e)
@@ -211,7 +211,7 @@ namespace ndu.ClefInspect.View
         private void ButtonApplyTextFilter_Click(object sender, RoutedEventArgs e)
         {
             TextFilter.GetBindingExpression(TextBox.TextProperty).UpdateSource();
-            (DataContext as ClefViewModel)?.ApplyTextFilter.Execute(this);
+            (DataContext as ClefViewModel)?.ApplyFilter.Execute(this);
         }
 
         private List<ClefLineViewModel> GetSelectedInOrder()
@@ -238,6 +238,13 @@ namespace ndu.ClefInspect.View
                 case ClefViewModel.UserAction.CopyClef: CopySelectedClef(); break;
                 case ClefViewModel.UserAction.Pin: PinSelected(parameter as Brush ?? SystemColors.GrayTextBrush); break;
                 case ClefViewModel.UserAction.Unpin: UnpinSelected(); break;
+                case ClefViewModel.UserAction.Hide: HideSelected(); break;
+                case ClefViewModel.UserAction.HideAllFromSelected: HideAllFromSelected(); break;
+                case ClefViewModel.UserAction.Show: ShowSelected(); break;
+                case ClefViewModel.UserAction.ToggleIgnoreFilter: ToggleShowFiltered(); break;
+                case ClefViewModel.UserAction.ToggleIgnorePinned: ToggleShowPinned(); break;
+                case ClefViewModel.UserAction.ToggleShowHiddenEvents: ToggleShowHiddenEvents(); break;
+                case ClefViewModel.UserAction.ToggleFilterAll: ToggleFilterAll(); break;
             }
         }
 
@@ -301,6 +308,56 @@ namespace ndu.ClefInspect.View
             }
         }
         private void UnpinSelected_Click(object sender, System.Windows.RoutedEventArgs e) => UnpinSelected();
+
+        private void HideSelected()
+        {
+            foreach (var item in ListViewLogEntries.SelectedItems)
+            {
+                if (item is ClefLineViewModel line)
+                {
+                    line.Hide = true;
+                }
+            }
+            (DataContext as ClefViewModel)?.ApplyFilter.Execute(this);
+        }
+        private void HideSelected_Click(object sender, System.Windows.RoutedEventArgs e) => HideSelected();
+
+        private void HideAllFromSelected()
+        {
+            (DataContext as ClefViewModel)?.HideAllEventIds.Execute(line.EventId);
+        }
+        private void HideAllFromSelected_Click(object sender, System.Windows.RoutedEventArgs e) => HideAllFromSelected();
+
+        private void ShowSelected()
+        {
+            foreach (var item in ListViewLogEntries.SelectedItems)
+            {
+                if (item is ClefLineViewModel line)
+                {
+                    line.Hidden = false;
+                }
+            }
+            (DataContext as ClefViewModel)?.ApplyFilter.Execute(this);
+        }
+        private void ShowSelected_Click(object sender, System.Windows.RoutedEventArgs e) => ShowSelected();
+
+
+        private void ToggleShowHiddenEvents()
+        {
+            (DataContext as ClefViewModel)?.Settings.ShowHiddenEvents ^= true;
+        }
+        private void ToggleShowFiltered()
+        {
+            (DataContext as ClefViewModel)?.Settings.ShowFiltered ^= true;
+        }
+        private void ToggleShowPinned()
+        {
+            (DataContext as ClefViewModel)?.Settings.ShowPinned ^= true;
+        }
+        private void ToggleFilterAll()
+        {
+            (DataContext as ClefViewModel)?.Settings.FilterAll ^= true;
+        }
 
 
         private void OnReloaded()

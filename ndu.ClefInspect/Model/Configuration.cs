@@ -40,6 +40,12 @@ namespace ndu.ClefInspect.Model
             public bool Enabled { get; set; } = false;
             public List<string> SearchText { get; set; } = [];
         }
+        public class EventSettingsOptions
+        {
+            public const string EventSettings = "eventSettings";
+            public string Name { get; set; } = string.Empty;
+            public ObservableCollection<string> HideEventIds { get; set; } = [];
+        }
 
         public Configuration()
         {
@@ -47,6 +53,7 @@ namespace ndu.ClefInspect.Model
             ViewSettings = new ViewSettingsOptions();
             Session = new SessionOptions();
             PinPresets = [];
+            EventSettings = new EventSettingsOptions();
             try
             {
                 IConfigurationRoot config = new ConfigurationBuilder()
@@ -56,6 +63,7 @@ namespace ndu.ClefInspect.Model
                 config.GetSection(ViewSettingsOptions.ViewSettings).Bind(ViewSettings);
                 config.GetSection(SessionOptions.Session).Bind(Session);
                 config.GetSection(PinPresetOptions.PinPresets).Bind(PinPresets);
+                config.GetSection(EventSettingsOptions.EventSettings).Bind(EventSettings);
             }
             catch (Exception e)
             {
@@ -80,6 +88,7 @@ namespace ndu.ClefInspect.Model
         public ViewSettingsOptions ViewSettings { get; }
         public SessionOptions Session { get; }
         public ObservableCollection<PinPresetOptions> PinPresets { get; }
+        public EventSettingsOptions EventSettings { get; }
 
         public void Write()
         {

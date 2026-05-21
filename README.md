@@ -40,14 +40,19 @@ Use timestamp field to browse to a event for a given time (enter a timestamp + `
 
 ### Shortcuts
 
- - `Ctrl+C`: Copy selected lines to clipboard (formatted, with the displayed columns)
- - `Ctrl+Shift+C`: Copy selected lines to clipboard as CLEF Events
- - `Ctrl+P`: Pin selected lines
- - `Ctrl+U`: Unpin selected lines
+ - `Ctrl+C`: Copy selected events to clipboard (formatted, with the displayed columns)
+ - `Ctrl+Shift+C`: Copy selected events to clipboard as CLEF Events
+ - `Ctrl+P`: Pin selected events
+ - `Ctrl+U`: Unpin selected events
+ - `Del`: Hide selected events
  - `Ctrl+A` (when in the Event list): Select all displayed events
  - `Ctrl+O`: Open a logfile
  - `Ctrl+W`: Close the active tab
  - `Ctrl+Tab`: Switch the active tab
+ - `F5`: Toggle filtering
+ - `F6`: Toggle display of pinned events
+ - `F7`: Toggle display of hidden events
+ - `F8`: Toggle hiding all events
 
 ## Installation
 
@@ -78,6 +83,12 @@ You may want to put a file `ClefInspect.defaults.json` in the folder of `ClefIns
 		"Files": [
 		"C:\\temp\\a.json",
 		"C:\\temp\\b.json"
+		]
+	},
+	"eventSettings": {
+		"HideEventIds": [
+		"5000",
+		"Ax89dbCD"
 		]
 	},
 	"pinPresets": [

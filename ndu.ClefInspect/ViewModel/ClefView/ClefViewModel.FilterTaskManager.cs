@@ -17,7 +17,8 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             private readonly ClefViewSettings _settings = settings;
             private int _nextItemFromSource = 0;
 
-            public void Filter(List<IMatcher> matchers, LinesChangedEventArgsAction action, bool pinPresetChanged, Action<int> onChanged)
+            public void Filter(List<IMatcher> matchers, ISet<string> ignoredEventIds, LinesChangedEventArgsAction action, bool pinPresetChanged,
+                bool ignoreFilter, bool filterAll, bool showPinned, bool showHidden, Action<int> onChanged)
             {
                 Task? previousFilterTask = _filterTask;
                 LinesChangedEventArgsAction previousAction = LinesChangedEventArgsAction.None;
@@ -37,8 +38,19 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                 _cancelFilterTask = new CancellationTokenSource();
                 _filterAction = Union(action, previousAction);
                 _pinPresetChanged = previousPinPresetChanged | pinPresetChanged;
-                _filterTask = Reload(_clefViewModel.ClefLines, _clefViewModel.Clef, matchers, _clefViewModel.SelectedIndex, _filterAction, _pinPresetChanged,
-                    () =>
+                _filterTask = Reload(
+                    clefLines: _clefViewModel.ClefLines,
+                    clef: _clefViewModel.Clef,
+                    filters: matchers,
+                    ignoredEvents: ignoredEventIds,
+                    selectedIndex: _clefViewModel.SelectedIndex,
+                    action: _filterAction,
+                    pinPresetChanged: _pinPresetChanged,
+                    ignoreFilter: ignoreFilter,
+                    filterAll: filterAll,
+                    showPinned: showPinned,
+                    showHidden: showHidden,
+                    onRun: () =>
                     {
                         if (previousFilterTask != null && previousCancellationToken != null)
                         {
@@ -52,13 +64,16 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                             }
                         }
                     },
-                   onChanged,
-                   _cancelFilterTask.Token);
+                   onChanged: onChanged,
+                   cancellationToken: _cancelFilterTask.Token);
             }
 
 
             public Task Reload(FilteredClef clefLines,
-                IClef clef, List<IMatcher> filters, int selectedIndex, LinesChangedEventArgsAction action, bool pinPresetChanged,
+                IClef clef, List<IMatcher> filters, ISet<string> ignoredEvents,
+                int selectedIndex, LinesChangedEventArgsAction action,
+                bool pinPresetChanged,
+                bool ignoreFilter, bool filterAll, bool showPinned, bool showHidden,
                 Action onRun, Action<int> onChanged,
                 CancellationToken cancellationToken)
             {
@@ -81,7 +96,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                     (object?, int) added = (null, 0);
                     bool changedAlot = false;
                     IList<ClefLine> lines = clef.ViewFrom(sourceIdx);
-
+                    List<int> notifyHiddenChangedOn = new List<int>();
                     for (int i = 0; i < lines.Count; ++i)
                     {
                         if (cancellationToken.IsCancellationRequested)
@@ -91,7 +106,18 @@ namespace ndu.ClefInspect.ViewModel.ClefView
 
                         ClefLine line = lines[i];
                         _nextItemFromSource = sourceIdx + i + 1;
-                        bool ok = line.HasPin() || (filters.Count == 0 || filters.All(f => f.Accept(line)));
+                        bool ignoreChanged = false;
+
+                        string? eventId = line.EventId;
+                        bool ignore = eventId != null && ignoredEvents.Contains(eventId);
+                        ignoreChanged = ignore != line.Ignore;
+                        if (ignoreChanged)
+                        {
+                            line.Ignore = ignore;
+                        }
+                        bool ok = (showPinned && line.HasPin()) ||
+                        (showHidden && (line.Hide || line.Ignore)) ||
+                        !filterAll && !line.Hide && !line.Ignore && (ignoreFilter || filters.Count == 0 || filters.All(f => f.Accept(line)));
                         if (ok)
                         {
                             ClefLineViewModel item;
@@ -130,6 +156,10 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                             {
                                 selectedIndexExact = selectedIndex;
                             }
+                            if(ignoreChanged)
+                            {
+                                notifyHiddenChangedOn.Add(idx);
+                            }
                             idx++;
                         }
                     }
@@ -145,6 +175,13 @@ namespace ndu.ClefInspect.ViewModel.ClefView
 
                     Application.Current?.Dispatcher?.Invoke(() =>
                     {
+                        foreach(int idx in notifyHiddenChangedOn)
+                        {
+                            if (idx >= 0 && idx < result.Count)
+                            {
+                                result[idx].NotifyHiddenChanged();
+                            }
+                        }
                         clefLines.Clear();
                         clefLines.AddRange(result);
                         if (changedAlot || pinPresetChanged)

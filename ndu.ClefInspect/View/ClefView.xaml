@@ -9,7 +9,10 @@
              d:DataContext="{d:DesignInstance Type=viewmodel:ClefViewModel}"
              mc:Ignorable="d" 
              x:Name="clefView"
-             d:DesignHeight="450" d:DesignWidth="800"> 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <local:InverseBoolConverter x:Key="InverseBoolConverter" />
+    </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
@@ -42,7 +45,7 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <local:ClefFilterView DataContext="{Binding}" Margin="2,2,2,2" />
+                    <local:ClefFilterView IsEnabled="{Binding ElementName=clefView, Path=DataContext.Settings.ShowFiltered, Converter={StaticResource InverseBoolConverter}}" DataContext="{Binding}" Margin="2,2,2,2" />
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
@@ -76,17 +79,21 @@
                 </ListView.ItemContainerStyle>
                 <ListView.Resources>
                     <local:BooleanVisibilityHiddenConverter x:Key="BooleanVisibilityHiddenConverter" />
+                    <local:StringFormatConverter x:Key="StringFormatConverter" />
+                    <local:NullVisibilityCollapsedConverter x:Key="NullVisibilityCollapsedConverter" />
                     <GridView x:Key="User">
-                        <GridViewColumn Header="Pin" Width="{Binding ElementName=clefView, Path=PinWidth}">
+                        <GridViewColumn Header="Pin / Hide" Width="{Binding ElementName=clefView, Path=PinWidth}">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
                                         <ToggleButton Grid.Column="0" IsChecked="{Binding Pin, Mode=TwoWay}" Style="{StaticResource PinToggleButton}" Foreground="{Binding PinForeground}"/>
-                                        <ContentControl Grid.Column="1" Content="{StaticResource icon_pin}" Foreground="{Binding PinPresetForeground}" Visibility="{Binding PinPreset, Mode=OneWay, Converter={StaticResource BooleanVisibilityHiddenConverter}}" />
+                                        <ToggleButton Grid.Column="1" IsChecked="{Binding Hidden, Mode=TwoWay}" Style="{StaticResource HideToggleButton}"/>
+                                        <ContentControl Grid.Column="2" Content="{StaticResource icon_pin}" Foreground="{Binding PinPresetForeground}" Visibility="{Binding PinPreset, Mode=OneWay, Converter={StaticResource BooleanVisibilityHiddenConverter}}" />
                                     </Grid>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
@@ -148,6 +155,12 @@
                             <MenuItem Header="{StaticResource icon_pin}" Click="PinSelected_Click" Foreground="{x:Static Brushes.DarkViolet}" />
                         </MenuItem>
                         <MenuItem Header="Unpin Selected Entries" Icon="{StaticResource icon_unpin}" Click="UnpinSelected_Click" InputGestureText="Ctrl+U" />
+                        <MenuItem Header="Hide Selected Entries" Icon="{StaticResource icon_cloakOrHide}" Click="HideSelected_Click" InputGestureText="Del" />
+                        <MenuItem Header="{Binding SelectedItem.ClefLine.EventId, Converter={StaticResource StringFormatConverter}, ConverterParameter=Hide All Entries with Id {0}, FallbackValue=Hide All Entries of the selected Events Types}"
+                                  Visibility="{Binding SelectedItem.ClefLine.EventId, Converter={StaticResource NullVisibilityCollapsedConverter}, FallbackValue=Collapsed}"
+                                  Icon="{StaticResource icon_cloakOrHide}" Click="HideAllFromSelected_Click" />
+                        <MenuItem Header="Show Selected Entries" Click="ShowSelected_Click"
+                                  Visibility="{Binding Settings.ShowHiddenEvents, Converter={StaticResource BooleanVisibilityCollapsedConverter}}" />
                     </ContextMenu>
                 </ListView.ContextMenu>
             </ListView>

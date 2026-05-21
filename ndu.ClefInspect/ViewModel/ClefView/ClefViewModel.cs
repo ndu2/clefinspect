@@ -1,5 +1,6 @@
 ﻿using ndu.ClefInspect.Model;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
 using System.Text;
@@ -52,12 +53,18 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             PropertyChangedEventManager.AddHandler(_settings.SessionSettings, OnSessionSettingsDetailViewChanged, nameof(_settings.SessionSettings.DetailView));
             PropertyChangedEventManager.AddHandler(_settings.SessionSettings, OnSessionSettingsDetailViewChanged, nameof(_settings.SessionSettings.DetailViewFraction));
             PropertyChangedEventManager.AddHandler(_settings, OnViewSettingsRefTimeStampChanged, nameof(_settings.RefTimeStamp));
+            CollectionChangedEventManager.AddHandler(_settings.IgnoredEventId, (_, _) => Reload(new LinesChangedEventArgs(LinesChangedEventArgs.LinesChangedEventArgsAction.Reset), false));
+            PropertyChangedEventManager.AddHandler(_settings, (_, _) => Reload(), nameof(_settings.ShowPinned));
+            PropertyChangedEventManager.AddHandler(_settings, (_, _) => Reload(), nameof(_settings.ShowFiltered));
+            PropertyChangedEventManager.AddHandler(_settings, (_, _) => Reload(), nameof(_settings.ShowHiddenEvents));
+            PropertyChangedEventManager.AddHandler(_settings, (_, _) => Reload(), nameof(_settings.FilterAll));
             Clef = clefFactoryMethod(new ReadOnlyCollection<PinPreset>(pinPresets));
             ClefLines = new FilteredClef(_settings);
             Filters = [];
             ClearTextFilter = new ClearTextFilterCommand(this);
-            ApplyTextFilter = new ApplyTextFilterCommand(this);
+            ApplyFilter = new ApplyFilterCommand(this);
             FiltersMenu = new FiltersMenuCommand(this);
+            HideAllEventIds = new HideAllEventIdsCommand(this);
             Clef.LinesChanged += Reload;
         }
 
@@ -149,7 +156,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
         {
             DataColumnEnabledChanged?.Invoke();
         }
-        public enum UserAction { Copy, CopyClef, Pin, Unpin };
+        public enum UserAction { Copy, CopyClef, Pin, Unpin, Hide, HideAllFromSelected, Show, ToggleIgnoreFilter, ToggleIgnorePinned, ToggleShowHiddenEvents, ToggleFilterAll };
         public delegate void UserActionEvent(UserAction userAction, object? parameter);
         public event UserActionEvent? UserActionHandler;
         public void DoUserAction(UserAction userAction, object? parameter)
@@ -229,9 +236,20 @@ namespace ndu.ClefInspect.ViewModel.ClefView
 
             List<IMatcher> matchers = CreateMatchers();
             CalculationRunning = true;
-            _filterTaskManager.Filter(matchers, e.Action, pinPresetChanged,
-                 (selectedIndex) =>
+            HashSet<string> ignoredEvents = [];
+            ignoredEvents.UnionWith(Settings.IgnoredEventId);
+            _filterTaskManager.Filter(matchers: matchers,
+                ignoredEventIds: ignoredEvents,
+                action: e.Action,
+                pinPresetChanged: pinPresetChanged,
+                ignoreFilter: _settings.ShowFiltered,
+                filterAll: _settings.FilterAll,
+                showPinned: _settings.ShowPinned,
+                showHidden: _settings.ShowHiddenEvents,
+                onChanged: (selectedIndex) =>
                  {
+                     // force PropertyChangedEventArgs associated with SelectedIndex
+                     _selectedIndex = -1;
                      SelectedIndex = selectedIndex;
                      PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DateInfo)));
                      PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FileInfo)));
@@ -258,7 +276,6 @@ namespace ndu.ClefInspect.ViewModel.ClefView
 
             return matchers;
         }
-
         public IClef Clef { get; }
         public string FilePath
         {
@@ -333,8 +350,9 @@ namespace ndu.ClefInspect.ViewModel.ClefView
 
         public ICommand ClearTextFilter { get; }
 
-        public ICommand ApplyTextFilter { get; }
+        public ICommand ApplyFilter { get; }
         public ICommand FiltersMenu { get; }
+        public ICommand HideAllEventIds { get; }
 
         public ClefLineViewModel? SelectedItem
         {

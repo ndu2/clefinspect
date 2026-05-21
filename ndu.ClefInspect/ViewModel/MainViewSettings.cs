@@ -94,7 +94,7 @@ namespace ndu.ClefInspect.ViewModel
             ClefColFormatString = "{0,-" + DefaultColWidthText.Length + "}";
         }
 
-        public static readonly string PinWidthText = "NNNNN";
+        public static readonly string PinWidthText = "NNNNNNN";
         public static string DateWidthText { get; }
 
         public string? Format(DateTime? dt)
