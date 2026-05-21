@@ -32,7 +32,6 @@ namespace ndu.ClefInspect.Model
         private readonly Dictionary<string, string> _indexableProperties = new()
         {
             {ClefSchema.LEVEL_KEY,"Level"},
-            //{"@i","Event Id"}
         };
 
         public Clef(List<FileInfo> files, ReadOnlyCollection<PinPreset> pinPresets)
@@ -333,7 +332,7 @@ namespace ndu.ClefInspect.Model
             }
             catch (Exception e)
             {
-                _lines.Add(new ClefLine(long.MaxValue, [new KeyValuePair<string, JsonNode?>("@m", JsonValue.Create(e.ToString()))]));
+                _lines.Add(new ClefLine(long.MaxValue, [new KeyValuePair<string, JsonNode?>(ClefSchema.MESSAGE_KEY, JsonValue.Create(e.ToString()))]));
                 uiUpdateTimer.Notify(LinesChangedEventArgsAction.Reset);
             }
             finally
@@ -375,7 +374,7 @@ namespace ndu.ClefInspect.Model
                 {
                     return
                     [
-                        new KeyValuePair<string, JsonNode?>("@m", JsonValue.Create(line))
+                        new KeyValuePair<string, JsonNode?>(ClefSchema.MESSAGE_KEY, JsonValue.Create(line))
                     ];
                 }
                 JsonObject? logline = JsonNode.Parse(line) as JsonObject;
@@ -416,7 +415,7 @@ namespace ndu.ClefInspect.Model
             {
                 return
                 [
-                    new KeyValuePair<string, JsonNode?>("@m", JsonValue.Create(ex.Message))
+                    new KeyValuePair<string, JsonNode?>(ClefSchema.MESSAGE_KEY, JsonValue.Create(ex.Message))
                 ];
             }
         }

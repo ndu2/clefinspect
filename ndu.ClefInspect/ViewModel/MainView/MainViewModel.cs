@@ -35,6 +35,13 @@ namespace ndu.ClefInspect.ViewModel.MainView
             CopyClefSelected = new UserActionCommand(this, ClefView.ClefViewModel.UserAction.CopyClef);
             PinSelected = new UserActionCommand(this, ClefView.ClefViewModel.UserAction.Pin);
             UnpinSelected = new UserActionCommand(this, ClefView.ClefViewModel.UserAction.Unpin);
+            HideSelected = new UserActionCommand(this, ClefView.ClefViewModel.UserAction.Hide);
+            HideAllFromSelected = new UserActionCommand(this, ClefView.ClefViewModel.UserAction.HideAllFromSelected);
+            ShowSelected = new UserActionCommand(this, ClefView.ClefViewModel.UserAction.Show);
+            ToggleIgnoreFilter = new UserActionCommand(this, ClefView.ClefViewModel.UserAction.ToggleIgnoreFilter);
+            ToggleIgnorePinned = new UserActionCommand(this, ClefView.ClefViewModel.UserAction.ToggleIgnorePinned);
+            ToggleShowHiddenEvents = new UserActionCommand(this, ClefView.ClefViewModel.UserAction.ToggleShowHiddenEvents);
+            ToggleFilterAll = new UserActionCommand(this, ClefView.ClefViewModel.UserAction.ToggleFilterAll);
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -54,6 +61,13 @@ namespace ndu.ClefInspect.ViewModel.MainView
         public UserActionCommand CopyClefSelected { get; }
         public UserActionCommand PinSelected { get; }
         public UserActionCommand UnpinSelected { get; }
+        public UserActionCommand HideSelected { get; }
+        public UserActionCommand HideAllFromSelected {  get; }
+        public UserActionCommand ShowSelected { get; }
+        public UserActionCommand ToggleIgnoreFilter { get; }
+        public UserActionCommand ToggleIgnorePinned { get; }
+        public UserActionCommand ToggleShowHiddenEvents { get; }
+        public UserActionCommand ToggleFilterAll { get; }
         public ICommand Exit { get; set; }
 
         private ClefTab? _activeTab;

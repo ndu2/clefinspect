@@ -26,7 +26,7 @@ namespace ndu.ClefInspect.Model
 
         private static string? Render(JsonObject? line)
         {
-            return line?["@m"]?.ToString() ?? Render(line?["@mt"]?.ToString(), line);
+            return line?[ClefSchema.MESSAGE_KEY]?.ToString() ?? Render(line?[ClefSchema.MESSAGETEMPLATE_KEY]?.ToString(), line);
         }
 
         private enum ParseState
@@ -96,6 +96,13 @@ namespace ndu.ClefInspect.Model
                 return _line?[ClefSchema.LEVEL_KEY]?.ToString() ?? ClefSchema.LEVEL_EMPTY;
             }
         }
+        public string? EventId
+        {
+            get
+            {
+                return _line?[ClefSchema.EVENTID_KEY]?.ToString();
+            }
+        }
         public DateTime? Time { get; } = GetTime(line);
 
         public string? Message { get; } = Render(line);
@@ -126,6 +133,8 @@ namespace ndu.ClefInspect.Model
         public bool Pin { get; set; } = false;
         public Brush PinForeground { get; set; } = SystemColors.WindowTextBrush;
         public HashSet<PinPreset> PinPreset { get; } = [];
+        public bool Ignore { get; set; } = false;
+        public bool Hide { get; set; } = false;
         public override string ToString()
         {
             return $"{Time};{Level};{Message}";

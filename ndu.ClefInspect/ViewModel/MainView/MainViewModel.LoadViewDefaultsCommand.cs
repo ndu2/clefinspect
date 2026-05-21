@@ -19,6 +19,10 @@ namespace ndu.ClefInspect.ViewModel.MainView
                     {
                         fvm.Visible = _mainViewModel.Settings.IsVisibleFilterByDefault(fvm.Name);
                     }
+                    tab.ClefViewModel.Settings.ShowFiltered = false;
+                    tab.ClefViewModel.Settings.ShowHiddenEvents = false;
+                    tab.ClefViewModel.Settings.ShowPinned = true;
+                    tab.ClefViewModel.Settings.FilterAll = false;
                 }
             }
         }

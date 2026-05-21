@@ -22,6 +22,7 @@
                 <ResourceDictionary Source="/Resources/SaveAll.xaml" />
                 <ResourceDictionary Source="/Resources/Unpin.xaml" />
                 <ResourceDictionary Source="/Resources/PasteTable.xaml" />
+                <ResourceDictionary Source="Resources/CloakOrHide.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <Style x:Key="TailToggleButton" TargetType="ToggleButton">
                 <Style.Setters>
@@ -47,6 +48,23 @@
                                 </Trigger>
                                 <Trigger Property="IsChecked" Value="False">
                                     <Setter TargetName="PinToggleButtonContent" Property="Content" Value="{StaticResource icon_empty}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style x:Key="HideToggleButton" TargetType="ToggleButton">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ToggleButton">
+                            <ContentControl x:Name="HideToggleButtonContent" Content="{StaticResource icon_empty}"/>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter TargetName="HideToggleButtonContent" Property="Content" Value="{StaticResource icon_cloakOrHide}" />
+                                </Trigger>
+                                <Trigger Property="IsChecked" Value="False">
+                                    <Setter TargetName="HideToggleButtonContent" Property="Content" Value="{StaticResource icon_empty}" />
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>

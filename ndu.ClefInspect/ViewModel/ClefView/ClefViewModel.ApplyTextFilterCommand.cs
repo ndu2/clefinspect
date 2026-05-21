@@ -4,7 +4,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
 {
     public partial class ClefViewModel
     {
-        private class ApplyTextFilterCommand(ClefViewModel clefViewModel) : ICommand
+        private class ApplyFilterCommand(ClefViewModel clefViewModel) : ICommand
         {
             private readonly ClefViewModel clefViewModel = clefViewModel;
 
