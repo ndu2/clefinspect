@@ -62,7 +62,7 @@ namespace ndu.ClefInspect.ViewModel.MainView
         public UserActionCommand PinSelected { get; }
         public UserActionCommand UnpinSelected { get; }
         public UserActionCommand HideSelected { get; }
-        public UserActionCommand HideAllFromSelected {  get; }
+        public UserActionCommand HideAllFromSelected { get; }
         public UserActionCommand ShowSelected { get; }
         public UserActionCommand ToggleIgnoreFilter { get; }
         public UserActionCommand ToggleIgnorePinned { get; }
