@@ -96,7 +96,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                     (object?, int) added = (null, 0);
                     bool changedAlot = false;
                     IList<ClefLine> lines = clef.ViewFrom(sourceIdx);
-                    List<int> notifyHiddenChangedOn = new List<int>();
+                    List<int> notifyHiddenChangedOn = [];
                     for (int i = 0; i < lines.Count; ++i)
                     {
                         if (cancellationToken.IsCancellationRequested)
@@ -156,7 +156,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                             {
                                 selectedIndexExact = selectedIndex;
                             }
-                            if(ignoreChanged)
+                            if (ignoreChanged)
                             {
                                 notifyHiddenChangedOn.Add(idx);
                             }
@@ -175,7 +175,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
 
                     Application.Current?.Dispatcher?.Invoke(() =>
                     {
-                        foreach(int idx in notifyHiddenChangedOn)
+                        foreach (int idx in notifyHiddenChangedOn)
                         {
                             if (idx >= 0 && idx < result.Count)
                             {

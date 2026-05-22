@@ -26,7 +26,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                 {
                     HashSet<string> ids = new HashSet<string>(clefViewModel.Settings.IgnoredEventId);
                     List<string> newIds = new List<string>();
-                    foreach(string s in set)
+                    foreach (string s in set)
                     {
                         if (!ids.Contains(s))
                         {

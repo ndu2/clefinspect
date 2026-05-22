@@ -4,7 +4,7 @@ A lightweight Windows (.NET, WPF) desktop app for viewing [CLEF](https://clef-js
 
 ![ClefInspect Screenshot](screenshot.png)
 
-Currently runs on Windows with .NET 8.0 only. Distributed as a zip archive.
+Currently runs on Windows with .NET 10.0 only. Distributed as a zip archive.
 
 ## Features
 
@@ -47,6 +47,7 @@ Use timestamp field to browse to a event for a given time (enter a timestamp + `
  - `Del`: Hide selected events
  - `Ctrl+A` (when in the Event list): Select all displayed events
  - `Ctrl+O`: Open a logfile
+ - `Ctrl+V`: Paste from clipboard
  - `Ctrl+W`: Close the active tab
  - `Ctrl+Tab`: Switch the active tab
  - `F5`: Toggle filtering

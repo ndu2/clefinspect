@@ -125,7 +125,7 @@
                 <MenuItem Header="Show Filtered Entries" IsCheckable="True" IsChecked="{Binding ActiveTab.ClefViewModel.Settings.ShowFiltered}" InputGestureText="F5"/>
                 <MenuItem Header="Show Pinned Entries" IsCheckable="True" IsChecked="{Binding ActiveTab.ClefViewModel.Settings.ShowPinned}" InputGestureText="F6"/>
                 <MenuItem Header="Show Hidden Entries" IsCheckable="True" IsChecked="{Binding ActiveTab.ClefViewModel.Settings.ShowHiddenEvents}" InputGestureText="F7"/>
-                <MenuItem Header="Filter All" IsCheckable="True" IsChecked="{Binding ActiveTab.ClefViewModel.Settings.FilterAll}" InputGestureText="F8"/>
+                <MenuItem Header="Hide All Entries" IsCheckable="True" IsChecked="{Binding ActiveTab.ClefViewModel.Settings.FilterAll}" InputGestureText="F8"/>
                 <Separator />
                 <MenuItem Header="Save View as Default" Command="{Binding SaveViewDefaults}" Visibility="{Binding Settings.CanPersist, Converter={StaticResource BooleanVisibilityCollapsedConverter}}" />
                 <MenuItem Header="Reset View to Default" Command="{Binding ApplyViewDefaults}" Icon="{StaticResource icon_restoredefaultview}" />
