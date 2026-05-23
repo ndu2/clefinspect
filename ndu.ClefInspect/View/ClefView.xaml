@@ -15,6 +15,8 @@
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="Auto" />
@@ -28,15 +30,15 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" 
+        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="7"
                    Padding="2,2,0,0" 
                    Text="{Binding FilePath}" />
-        <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="5"
+        <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="7"
                     Orientation="Horizontal" >
             <TextBlock Padding="2,2,0,10" Text="{Binding FileInfo}" />
             <TextBlock Padding="10,2,0,10" Text="{Binding DateInfo}" />
         </StackPanel>
-        <ItemsControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="5"
+        <ItemsControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="7"
             ItemsSource="{Binding VisibleFilters}" >
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
@@ -49,15 +51,21 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-        <Button Grid.Row="3" Grid.Column="0" Padding="2,0,0,0" Name="ButtonApplyTextFilter"
-                Content="{StaticResource icon_filter}" Margin="5,0,5,0" Click="ButtonApplyTextFilter_Click" />
-        <TextBox Grid.Row="3" Grid.Column="1" Name="TextFilter" helper:TextBoxHelper.Placeholder="Text Filter"
-                 Text="{Binding TextFilter, ValidatesOnExceptions=True, UpdateSourceTrigger=Explicit}" KeyDown="TextFilter_KeyDown" ></TextBox>
-        <Button Grid.Row="3" Grid.Column="2" Padding="0,0,2,0"
-                Content="{StaticResource icon_deleteFilter}" Command="{Binding ClearTextFilter}" Margin="5,0,5,0" />
-        <TextBox Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="2" Margin="2,2,2,2" Width="{Binding ElementName=clefView, Path=DateWidth}"
+        <TextBox Grid.Row="3" Grid.Column="0" Margin="2,0,1,0" Name="TextFilter" helper:TextBoxHelper.Placeholder="Text Filter"
+                 Text="{Binding TextFilter, ValidatesOnExceptions=True, UpdateSourceTrigger=Explicit}" KeyDown="TextFilter_KeyDown" />
+        <Button Grid.Row="3" Grid.Column="1" Padding="2,2,2,2" Margin="1,0,1,0"
+                Name="ButtonApplyTextFilter" Content="{StaticResource icon_filter}" Click="ButtonApplyTextFilter_Click" />
+        <Button Grid.Row="3" Grid.Column="2" Padding="2,2,2,2" Margin="1,0,2,0"
+                Content="{StaticResource icon_deleteFilter}" Command="{Binding ClearTextFilter}" />
+        <TextBox Grid.Row="3" Grid.Column="3" Margin="2,0,1,0"  Name="TextSearch" helper:TextBoxHelper.Placeholder="Text Search"
+                 Text="{Binding TextSearch, ValidatesOnExceptions=True, UpdateSourceTrigger=Explicit}" KeyDown="TextSearch_KeyDown"/>
+        <Button Grid.Row="3" Grid.Column="4" Padding="2,2,2,2" Margin="1,0,1,0"
+        Content="{StaticResource icon_finddown}" Click="ButtonTextSearchDown_Click" />
+        <Button Grid.Row="3" Grid.Column="5" Padding="2,2,2,2" Margin="1,0,2,0"
+        Content="{StaticResource icon_findup}" Click="ButtonTextSearchUp_Click" />
+        <TextBox Grid.Row="3" Grid.Column="6" Margin="2,0,2,0" Width="{Binding ElementName=clefView, Path=DateWidth}"
                  Name="TextDatePosition" Text="{Binding DatePosition, ValidatesOnExceptions=True, UpdateSourceTrigger=Explicit}" KeyDown="TextDatePosition_KeyDown" />
-        <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="5">
+        <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="7">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Name="ColEvtList" Width="*"/>
                 <ColumnDefinition Width="Auto"/>

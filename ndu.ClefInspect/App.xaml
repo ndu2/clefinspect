@@ -23,6 +23,12 @@
                 <ResourceDictionary Source="/Resources/Unpin.xaml" />
                 <ResourceDictionary Source="/Resources/PasteTable.xaml" />
                 <ResourceDictionary Source="Resources/CloakOrHide.xaml" />
+                <ResourceDictionary Source="Resources/Search.xaml" />
+                <ResourceDictionary Source="Resources/QuickFind.xaml" />
+                <ResourceDictionary Source="Resources/FindUp.xaml" />
+                <ResourceDictionary Source="Resources/FindDown.xaml" />
+                <ResourceDictionary Source="Resources/FindPrevious.xaml" />
+                <ResourceDictionary Source="Resources/FindNext.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <Style x:Key="TailToggleButton" TargetType="ToggleButton">
                 <Style.Setters>
