@@ -213,6 +213,24 @@ namespace ndu.ClefInspect.View
             TextFilter.GetBindingExpression(TextBox.TextProperty).UpdateSource();
             (DataContext as ClefViewModel)?.ApplyFilter.Execute(this);
         }
+        private void TextSearch_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                TextSearch.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+                (DataContext as ClefViewModel)?.Search.Execute(ClefViewModel.SearchDirection.Down);
+            }
+        }
+        private void ButtonTextSearchUp_Click(object sender, RoutedEventArgs e)
+        {
+            TextSearch.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+            (DataContext as ClefViewModel)?.Search.Execute(ClefViewModel.SearchDirection.Up);
+        }
+        private void ButtonTextSearchDown_Click(object sender, RoutedEventArgs e)
+        {
+            TextSearch.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+            (DataContext as ClefViewModel)?.Search.Execute(ClefViewModel.SearchDirection.Down);
+        }
 
         private List<ClefLineViewModel> GetSelectedInOrder()
         {

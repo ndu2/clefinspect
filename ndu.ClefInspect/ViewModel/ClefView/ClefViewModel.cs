@@ -66,6 +66,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             FiltersMenu = new FiltersMenuCommand(this);
             HideAllEventIds = new HideAllEventIdsCommand(this);
             Clef.LinesChanged += Reload;
+            Search = new SearchCommand(this);
         }
 
         public ClefViewSettings Settings => _settings;
@@ -188,6 +189,19 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             Reload(new LinesChangedEventArgs(LinesChangedEventArgs.LinesChangedEventArgsAction.Reset), false);
         }
 
+        private void BrowseTo(SearchDirection dir, String? text)
+        {
+            _filterTaskManager.BrowseTo(dir, text,
+                onChanged: (selectedIndex) =>
+                {
+                    SelectedIndex = selectedIndex;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DateInfo)));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FileInfo)));
+                    Reloaded?.Invoke();
+                    CalculationRunning = false;
+                });
+        }
+
         private void Reload(LinesChangedEventArgs e, bool pinPresetChanged)
         {
             bool newFilters = false;
@@ -236,16 +250,9 @@ namespace ndu.ClefInspect.ViewModel.ClefView
 
             List<IMatcher> matchers = CreateMatchers();
             CalculationRunning = true;
-            HashSet<string> ignoredEvents = [];
-            ignoredEvents.UnionWith(Settings.IgnoredEventId);
             _filterTaskManager.Filter(matchers: matchers,
-                ignoredEventIds: ignoredEvents,
                 action: e.Action,
                 pinPresetChanged: pinPresetChanged,
-                ignoreFilter: _settings.ShowFiltered,
-                filterAll: _settings.FilterAll,
-                showPinned: _settings.ShowPinned,
-                showHidden: _settings.ShowHiddenEvents,
                 onChanged: (selectedIndex) =>
                  {
                      // force PropertyChangedEventArgs associated with SelectedIndex
@@ -344,6 +351,18 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                 }
             }
         }
+        public string? TextSearch
+        {
+            get;
+            set
+            {
+                if (value != field)
+                {
+                    field = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(TextSearch)));
+                }
+            }
+        }
         public GridLength ColWidthEvtList => _colWidthEvtList;
         public GridLength ColWidthDetails => _colWidthDetails;
         public Visibility DetailsVisibility => _settings.SessionSettings.DetailView ? Visibility.Visible : Visibility.Collapsed;
@@ -353,6 +372,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
         public ICommand ApplyFilter { get; }
         public ICommand FiltersMenu { get; }
         public ICommand HideAllEventIds { get; }
+        public ICommand Search { get; }
 
         public ClefLineViewModel? SelectedItem
         {

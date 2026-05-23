@@ -17,9 +17,10 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             private readonly ClefViewSettings _settings = settings;
             private int _nextItemFromSource = 0;
 
-            public void Filter(List<IMatcher> matchers, ISet<string> ignoredEventIds, LinesChangedEventArgsAction action, bool pinPresetChanged,
-                bool ignoreFilter, bool filterAll, bool showPinned, bool showHidden, Action<int> onChanged)
+            public void Filter(List<IMatcher> matchers, LinesChangedEventArgsAction action, bool pinPresetChanged,
+                Action<int> onChanged)
             {
+
                 Task? previousFilterTask = _filterTask;
                 LinesChangedEventArgsAction previousAction = LinesChangedEventArgsAction.None;
                 bool previousPinPresetChanged = false;
@@ -39,17 +40,9 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                 _filterAction = Union(action, previousAction);
                 _pinPresetChanged = previousPinPresetChanged | pinPresetChanged;
                 _filterTask = Reload(
-                    clefLines: _clefViewModel.ClefLines,
-                    clef: _clefViewModel.Clef,
                     filters: matchers,
-                    ignoredEvents: ignoredEventIds,
-                    selectedIndex: _clefViewModel.SelectedIndex,
                     action: _filterAction,
                     pinPresetChanged: _pinPresetChanged,
-                    ignoreFilter: ignoreFilter,
-                    filterAll: filterAll,
-                    showPinned: showPinned,
-                    showHidden: showHidden,
                     onRun: () =>
                     {
                         if (previousFilterTask != null && previousCancellationToken != null)
@@ -67,13 +60,9 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                    onChanged: onChanged,
                    cancellationToken: _cancelFilterTask.Token);
             }
-
-
-            public Task Reload(FilteredClef clefLines,
-                IClef clef, List<IMatcher> filters, ISet<string> ignoredEvents,
-                int selectedIndex, LinesChangedEventArgsAction action,
+            public Task Reload(List<IMatcher> filters,
+                LinesChangedEventArgsAction action,
                 bool pinPresetChanged,
-                bool ignoreFilter, bool filterAll, bool showPinned, bool showHidden,
                 Action onRun, Action<int> onChanged,
                 CancellationToken cancellationToken)
             {
@@ -81,12 +70,19 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                 {
                     return Task.CompletedTask;
                 }
-
+                FilteredClef clefLines = _clefViewModel.ClefLines;
+                IClef clef = _clefViewModel.Clef;
+                int selectedIndex = _clefViewModel.SelectedIndex;
+                HashSet<string> ignoredEvents = [];
+                ignoredEvents.UnionWith(_clefViewModel.Settings.IgnoredEventId);
+                bool ignoreFilter = _clefViewModel.Settings.ShowFiltered;
+                bool filterAll = _clefViewModel.Settings.FilterAll;
+                bool showPinned = _clefViewModel.Settings.ShowPinned;
+                bool showHidden = _clefViewModel.Settings.ShowHiddenEvents;
                 ClefLineViewModel? selectedLine = clefLines.ElementAtOrDefault(selectedIndex);
                 DateTime? date = selectedLine?.GetTime();
                 int selectedIndexExact = (action == LinesChangedEventArgsAction.Add && selectedIndex < clefLines.Count) ? selectedIndex : -1;
                 selectedIndex = -1;
-
                 int sourceIdx = (action == LinesChangedEventArgsAction.Add && clefLines.Count > 0) ? _nextItemFromSource : 0;
                 int idx = (action == LinesChangedEventArgsAction.Add) ? clefLines.Count : 0;
                 List<ClefLineViewModel> result = new(clefLines);
@@ -199,7 +195,66 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                     });
                 }, cancellationToken);
             }
-
+            public void BrowseTo(SearchDirection dir, string? text, Action<int> onChanged)
+            {
+                Task? previousFilterTask = _filterTask;
+                CancellationTokenSource? previousCancellationToken = _cancelFilterTask;
+                _cancelFilterTask = new CancellationTokenSource();
+                // wait for previous task and browse to the given text
+                _filterTask = BrowseTo(dir: dir, text: text,
+                  onRun: () =>
+                  {
+                      if (previousFilterTask != null && previousCancellationToken != null)
+                      {
+                          try
+                          {
+                              previousFilterTask.Wait(previousCancellationToken.Token);
+                          }
+                          catch (OperationCanceledException)
+                          {
+                              // task was cancelled, nothing to do
+                          }
+                      }
+                  },
+                 onChanged: onChanged,
+                 cancellationToken: _cancelFilterTask.Token);
+            }
+            private Task BrowseTo(SearchDirection dir, string? text,
+                Action onRun, Action<int> onChanged, CancellationToken cancellationToken)
+            {
+                FilteredClef clefLines = _clefViewModel.ClefLines;
+                int selectedIndex = _clefViewModel.SelectedIndex;
+                return Task.Run(() =>
+                {
+                    IMatcher matcher = new TextFilter(text).Create();
+                    int iDir;
+                    switch (dir)
+                    {
+                        case SearchDirection.Up: iDir = -1; break;
+                        case SearchDirection.Down: iDir = 1; break;
+                        default: return;
+                    }
+                    int newIndex = selectedIndex;
+                    onRun();
+                    // we can work directly on FilteredClef, because we do read-only and no-one changes the collection during the browsing
+                    for (int i = selectedIndex + iDir; i < clefLines.Count && i >= 0; i+=iDir)
+                    {
+                        if (cancellationToken.IsCancellationRequested)
+                        {
+                            return;
+                        }
+                        newIndex = i;
+                        if (matcher.Accept(clefLines[i].ClefLine))
+                        {
+                            break;
+                        }
+                    }
+                    Application.Current?.Dispatcher?.Invoke(() =>
+                    {
+                        onChanged(newIndex);
+                    });
+                }, cancellationToken);
+            }
         }
     }
 }
