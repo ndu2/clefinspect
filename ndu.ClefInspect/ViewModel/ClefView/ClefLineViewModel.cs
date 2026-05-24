@@ -64,7 +64,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
         {
             get
             {
-                return _settings.SessionSettings.Format(GetTime());
+                return _settings.Format(GetTime());
             }
         }
         public string? DeltaTime
@@ -98,7 +98,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                 return SystemColors.WindowBrush;
             }
         }
-        public string? Message => _settings.SessionSettings.OneLineOnly ? _messageOneLine : ClefLine.Message;
+        public string? Message => _settings.OneLineOnly ? _messageOneLine : ClefLine.Message;
 
         public string? MessageMultiline => ClefLine.Message;
 
@@ -194,7 +194,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             {
                 if (ClefLine?.JsonObject?.TryGetPropertyValue(key, out JsonNode? jsonNode) ?? false)
                 {
-                    return jsonNode?.ToJsonString(_settings.SessionSettings.OneLineOnly ? _propFormatOneLine : _propFormatMultiLine);
+                    return jsonNode?.ToJsonString(_settings.OneLineOnly ? _propFormatOneLine : _propFormatMultiLine);
                 }
                 else
                 {

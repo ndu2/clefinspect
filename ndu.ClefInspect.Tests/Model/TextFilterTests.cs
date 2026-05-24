@@ -15,7 +15,7 @@ namespace ndu.ClefInspect.Tests.Model
         {
             JsonObject? test1 = JsonNode.Parse("{\"@t\":\"2024-12-05T15:03:51.1732124Z\",\"@m\":\"log in kv scope\",\"@i\":\"7e0ac33d\",\"Scope\":[{\"3\":\"a\",\"6\":\"b\",\"12\":\"c\"}]}") as JsonObject;
             JsonObject? test2 = JsonNode.Parse("{\"@t\":\"2024-12-18T20:02:44.2677859Z\",\"@m\":\"my, message is \\\"halihalo\\\"\",\"@i\":\"ea85fb10\",\"@l\":\"Debug\",\"message\":\"halihalo\",\"SourceContext\":\"test\",\"name\":\"hallo\",\"Scope\":[\"test hallo\"],\"ThreadId\":1}") as JsonObject;
-            JsonObject? test3 = JsonNode.Parse("{\"@t\":\"2024-12-18T20:04:02.9613371Z\",\"@mt\":\"my message is {message}\",\"@l\":\"Debug\",\"message\":\"halihalo\",\"SourceContext\":\"test\",\"name\":\"hallo\",\"Scope\":[\"test hallo\"],\"ThreadId\":1}") as JsonObject;
+            JsonObject? test3 = JsonNode.Parse("{\"@t\":\"2024-12-18T20:04:02.9613371Z\",\"@mt\":\"my message is {message}\",\"@l\":\"Debug\",\"message\":\"halihalo\",\"SourceContext\":\"test\",\"name\":\"hallo\",\"Scope\":[\"testabcdhallo\"],\"ThreadId\":1}") as JsonObject;
             testLogLine1 = new(1, test1);
             testLogLine2 = new(1, test2);
             testLogLine3 = new(1, test3);
@@ -23,41 +23,41 @@ namespace ndu.ClefInspect.Tests.Model
         [TestMethod]
         public void Accept_AcceptAllEmpty()
         {
-            Assert.IsTrue(new TextFilter(null).AcceptsAll);
-            Assert.IsTrue(new TextFilter("").AcceptsAll);
-            Assert.IsTrue(new TextFilter("   , ").AcceptsAll);
+            Assert.IsTrue(new TextFilter(null, true).AcceptsAll);
+            Assert.IsTrue(new TextFilter("", true).AcceptsAll);
+            Assert.IsTrue(new TextFilter("   , ", true).AcceptsAll);
         }
 
         [TestMethod]
         public void Accept_IsCaseInsensitive()
         {
-            TextFilter textFilter = new("HalIhaLo");
+            TextFilter textFilter = new("HalIhaLo", true);
             Assert.IsTrue(textFilter.Create().Accept(testLogLine2));
             Assert.IsTrue(textFilter.Create().Accept(testLogLine3));
         }
         [TestMethod]
         public void Accept_Trims_Whitespaces()
         {
-            TextFilter textFilter = new("a ,b, kv  ");
+            TextFilter textFilter = new("a ,b, kv  ", true);
             Assert.IsTrue(textFilter.Create().Accept(testLogLine1));
         }
         [TestMethod]
         public void Accept_Handles_Quotes1()
         {
-            TextFilter textFilter = new("my, message");
+            TextFilter textFilter = new("my, message", true);
             Assert.IsTrue(textFilter.Create().Accept(testLogLine2));
         }
         [TestMethod]
         public void Accept_Handles_Quotes2()
         {
-            TextFilter textFilter = new("\"my, message\"");
+            TextFilter textFilter = new("\"my, message\"", true);
             Assert.IsTrue(textFilter.Create().Accept(testLogLine2));
         }
 
         [TestMethod]
         public void Accept_Handles_Quotes3()
         {
-            TextFilter textFilter = new("\"messag \"");
+            TextFilter textFilter = new("\"messag \"", true);
             Assert.IsFalse(textFilter.Create().Accept(testLogLine2));
             Assert.IsFalse(textFilter.Create().Accept(testLogLine3));
         }
@@ -65,21 +65,52 @@ namespace ndu.ClefInspect.Tests.Model
         [TestMethod]
         public void Accept_Uses_Formatted_Message()
         {
-            TextFilter textFilter = new("\"halihalo\"");
+            TextFilter textFilter = new("\"halihalo\"", true);
             Assert.IsTrue(textFilter.Create().Accept(testLogLine2));
             Assert.IsTrue(textFilter.Create().Accept(testLogLine3));
         }
         [TestMethod]
         public void Accept_IgnoresData1()
         {
-            TextFilter textFilter = new("Debug");
-            Assert.IsFalse(textFilter.Create().Accept(testLogLine1));
+            TextFilter textFilter = new("Debug", true);
+            Assert.IsFalse(textFilter.Create().Accept(testLogLine2));
         }
         [TestMethod]
         public void Accept_IgnoresData2()
         {
-            TextFilter textFilter = new("test");
+            TextFilter textFilter = new("test", true);
             Assert.IsFalse(textFilter.Create().Accept(testLogLine2));
         }
+        [TestMethod]
+        public void Accept_CanSearchData1()
+        {
+            TextFilter textFilter = new("Debug", false);
+            Assert.IsTrue(textFilter.Create().Accept(testLogLine2));
+        }
+        [TestMethod]
+        public void Accept_CanSearchData2()
+        {
+            TextFilter textFilter = new("test", false);
+            Assert.IsTrue(textFilter.Create().Accept(testLogLine2));
+        }
+        [TestMethod]
+        public void Accept_IgnoreKeys()
+        {
+            TextFilter textFilter = new("SourceContext", false);
+            Assert.IsFalse(textFilter.Create().Accept(testLogLine2));
+        }
+        [TestMethod]
+        public void Accept_SearchInStructure1()
+        {
+            TextFilter textFilter = new("b", false);
+            Assert.IsTrue(textFilter.Create().Accept(testLogLine1));
+        }
+        [TestMethod]
+        public void Accept_SearchInStructure2()
+        {
+            TextFilter textFilter = new("testabcdhallo", false);
+            Assert.IsTrue(textFilter.Create().Accept(testLogLine3));
+        }
+
     }
 }

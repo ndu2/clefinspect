@@ -12,6 +12,10 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <local:InverseBoolConverter x:Key="InverseBoolConverter" />
+        <local:BooleanVisibilityHiddenConverter x:Key="BooleanVisibilityHiddenConverter" />
+        <local:BooleanVisibilityCollapsedConverter x:Key="BooleanVisibilityCollapsedConverter" />
+        <local:StringFormatConverter x:Key="StringFormatConverter" />
+        <local:NullVisibilityCollapsedConverter x:Key="NullVisibilityCollapsedConverter" />
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -86,9 +90,6 @@
                     </Style>
                 </ListView.ItemContainerStyle>
                 <ListView.Resources>
-                    <local:BooleanVisibilityHiddenConverter x:Key="BooleanVisibilityHiddenConverter" />
-                    <local:StringFormatConverter x:Key="StringFormatConverter" />
-                    <local:NullVisibilityCollapsedConverter x:Key="NullVisibilityCollapsedConverter" />
                     <GridView x:Key="User">
                         <GridViewColumn Header="Pin / Hide" Width="{Binding ElementName=clefView, Path=PinWidth}">
                             <GridViewColumn.CellTemplate>

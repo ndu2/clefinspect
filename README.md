@@ -12,7 +12,9 @@ Currently runs on Windows with .NET 10.0 only. Distributed as a zip archive.
  * Show columns based on the properties available in your logfiles.
  * Filter events (text and properties) and pin (always display) individual events.
  * Auto Pin based on Pin Presets (see [Configuration](#configuration)).
- * Scroll to events by timestamp, switch between local and UTC timestamps.
+ * Hide individual events, hide all events of a type (Event id)
+ * Scroll to events by timestamp and search
+ * Switch between local and UTC timestamps.
  * Show the time difference between events.
  * Can follow (tail) log files while other processes write to it.
  * Tabs
@@ -26,17 +28,17 @@ There are amazing full featured log servers, analysers, and viewers for [CLEF](h
 My work with CLEF logfiles is mostly bug-hunting and timing analysis of extensive logfiles. The main task is to collect the revealing events and put them into a context. As none of the tools I found could fit my workflow perfectly, I created ClefInspect.
 
 
-With ClefInspect, you can crawl the logfiles and keep track of important events very efficiently by pining them. A typical workflow is *filter* -> *pin* -> *filter*.
+With ClefInspect, you can crawl the logfiles and keep track of important events very efficiently by pining them. A typical workflow is *filter* -> *pin* or *hide* -> *filter*.
 
 ## Usage
 
-Use *File* -> *Open*, *open with* or *drag & drop* to open logfiles with ClefInspect.
+Use *File* -> *Open*, *open with* or *drag & drop* to open logfiles with ClefInspect. Multiple files can be opened in individual tabs or combined into one.
 
-The text filter searches in the message only. It allows for multiple keywords (e.g. `users,login,logoff`) and quotes (`"a comma , here","   do not trim the spaces   "`).
+The text filter and text search searches in the message only by default (see *Settings* menu). It allows for multiple keywords (e.g. `users,login,logoff`) and quotes (`"a comma , here","   do not trim the spaces   "`).
 
-Events must match all filters to be displayed (pinned events are always displayed).
+Events must match all filters to be displayed (pinned events are always displayed, see *View* menu).
 
-Use timestamp field to browse to a event for a given time (enter a timestamp + `Enter`). This does not act as a filter, but just navigates the view to a given time.
+Use timestamp field to navigate to a event for a given time (enter a timestamp + `Enter`).
 
 ### Shortcuts
 
@@ -54,14 +56,17 @@ Use timestamp field to browse to a event for a given time (enter a timestamp + `
  - `F6`: Toggle display of pinned events
  - `F7`: Toggle display of hidden events
  - `F8`: Toggle hiding all events
+ - `F9`: Reset View (enable filter, show pinned events, hide hidden events)
 
 ## Installation
 
-ClefInspect is distributed with a zip. Just extract the zip to a folder of your choice (e.g. ClefInspect in your users directory).
+ClefInspect is distributed in a zip. Just extract the zip to a folder of your choice (e.g. ClefInspect in your users directory).
 
 ### Configuration (optional)
 
-You may want to put a file `ClefInspect.defaults.json` in the folder of `ClefInspect.exe`:
+You may want to put a file `ClefInspect.defaults.json` in the folder of `ClefInspect.exe`. With `"WriteableConfig": true`, ClefInspect will track recent files.
+
+Example:
 
 	{
 	"clefFeatures": {
@@ -79,8 +84,10 @@ You may want to put a file `ClefInspect.defaults.json` in the folder of `ClefIns
 		],
 		"DetailViewFraction": 0.33,
 		"DetailView": false
+		"TextSearchMsgOnly": true
 	},
 	"session": {
+		"MaxFiles": 10,
 		"Files": [
 		"C:\\temp\\a.json",
 		"C:\\temp\\b.json"
@@ -110,6 +117,6 @@ You may want to put a file `ClefInspect.defaults.json` in the folder of `ClefIns
 
 ## Future
 
-I use ClefInspect 1.3 actively, thus i will enhance and fix every now and then. Feel free to report bugs or wishes on github.
+I use ClefInspect 1.4 actively, thus i will enhance and fix every now and then. Feel free to report bugs or wishes on github.
 
 Commercial support is available via my employer (see my github profile).

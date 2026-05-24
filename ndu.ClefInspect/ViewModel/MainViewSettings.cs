@@ -3,80 +3,56 @@ using ndu.ClefInspect.ViewModel.ClefView;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
+using System.IO;
 
 namespace ndu.ClefInspect.ViewModel
 {
-    public class MainViewSettings : INotifyPropertyChanged
+    public class MainViewSettings
     {
         private readonly Configuration _configuration;
-
+        private readonly HashSet<string> _sessionFilesSet;
         private static readonly IFormatProvider local = CultureInfo.CurrentCulture.DateTimeFormat;
         private static readonly string utc = CultureInfo.InvariantCulture.DateTimeFormat.UniversalSortableDateTimePattern;
-
         public MainViewSettings()
         {
             // load defaults
             _configuration = new Configuration();
-            _configuration.Session.Files.CollectionChanged += (sender, e) => { PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HasSessionData))); };
+            _sessionFilesSet = new(_configuration.Session.Files);
+            RecentFiles = _configuration.Session.Files.AsReadOnly();
+            PinPresets = _configuration.PinPresets.AsReadOnly();
+            HideEventIds = _configuration.EventSettings.HideEventIds.AsReadOnly();
         }
-
-        public Configuration UserSettings => _configuration;
+        public ReadOnlyCollection<Configuration.PinPresetOptions> PinPresets { get; }
+        public ReadOnlyCollection<string> HideEventIds { get; }
+        public Configuration.ViewSettingsOptions ViewSettings => _configuration.ViewSettings;
         public bool CanPersist => _configuration.ClefFeatures.WriteableConfig;
-        public bool HasSessionData => _configuration.Session.Files.Count > 0;
 
+        public void AddRecentFile(List<FileInfo> fileNames)
+        {
+            List<string> names = fileNames.Select(fn => fn.FullName).ToList();
+            string recentEntry = String.Join(Fsep, names);
+            if (_sessionFilesSet.Add(recentEntry))
+            {
+                _configuration.Session.Files.Add(recentEntry);
+            }
+            while (_configuration.Session.Files.Count >= _configuration.Session.MaxFiles)
+            {
+                _configuration.Session.Files.RemoveAt(0);
+            }
+            Persist();
+        }
+        public void ClearRecentFiles()
+        {
+            _configuration.Session.Files.Clear();
+            _sessionFilesSet.Clear();
+            Persist();
+        }
+        public ReadOnlyCollection<string> RecentFiles { get; }
         public void Persist()
         {
-            _configuration.Write();
-        }
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        public bool LocalTime
-        {
-            get => _configuration.ViewSettings.LocalTime;
-            set
+            if (CanPersist)
             {
-                if (_configuration.ViewSettings.LocalTime != value)
-                {
-                    _configuration.ViewSettings.LocalTime = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LocalTime)));
-                }
-            }
-        }
-        public bool OneLineOnly
-        {
-            get => _configuration.ViewSettings.OneLineOnly;
-            set
-            {
-                if (_configuration.ViewSettings.OneLineOnly != value)
-                {
-                    _configuration.ViewSettings.OneLineOnly = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(OneLineOnly)));
-                }
-            }
-        }
-        public bool DetailView
-        {
-            get => _configuration.ViewSettings.DetailView;
-            set
-            {
-                if (_configuration.ViewSettings.DetailView != value)
-                {
-                    _configuration.ViewSettings.DetailView = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DetailView)));
-                }
-            }
-        }
-        public double DetailViewFraction
-        {
-            get => _configuration.ViewSettings.DetailViewFraction;
-            set
-            {
-                if (_configuration.ViewSettings.DetailViewFraction != value)
-                {
-                    _configuration.ViewSettings.DetailViewFraction = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DetailViewFraction)));
-                }
+                _configuration.Write();
             }
         }
         public static string LevelWidthText => "WARNINGW";
@@ -95,15 +71,17 @@ namespace ndu.ClefInspect.ViewModel
         }
 
         public static readonly string PinWidthText = "NNNNNNN";
+        public static readonly char Fsep = '|';
+
         public static string DateWidthText { get; }
 
-        public string? Format(DateTime? dt)
+        public static string? Format(DateTime? dt, bool localTime)
         {
             if (dt == null)
             {
                 return null;
             }
-            if (LocalTime)
+            if (localTime)
             {
                 return dt.Value.ToString(local);
             }
@@ -123,46 +101,6 @@ namespace ndu.ClefInspect.ViewModel
         public static string FormatCol(string? data)
         {
             return string.Format(ClefColFormatString, data);
-        }
-        public bool IsVisibleFilterByDefault(string filter)
-        {
-            return _configuration.ViewSettings.DefaultFilterVisibility.Contains(filter);
-        }
-
-        public void SetVisibleFilterDefaults(List<string> filters)
-        {
-            _configuration.ViewSettings.DefaultFilterVisibility.Clear();
-            foreach (string s in filters)
-            {
-                _configuration.ViewSettings.DefaultFilterVisibility.Add(s);
-            }
-        }
-
-        public bool IsVisibleColumnByDefault(string column)
-        {
-            return _configuration.ViewSettings.DefaultColumnVisibility.Contains(column);
-        }
-        public void SetVisibleColumnDefaults(List<string> columns)
-        {
-            _configuration.ViewSettings.DefaultColumnVisibility.Clear();
-            foreach (string s in columns)
-            {
-                _configuration.ViewSettings.DefaultColumnVisibility.Add(s);
-            }
-        }
-
-        public void SetSessionFiles(List<string> openFiles)
-        {
-            _configuration.Session.Files.Clear();
-            foreach (string file in openFiles)
-            {
-                _configuration.Session.Files.Add(file);
-            }
-        }
-
-        public ObservableCollection<string> GetSessionFiles()
-        {
-            return _configuration.Session.Files;
         }
     }
 }

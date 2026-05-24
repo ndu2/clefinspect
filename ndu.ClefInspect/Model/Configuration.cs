@@ -25,11 +25,13 @@ namespace ndu.ClefInspect.Model
             public HashSet<string> DefaultColumnVisibility { get; set; } = [];
             public double DetailViewFraction { get; set; } = 0.33;
             public bool DetailView { get; set; } = false;
+            public bool TextSearchMsgOnly { get; set; } = true;
         }
 
         public class SessionOptions
         {
             public const string Session = "session";
+            public int MaxFiles { get; set; } = 10;
             public ObservableCollection<string> Files { get; set; } = [];
         }
         public class PinPresetOptions

@@ -37,7 +37,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             _settings = new ClefViewSettings(settings);
 
             List<PinPreset> pinPresets = [];
-            foreach (Configuration.PinPresetOptions p in _settings.SessionSettings.UserSettings.PinPresets)
+            foreach (Configuration.PinPresetOptions p in _settings.PinPresets)
             {
                 PinPreset pp = new(p);
                 PropertyChangedEventManager.AddHandler(pp, (s, e) => Reload(new LinesChangedEventArgs(LinesChangedEventArgs.LinesChangedEventArgsAction.Reset), true), nameof(pp.Enabled));
@@ -48,10 +48,11 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             _filterTaskManager = new FilterTaskManager(this, _settings);
             _calculationRunning = false;
             DetailViewInit();
-            PropertyChangedEventManager.AddHandler(_settings.SessionSettings, OnSessionSettingsLocalTimeChanged, nameof(_settings.SessionSettings.LocalTime));
-            PropertyChangedEventManager.AddHandler(_settings.SessionSettings, OnSessionSettingsOneLineOnlyChanged, nameof(_settings.SessionSettings.OneLineOnly));
-            PropertyChangedEventManager.AddHandler(_settings.SessionSettings, OnSessionSettingsDetailViewChanged, nameof(_settings.SessionSettings.DetailView));
-            PropertyChangedEventManager.AddHandler(_settings.SessionSettings, OnSessionSettingsDetailViewChanged, nameof(_settings.SessionSettings.DetailViewFraction));
+            PropertyChangedEventManager.AddHandler(_settings, OnSessionSettingsLocalTimeChanged, nameof(_settings.LocalTime));
+            PropertyChangedEventManager.AddHandler(_settings, OnSessionSettingsOneLineOnlyChanged, nameof(_settings.OneLineOnly));
+            PropertyChangedEventManager.AddHandler(_settings, OnSessionSettingsDetailViewChanged, nameof(_settings.DetailView));
+            PropertyChangedEventManager.AddHandler(_settings, OnSessionSettingsDetailViewChanged, nameof(_settings.DetailViewFraction));
+            PropertyChangedEventManager.AddHandler(_settings, OnSessionSettingsTextSearchMsgOnlyChanged, nameof(_settings.TextSearchMsgOnly));
             PropertyChangedEventManager.AddHandler(_settings, OnViewSettingsRefTimeStampChanged, nameof(_settings.RefTimeStamp));
             CollectionChangedEventManager.AddHandler(_settings.IgnoredEventId, (_, _) => Reload(new LinesChangedEventArgs(LinesChangedEventArgs.LinesChangedEventArgsAction.Reset), false));
             PropertyChangedEventManager.AddHandler(_settings, (_, _) => Reload(), nameof(_settings.ShowPinned));
@@ -64,6 +65,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             ClearTextFilter = new ClearTextFilterCommand(this);
             ApplyFilter = new ApplyFilterCommand(this);
             FiltersMenu = new FiltersMenuCommand(this);
+            ColumnsMenu = new ColumnsMenuCommand(this);
             HideAllEventIds = new HideAllEventIdsCommand(this);
             Clef.LinesChanged += Reload;
             Search = new SearchCommand(this);
@@ -124,7 +126,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
 
         private void DetailViewInit()
         {
-            double eventSize = _settings.SessionSettings.DetailView ? (1.0 - _settings.SessionSettings.DetailViewFraction) : 1.0;
+            double eventSize = _settings.DetailView ? (1.0 - _settings.DetailViewFraction) : 1.0;
             _colWidthEvtList = new GridLength(eventSize, GridUnitType.Star);
             _colWidthDetails = new GridLength(1.0 - eventSize, GridUnitType.Star);
         }
@@ -132,9 +134,9 @@ namespace ndu.ClefInspect.ViewModel.ClefView
         {
             if (value < 0.1)
             {
-                if (_settings.SessionSettings.DetailView)
+                if (_settings.DetailView)
                 {
-                    _settings.SessionSettings.DetailView = false;
+                    _settings.DetailView = false;
                 }
                 else if (value > 0.0)
                 {
@@ -145,8 +147,8 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             else
             {
                 if (value > 1.0) value = 1.0;
-                _settings.SessionSettings.DetailView = true;
-                _settings.SessionSettings.DetailViewFraction = value;
+                _settings.DetailView = true;
+                _settings.DetailViewFraction = value;
             }
         }
 
@@ -229,10 +231,10 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                     Filter filter = new(p.Key, p.Value);
                     PropertyChangedEventManager.AddHandler(filter, (s, e) => { Reload(); }, nameof(filter.Values));
                     _filters.Add(p.Key, filter);
-                    ClefFilterViewModel clefFilterViewModel = new(p.Key, filter, Settings.SessionSettings.IsVisibleFilterByDefault(p.Key));
+                    ClefFilterViewModel clefFilterViewModel = new(p.Key, filter, Settings.IsVisibleFilterByDefault(p.Key));
                     PropertyChangedEventManager.AddHandler(clefFilterViewModel, (s, e) => { NotifyVisibleFiltersChanged(); }, nameof(clefFilterViewModel.Visible));
                     Filters.Add(clefFilterViewModel);
-                    var dataColumnView = new DataColumnView(p.Key, Settings.SessionSettings.IsVisibleColumnByDefault(p.Key));
+                    var dataColumnView = new DataColumnView(p.Key, Settings.IsVisibleColumnByDefault(p.Key));
                     PropertyChangedEventManager.AddHandler(dataColumnView, (s, e) => { NotifyDataColumnEnabledChanged(); }, nameof(dataColumnView.Enabled));
                     _dataColumns.Add(dataColumnView);
                     newFilters = true;
@@ -338,7 +340,10 @@ namespace ndu.ClefInspect.ViewModel.ClefView
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(VisibleFilters)));
         }
-
+        private void OnSessionSettingsTextSearchMsgOnlyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            _textFilter?.TextSearchMsgOnly = Settings.TextSearchMsgOnly;
+        }
         public string? TextFilter
         {
             get => _textFilter?.FilterString;
@@ -346,7 +351,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             {
                 if (value != _textFilter?.FilterString)
                 {
-                    _textFilter = new(value);
+                    _textFilter = new(value, Settings.TextSearchMsgOnly);
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(TextFilter)));
                 }
             }
@@ -365,12 +370,13 @@ namespace ndu.ClefInspect.ViewModel.ClefView
         }
         public GridLength ColWidthEvtList => _colWidthEvtList;
         public GridLength ColWidthDetails => _colWidthDetails;
-        public Visibility DetailsVisibility => _settings.SessionSettings.DetailView ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility DetailsVisibility => _settings.DetailView ? Visibility.Visible : Visibility.Collapsed;
 
         public ICommand ClearTextFilter { get; }
 
         public ICommand ApplyFilter { get; }
         public ICommand FiltersMenu { get; }
+        public ICommand ColumnsMenu {  get; }
         public ICommand HideAllEventIds { get; }
         public ICommand Search { get; }
 
@@ -417,7 +423,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
         {
             get
             {
-                return _settings.SessionSettings.Format(_settings.RefTimeStamp);
+                return _settings.Format(_settings.RefTimeStamp);
             }
             set
             {

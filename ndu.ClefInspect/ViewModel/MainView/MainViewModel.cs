@@ -28,8 +28,9 @@ namespace ndu.ClefInspect.ViewModel.MainView
             OpenFromClipboard = new OpenFromClipboardCommand(this);
             SaveViewDefaults = new SaveViewDefaultsCommand(this);
             ApplyViewDefaults = new ApplyViewDefaultsCommand(this);
-            SaveSession = new SaveSessionCommand(this);
-            LoadSession = new LoadSessionCommand(this);
+            ResetView = new ResetViewCommand(this);
+            LoadRecentFiles = new LoadRecentFilesCommand(this);
+            ClearRecentFiles = new ClearRecentFilesCommand(this);
             CloseTab = new CloseTabCommand(this);
             CopySelected = new UserActionCommand(this, ClefView.ClefViewModel.UserAction.Copy);
             CopyClefSelected = new UserActionCommand(this, ClefView.ClefViewModel.UserAction.CopyClef);
@@ -54,8 +55,9 @@ namespace ndu.ClefInspect.ViewModel.MainView
         public ICommand OpenFromClipboard { get; set; }
         public ICommand SaveViewDefaults { get; set; }
         public ICommand ApplyViewDefaults { get; set; }
-        public ICommand SaveSession { get; set; }
-        public ICommand LoadSession { get; set; }
+        public ICommand ResetView { get; }
+        public ICommand LoadRecentFiles { get; set; }
+        public ICommand ClearRecentFiles { get; set; }
         public CloseTabCommand CloseTab { get; }
         public UserActionCommand CopySelected { get; }
         public UserActionCommand CopyClefSelected { get; }
@@ -88,6 +90,7 @@ namespace ndu.ClefInspect.ViewModel.MainView
 
         public void OpenFile(FileInfo fileName)
         {
+            Settings.AddRecentFile([fileName]);
             ClefTab tab = new(fileName, Settings);
             ClefTabs.Add(tab);
             tab.Closing += () =>
@@ -98,6 +101,7 @@ namespace ndu.ClefInspect.ViewModel.MainView
         }
         public void OpenFile(List<FileInfo> fileNames)
         {
+            Settings.AddRecentFile(fileNames);
             ClefTab tab = new(fileNames, Settings);
             ClefTabs.Add(tab);
             tab.Closing += () =>
