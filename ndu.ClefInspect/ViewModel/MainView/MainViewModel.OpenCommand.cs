@@ -1,4 +1,6 @@
-﻿namespace ndu.ClefInspect.ViewModel.MainView
+﻿using System.IO;
+
+namespace ndu.ClefInspect.ViewModel.MainView
 {
     public partial class MainViewModel
     {
@@ -8,22 +10,30 @@
 
             public override void Execute(object? parameter)
             {
-                var dialog = new Microsoft.Win32.OpenFileDialog
+                if (parameter is string file)
                 {
-                    Filter = @"all supported logs|*.json;*.clef|Json only (.json)|*.json|Clef only (.clef)|*.clef|All|*.*",
-                    Multiselect = true
-                };
-                bool? result = dialog.ShowDialog();
-                // Process open file dialog box results
-                if (result == true)
+                    List<FileInfo> fileInfo = file.Split(MainViewSettings.Fsep).Select(s => new FileInfo(s)).ToList();
+                    mainViewModel.OpenFile(fileInfo);
+                }
+                else
                 {
-                    if (dialog.FileNames.Length == 1)
+                    var dialog = new Microsoft.Win32.OpenFileDialog
                     {
-                        this.mainViewModel.OpenFiles(dialog.FileNames);
-                    }
-                    else
+                        Filter = @"all supported logs|*.json;*.clef|Json only (.json)|*.json|Clef only (.clef)|*.clef|All|*.*",
+                        Multiselect = true
+                    };
+                    bool? result = dialog.ShowDialog();
+                    // Process open file dialog box results
+                    if (result == true)
                     {
-                        this.mainViewModel.SetSelectedFilesSorted(dialog.FileNames);
+                        if (dialog.FileNames.Length == 1)
+                        {
+                            this.mainViewModel.OpenFiles(dialog.FileNames);
+                        }
+                        else
+                        {
+                            this.mainViewModel.SetSelectedFilesSorted(dialog.FileNames);
+                        }
                     }
                 }
             }

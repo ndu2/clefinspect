@@ -17,17 +17,18 @@ namespace ndu.ClefInspect.ViewModel.MainView
                     {
                         colsEnabled.Add(dcv.Header);
                     }
-                    _mainViewModel.Settings.SetVisibleColumnDefaults(colsEnabled);
+                    tab.ClefViewModel.Settings.SetVisibleColumnDefaults(colsEnabled);
                     List<string> filters = [];
                     foreach (ClefFilterViewModel fvm in tab.ClefViewModel.VisibleFilters)
                     {
                         filters.Add(fvm.Name);
                     }
-                    _mainViewModel.Settings.SetVisibleFilterDefaults(filters);
+                    tab.ClefViewModel.Settings.SetVisibleFilterDefaults(filters);
+                    tab.ClefViewModel.Settings.StoreAsDefaults();
                 }
                 try
                 {
-                    _mainViewModel.Settings.UserSettings.Write();
+                    _mainViewModel.Settings.Persist();
                 }
                 catch (Exception e)
                 {

@@ -26,16 +26,16 @@
         <KeyBinding Command="{Binding ToggleIgnorePinned}" Gesture="F6" />
         <KeyBinding Command="{Binding ToggleShowHiddenEvents}" Gesture="F7" />
         <KeyBinding Command="{Binding ToggleFilterAll}" Gesture="F8" />
+        <KeyBinding Command="{Binding ResetView}" Gesture="F9" />
     </Window.InputBindings>
     <Window.Resources>
         <DataTemplate x:Key="tabControlHeaderTemplate" DataType="{x:Type viewmodel:ClefTab}">
             <StackPanel Orientation="Horizontal">
-                <!--https://adamdawes.com/windows8/win8_segoeuisymbol.html-->
                 <TextBlock Text="{Binding Name}" />
                 <ContentControl Content="{StaticResource icon_error}" Visibility="{Binding FileError}" Margin="5,0,2,0" />
                 <ContentControl Content="{StaticResource icon_quickRefresh}" Visibility="{Binding CalculationRunning}" Margin="2,0,2,0" />
                 <ToggleButton IsChecked="{Binding AutoUpdate, Mode=TwoWay}" Margin="2,0,2,0" Style="{StaticResource TailToggleButton}" />
-                <Button Content="{StaticResource icon_close}" Command="{Binding Close}" /><!-- Margin="2,0,5,0" />-->
+                <Button Content="{StaticResource icon_close}" Command="{Binding Close}" />
             </StackPanel>
         </DataTemplate>
         <DataTemplate DataType="{x:Type viewmodel:ClefTab}">
@@ -54,15 +54,27 @@
                 <local:BooleanVisibilityCollapsedConverter x:Key="BooleanVisibilityCollapsedConverter" />
                 <local:StringFormatConverter x:Key="StringFormatConverter" />
                 <local:NullVisibilityCollapsedConverter x:Key="NullVisibilityCollapsedConverter" />
+                <local:NullBoolFalseConverter x:Key="NullBoolFalseConverter" />
             </Menu.Resources>
             <MenuItem Header="_File">
                 <MenuItem Header="_Open" Command="{Binding Open}" Icon="{StaticResource icon_openfile}" InputGestureText="Ctrl+O"/>
+                <MenuItem Header="Recent" ItemsSource="{Binding Settings.RecentFiles}"
+                          Visibility="{Binding Settings.RecentFiles.Count, Converter={StaticResource IntegerZeroIsCollapsedConverter}, FallbackValue=Collapsed}">
+                    <MenuItem.ItemContainerStyle>
+                        <Style>
+                            <Setter Property="MenuItem.Header" Value="{Binding}" />
+                            <Setter Property="MenuItem.CommandParameter" Value="{Binding}" />
+                            <Setter Property="MenuItem.Command" Value="{Binding DataContext.Open, ElementName=mainView}"/>
+                        </Style>
+                    </MenuItem.ItemContainerStyle>
+                </MenuItem>
+                <MenuItem Header="Open all recent Files" Icon="{StaticResource icon_restoredefaultview}" Command="{Binding LoadRecentFiles}"
+                          Visibility="{Binding Settings.RecentFiles.Count, Converter={StaticResource IntegerZeroIsCollapsedConverter}, FallbackValue=Collapsed}" />
+                <MenuItem Header="Clear recent Files" Command="{Binding ClearRecentFiles}"
+                          Visibility="{Binding Settings.RecentFiles.Count, Converter={StaticResource IntegerZeroIsCollapsedConverter}, FallbackValue=Collapsed}" />
                 <MenuItem Header="Open from Clipboard" Command="{Binding OpenFromClipboard}" Icon="{StaticResource icon_pastetable}" InputGestureText="Ctrl+V"/>
                 <MenuItem Header="_Close" Command="{Binding CloseTab}" Icon="{StaticResource icon_close}" InputGestureText="Ctrl+W"/>
                 <Separator />
-                <MenuItem Header="Save Session" Command="{Binding SaveSession}" Icon="{StaticResource icon_saveall}" Visibility="{Binding Settings.CanPersist, Converter={StaticResource BooleanVisibilityCollapsedConverter}}" />
-                <MenuItem Header="Load Session" Command="{Binding LoadSession}" Icon="{StaticResource icon_restoredefaultview}" Visibility="{Binding Settings.HasSessionData, Converter={StaticResource BooleanVisibilityCollapsedConverter}}" />
-                <Separator Visibility="{Binding Settings.CanPersist, Converter={StaticResource BooleanVisibilityCollapsedConverter}}" />
                 <MenuItem Header="_Exit" Command="{Binding Exit}" InputGestureText="Alt+F4"/>
             </MenuItem>
             <MenuItem Header="_Tools">
@@ -90,7 +102,8 @@
                 <MenuItem Visibility="{Binding ActiveTab.ClefViewModel.SelectedItem.ClefLine.EventId, Converter={StaticResource NullVisibilityCollapsedConverter}, FallbackValue=Collapsed}"
                           Header="{Binding ActiveTab.ClefViewModel.SelectedItem.ClefLine.EventId, Converter={StaticResource StringFormatConverter}, ConverterParameter=Hide All Entries with Id {0}, FallbackValue=Hide All Entries of the selected Events Types}"
                           Icon="{StaticResource icon_cloakOrHide}" Command="{Binding HideAllFromSelected}" />
-                <MenuItem Header="Show Selected Entries" Command="{Binding ShowSelected}" />
+                <MenuItem Header="Show Selected Entries" Command="{Binding ShowSelected}"
+                          Visibility="{Binding ActiveTab.ClefViewModel.Settings.ShowHiddenEvents, Converter={StaticResource BooleanVisibilityCollapsedConverter}}" />
                 <MenuItem Header="Pin Presets" ItemsSource="{Binding ActiveTab.ClefViewModel.PinPresets}" Visibility="{Binding ActiveTab.ClefViewModel.PinPresets.Count, Converter={StaticResource IntegerZeroIsCollapsedConverter}, FallbackValue=Collapsed}" >
                     <MenuItem.Icon>
                         <ContentControl Content="{StaticResource icon_pin}"></ContentControl>
@@ -105,32 +118,40 @@
                     </MenuItem.ItemContainerStyle>
                 </MenuItem>
             </MenuItem>
-            <MenuItem Header="_Filter" ItemsSource="{Binding ActiveTab.ClefViewModel.Filters}" Command="{Binding ActiveTab.ClefViewModel.FiltersMenu, FallbackValue={StaticResource CannotExecuteCommand}}">
-                <MenuItem.ItemContainerStyle>
-                    <Style>
-                        <Setter Property="MenuItem.IsCheckable" Value="True"/>
-                        <Setter Property="MenuItem.Header" Value="{Binding Name}"/>
-                        <!--<Setter Property="MenuItem.IsChecked" Value="{Binding Visible}"/>-->
-                        <Setter Property="MenuItem.IsChecked" Value="{Binding Visible, Mode=OneWay}"/>
-                        <Setter Property="MenuItem.CommandParameter" Value="{Binding Visible, Converter={StaticResource InverseBoolConverter}}" />
-                        <Setter Property="MenuItem.Command" Value="{Binding ChangeVisibility}"/>
-                    </Style>
-                </MenuItem.ItemContainerStyle>
-            </MenuItem>
             <MenuItem Header="_View">
-                <MenuItem Header="_One Line Only" IsCheckable="True" IsChecked="{Binding Settings.OneLineOnly}"/>
-                <MenuItem Header="_Local Time" IsCheckable="True" IsChecked="{Binding Settings.LocalTime}"/>
-                <MenuItem Header="_Details" IsCheckable="True" IsChecked="{Binding Settings.DetailView}"/>
+                <MenuItem Header="Enable Filter" IsCheckable="True" IsChecked="{Binding ActiveTab.ClefViewModel.Settings.ShowFiltered}" InputGestureText="F5"
+                           IsEnabled="{Binding ActiveTab, Converter={StaticResource NullBoolFalseConverter}, FallbackValue=false}"/>
+                <MenuItem Header="Show Pinned Entries" IsCheckable="True" IsChecked="{Binding ActiveTab.ClefViewModel.Settings.ShowPinned}" InputGestureText="F6"
+                           IsEnabled="{Binding ActiveTab, Converter={StaticResource NullBoolFalseConverter}, FallbackValue=false}"/>
+                <MenuItem Header="Show Hidden Entries" IsCheckable="True" IsChecked="{Binding ActiveTab.ClefViewModel.Settings.ShowHiddenEvents}" InputGestureText="F7"
+                           IsEnabled="{Binding ActiveTab, Converter={StaticResource NullBoolFalseConverter}, FallbackValue=false}"/>
+                <MenuItem Header="Hide All Entries" IsCheckable="True" IsChecked="{Binding ActiveTab.ClefViewModel.Settings.FilterAll}" InputGestureText="F8"
+                           IsEnabled="{Binding ActiveTab, Converter={StaticResource NullBoolFalseConverter}, FallbackValue=false}"/>
                 <Separator />
-                <MenuItem Header="Show Filtered Entries" IsCheckable="True" IsChecked="{Binding ActiveTab.ClefViewModel.Settings.ShowFiltered}" InputGestureText="F5"/>
-                <MenuItem Header="Show Pinned Entries" IsCheckable="True" IsChecked="{Binding ActiveTab.ClefViewModel.Settings.ShowPinned}" InputGestureText="F6"/>
-                <MenuItem Header="Show Hidden Entries" IsCheckable="True" IsChecked="{Binding ActiveTab.ClefViewModel.Settings.ShowHiddenEvents}" InputGestureText="F7"/>
-                <MenuItem Header="Hide All Entries" IsCheckable="True" IsChecked="{Binding ActiveTab.ClefViewModel.Settings.FilterAll}" InputGestureText="F8"/>
+                <MenuItem Header="Reset View" Command="{Binding ResetView}" InputGestureText="F9"/>
+            </MenuItem>
+            <MenuItem Header="_Settings">
+                <MenuItem Header="_One Line Only" IsCheckable="True" IsChecked="{Binding ActiveTab.ClefViewModel.Settings.OneLineOnly}"
+                          IsEnabled="{Binding ActiveTab, Converter={StaticResource NullBoolFalseConverter}, FallbackValue=false}"/>
+                <MenuItem Header="_Local Time" IsCheckable="True" IsChecked="{Binding ActiveTab.ClefViewModel.Settings.LocalTime}"
+                          IsEnabled="{Binding ActiveTab, Converter={StaticResource NullBoolFalseConverter}, FallbackValue=false}"/>
+                <MenuItem Header="_Details" IsCheckable="True" IsChecked="{Binding ActiveTab.ClefViewModel.Settings.DetailView}"
+                          IsEnabled="{Binding ActiveTab, Converter={StaticResource NullBoolFalseConverter}, FallbackValue=false}"/>
                 <Separator />
-                <MenuItem Header="Save View as Default" Command="{Binding SaveViewDefaults}" Visibility="{Binding Settings.CanPersist, Converter={StaticResource BooleanVisibilityCollapsedConverter}}" />
-                <MenuItem Header="Reset View to Default" Command="{Binding ApplyViewDefaults}" Icon="{StaticResource icon_restoredefaultview}" />
-                <Separator />
-                <MenuItem Header="_Columns" ItemsSource="{Binding ActiveTab.ClefViewModel.DataColumns}">
+                <MenuItem Header="_Filter" ItemsSource="{Binding ActiveTab.ClefViewModel.Filters}" Command="{Binding ActiveTab.ClefViewModel.FiltersMenu, FallbackValue={StaticResource CannotExecuteCommand}}">
+                    <MenuItem.ItemContainerStyle>
+                        <Style>
+                            <Setter Property="MenuItem.IsCheckable" Value="True"/>
+                            <Setter Property="MenuItem.Header" Value="{Binding Name}"/>
+                            <Setter Property="MenuItem.IsChecked" Value="{Binding Visible, Mode=OneWay}"/>
+                            <Setter Property="MenuItem.CommandParameter" Value="{Binding Visible, Converter={StaticResource InverseBoolConverter}}" />
+                            <Setter Property="MenuItem.Command" Value="{Binding ChangeVisibility}"/>
+                        </Style>
+                    </MenuItem.ItemContainerStyle>
+                </MenuItem>
+                <MenuItem Header="Search in Log Message only" IsCheckable="True" IsChecked="{Binding ActiveTab.ClefViewModel.Settings.TextSearchMsgOnly}"
+                          IsEnabled="{Binding ActiveTab, Converter={StaticResource NullBoolFalseConverter}, FallbackValue=false}"/>
+                <MenuItem Header="_Columns" ItemsSource="{Binding ActiveTab.ClefViewModel.DataColumns}" Command="{Binding ActiveTab.ClefViewModel.ColumnsMenu, FallbackValue={StaticResource CannotExecuteCommand}}">
                     <MenuItem.ItemContainerStyle>
                         <Style>
                             <Setter Property="MenuItem.IsCheckable" Value="True" />
@@ -139,6 +160,9 @@
                         </Style>
                     </MenuItem.ItemContainerStyle>
                 </MenuItem>
+                <Separator />
+                <MenuItem Header="Save Settings as Default" Command="{Binding SaveViewDefaults}" Visibility="{Binding Settings.CanPersist, Converter={StaticResource BooleanVisibilityCollapsedConverter}}" />
+                <MenuItem Header="Reset Settings to Default" Command="{Binding ApplyViewDefaults}" Icon="{StaticResource icon_restoredefaultview}" />
             </MenuItem>
         </Menu>
 

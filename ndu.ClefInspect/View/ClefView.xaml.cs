@@ -101,7 +101,7 @@ namespace ndu.ClefInspect.View
                 oldViewModel.Reloaded -= OnReloaded;
                 oldViewModel.UserActionHandler -= OnUserAction;
                 oldViewModel.DataColumnEnabledChanged -= OnDataColumnEnabledChanged;
-                oldViewModel.Settings.SessionSettings.PropertyChanged -= ListViewLogEntries_Update;
+                oldViewModel.Settings.PropertyChanged -= ListViewLogEntries_Update;
                 oldViewModel.PropertyChanged -= ViewModel_PropertyChanged;
             }
             if (DataContext is ClefViewModel viewModel)
@@ -115,7 +115,7 @@ namespace ndu.ClefInspect.View
                     _listViewLogEntriesScrollViewer.ScrollToVerticalOffset(viewModel.VerticalOffset);
                     _listViewLogEntriesScrollViewer.ScrollToHorizontalOffset(viewModel.HorizontalOffset);
                 }
-                viewModel.Settings.SessionSettings.PropertyChanged += ListViewLogEntries_Update;
+                viewModel.Settings.PropertyChanged += ListViewLogEntries_Update;
                 viewModel.PropertyChanged += ViewModel_PropertyChanged;
                 Layout(viewModel);
             }
@@ -342,7 +342,10 @@ namespace ndu.ClefInspect.View
 
         private void HideAllFromSelected()
         {
-            (DataContext as ClefViewModel)?.HideAllEventIds.Execute(line.EventId);
+            if(ListViewLogEntries.SelectedItem is ClefLineViewModel line)
+            {
+                (DataContext as ClefViewModel)?.HideAllEventIds.Execute(line.EventId);
+            }
         }
         private void HideAllFromSelected_Click(object sender, System.Windows.RoutedEventArgs e) => HideAllFromSelected();
 

@@ -13,16 +13,13 @@ namespace ndu.ClefInspect.ViewModel.MainView
                 {
                     foreach (ClefViewModel.DataColumnView dcv in tab.ClefViewModel.DataColumns)
                     {
-                        dcv.Enabled = _mainViewModel.Settings.IsVisibleColumnByDefault(dcv.Header);
+                        dcv.Enabled = tab.ClefViewModel.Settings.IsVisibleColumnByDefault(dcv.Header);
                     }
                     foreach (ClefFilterViewModel fvm in tab.ClefViewModel.Filters)
                     {
-                        fvm.Visible = _mainViewModel.Settings.IsVisibleFilterByDefault(fvm.Name);
+                        fvm.Visible = tab.ClefViewModel.Settings.IsVisibleFilterByDefault(fvm.Name);
                     }
-                    tab.ClefViewModel.Settings.ShowFiltered = false;
-                    tab.ClefViewModel.Settings.ShowHiddenEvents = false;
-                    tab.ClefViewModel.Settings.ShowPinned = true;
-                    tab.ClefViewModel.Settings.FilterAll = false;
+                    tab.ClefViewModel.Settings.LoadDefaults();
                 }
             }
         }

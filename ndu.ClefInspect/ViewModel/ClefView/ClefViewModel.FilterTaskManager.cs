@@ -224,9 +224,10 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             {
                 FilteredClef clefLines = _clefViewModel.ClefLines;
                 int selectedIndex = _clefViewModel.SelectedIndex;
+                bool textSearchMsgOnly = _clefViewModel.Settings.TextSearchMsgOnly;
                 return Task.Run(() =>
                 {
-                    IMatcher matcher = new TextFilter(text).Create();
+                    IMatcher matcher = new TextFilter(text, textSearchMsgOnly).Create();
                     int iDir;
                     switch (dir)
                     {
