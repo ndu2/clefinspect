@@ -103,6 +103,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
         public string? MessageMultiline => ClefLine.Message;
 
         public string? Exception => ClefLine.Exception;
+        public string? EventId => ClefLine.EventId;
 
         public string? JsonFormatted
         {
@@ -161,7 +162,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                 }
                 if (!value && ClefLine.Ignore && EventId != null)
                 {
-                    _settings.IgnoredEventId.Remove(this.ClefLine.EventId);
+                    _settings.IgnoredEventId.Remove(EventId);
                 }
             }
         }
