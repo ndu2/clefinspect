@@ -7,9 +7,10 @@ namespace ndu.ClefInspect.Model
     {
         private readonly string _key;
         private bool _disableNotifyFilterChanged;
+        // Values and _values store the same objects, the former allows VM to bind to, the latter is used for fast retrieval by the filter value
+        private Dictionary<string, FilterValue> _values = [];
 
         public event PropertyChangedEventHandler? PropertyChanged;
-
 
         public Filter(string key, IEnumerable<KeyValuePair<string, int>> filter)
         {
@@ -17,6 +18,20 @@ namespace ndu.ClefInspect.Model
             _key = key;
             List<FilterValue> values = [];
             foreach ((string value, int amount) in filter)
+            {
+                Add(values, value, amount);
+            }
+            values.Sort();
+            Values = new ObservableCollection<FilterValue>(values);
+        }
+
+        private void Add(IList<FilterValue> values, string value, int amount)
+        {
+            if (_values.TryGetValue(value, out var filter))
+            {
+                filter.Amount = amount;
+            }
+            else
             {
                 FilterValue fi = new(value, amount, true, UiWhenEmpty());
                 fi.PropertyChanged += (sender, e) =>
@@ -27,11 +42,9 @@ namespace ndu.ClefInspect.Model
                     }
                 };
                 values.Add(fi);
+                _values.Add(value, fi);
             }
-            values.Sort();
-            Values = new ObservableCollection<FilterValue>(values);
         }
-
 
         private string UiWhenEmpty()
         {
@@ -99,25 +112,7 @@ namespace ndu.ClefInspect.Model
         {
             foreach ((string value, int amount) in values)
             {
-                FilterValue? filterValue = Values.FirstOrDefault((f) => f.ValueMatcher == value);
-                if (filterValue == null)
-                {
-                    FilterValue newFilterValue = new(value, amount, true, UiWhenEmpty());
-                    int pos = 0;
-                    foreach (FilterValue fi in Values)
-                    {
-                        if (fi.CompareTo(newFilterValue) > 0)
-                        {
-                            break;
-                        }
-                        pos++;
-                    }
-                    Values.Insert(pos, newFilterValue);
-                }
-                else
-                {
-                    filterValue.Amount = amount;
-                }
+                Add(Values, value, amount);
             }
         }
 
