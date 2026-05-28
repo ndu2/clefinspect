@@ -83,7 +83,7 @@ Example:
 			"ThreadId"
 		],
 		"DetailViewFraction": 0.33,
-		"DetailView": false
+		"DetailView": false,
 		"TextSearchMsgOnly": true
 	},
 	"session": {

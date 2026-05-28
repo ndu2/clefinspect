@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Media;
 namespace ndu.ClefInspect.Model
@@ -34,6 +35,27 @@ namespace ndu.ClefInspect.Model
             public int MaxFiles { get; set; } = 10;
             public ObservableCollection<string> Files { get; set; } = [];
         }
+
+        public class BrushColorJsonConverter : JsonConverter<Brush>
+        {
+            public override Brush? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+            {
+                string? dat = reader.GetString();
+                if (dat != null)
+                {
+                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString(dat));
+                }
+                else
+                {
+                    return SystemColors.GrayTextBrush;
+                }
+            }
+            public override void Write(Utf8JsonWriter writer, Brush value, JsonSerializerOptions options)
+            {
+                writer.WriteStringValue(value.ToString());
+            }
+        }
+
         public class PinPresetOptions
         {
             public const string PinPresets = "pinPresets";
@@ -107,6 +129,14 @@ namespace ndu.ClefInspect.Model
             JsonSerializer.Serialize(writer, ViewSettings);
             writer.WritePropertyName(SessionOptions.Session);
             JsonSerializer.Serialize(writer, Session);
+            writer.WritePropertyName(EventSettingsOptions.EventSettings);
+            JsonSerializer.Serialize(writer, EventSettings);
+            var serializeOptions = new JsonSerializerOptions
+            {
+            };
+            serializeOptions.Converters.Add(new BrushColorJsonConverter());
+            writer.WritePropertyName(PinPresetOptions.PinPresets);
+            JsonSerializer.Serialize(writer, PinPresets, serializeOptions);
             writer.WriteEndObject();
             writer.Flush();
         }
