@@ -381,11 +381,14 @@ namespace ndu.ClefInspect.View
         }
 
 
-        private void OnReloaded()
+        private void OnReloaded(bool scroll)
         {
-            if (DataContext is ClefViewModel viewModel)
+            if (scroll)
             {
-                ListViewLogEntries.ScrollIntoView(viewModel.SelectedItem);
+                if (DataContext is ClefViewModel viewModel)
+                {
+                    ListViewLogEntries.ScrollIntoView(viewModel.SelectedItem);
+                }
             }
         }
 

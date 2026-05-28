@@ -18,7 +18,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             private int _nextItemFromSource = 0;
 
             public void Filter(List<IMatcher> matchers, LinesChangedEventArgsAction action, bool pinPresetChanged,
-                Action<int> onChanged)
+                Action<int, bool> onChanged)
             {
 
                 Task? previousFilterTask = _filterTask;
@@ -63,7 +63,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             public Task Reload(List<IMatcher> filters,
                 LinesChangedEventArgsAction action,
                 bool pinPresetChanged,
-                Action onRun, Action<int> onChanged,
+                Action onRun, Action<int, bool> onChanged,
                 CancellationToken cancellationToken)
             {
                 if (action == LinesChangedEventArgsAction.None)
@@ -73,6 +73,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                 FilteredClef clefLines = _clefViewModel.ClefLines;
                 IClef clef = _clefViewModel.Clef;
                 int selectedIndex = _clefViewModel.SelectedIndex;
+                int selectedIndexBefore = _clefViewModel.SelectedIndex;
                 HashSet<string> ignoredEvents = [];
                 ignoredEvents.UnionWith(_clefViewModel.Settings.IgnoredEventId);
                 bool ignoreFilter = _clefViewModel.Settings.ShowFiltered;
@@ -164,9 +165,11 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                         result.RemoveRange(idx, result.Count - idx);
                         changedAlot = true;
                     }
+                    bool forceIdxChange = true;
                     if (selectedIndexExact > 0)
                     {
                         selectedIndex = selectedIndexExact;
+                        forceIdxChange = selectedIndexBefore != selectedIndex;
                     }
 
                     Application.Current?.Dispatcher?.Invoke(() =>
@@ -191,7 +194,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                                 clefLines.NotifyCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, added.Item1, added.Item2));
                             }
                         }
-                        onChanged(selectedIndex);
+                        onChanged(selectedIndex, forceIdxChange);
                     });
                 }, cancellationToken);
             }

@@ -153,7 +153,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
-        public event Action? Reloaded;
+        public event Action<bool>? Reloaded;
         public event Action? DataColumnEnabledChanged;
         public void NotifyDataColumnEnabledChanged()
         {
@@ -199,7 +199,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                     SelectedIndex = selectedIndex;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DateInfo)));
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FileInfo)));
-                    Reloaded?.Invoke();
+                    Reloaded?.Invoke(true);
                     CalculationRunning = false;
                 });
         }
@@ -255,15 +255,18 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             _filterTaskManager.Filter(matchers: matchers,
                 action: e.Action,
                 pinPresetChanged: pinPresetChanged,
-                onChanged: (selectedIndex) =>
+                onChanged: (selectedIndex, forceChange) =>
                  {
-                     // force PropertyChangedEventArgs associated with SelectedIndex
-                     _selectedIndex = -1;
-                     SelectedIndex = selectedIndex;
-                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DateInfo)));
-                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FileInfo)));
-                     Reloaded?.Invoke();
-                     CalculationRunning = false;
+                    if (forceChange)
+                    {
+                        // force PropertyChangedEventArgs associated with SelectedIndex
+                        _selectedIndex = -1;
+                    }
+                    SelectedIndex = selectedIndex;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DateInfo)));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FileInfo)));
+                    Reloaded?.Invoke(forceChange);
+                    CalculationRunning = false;
                  });
         }
         public ObservableCollection<DataColumnView> DataColumns => _dataColumns;
@@ -446,7 +449,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
                     }
                     _selectedIndex = i - 1;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectedIndex)));
-                    Reloaded?.Invoke();
+                    Reloaded?.Invoke(true);
                 }
             }
         }
