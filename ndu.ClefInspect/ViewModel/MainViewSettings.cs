@@ -1,7 +1,6 @@
 ﻿using ndu.ClefInspect.Model;
 using ndu.ClefInspect.ViewModel.ClefView;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 
@@ -18,7 +17,7 @@ namespace ndu.ClefInspect.ViewModel
             // load defaults
             _configuration = new Configuration();
             _sessionFilesSet = new(_configuration.Session.Files);
-            RecentFiles = _configuration.Session.Files.AsReadOnly();
+            RecentFiles = _configuration.Session.Files;
             PinPresets = _configuration.PinPresets.AsReadOnly();
             HideEventIds = _configuration.EventSettings.HideEventIds.AsReadOnly();
         }
@@ -47,7 +46,7 @@ namespace ndu.ClefInspect.ViewModel
             _sessionFilesSet.Clear();
             Persist();
         }
-        public ReadOnlyCollection<string> RecentFiles { get; }
+        public ObservableCollection<string> RecentFiles { get; }
         public void Persist()
         {
             if (CanPersist)
