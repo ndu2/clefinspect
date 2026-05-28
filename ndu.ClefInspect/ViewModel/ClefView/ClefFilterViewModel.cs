@@ -8,34 +8,10 @@ namespace ndu.ClefInspect.ViewModel.ClefView
 {
     public partial class ClefFilterViewModel : INotifyPropertyChanged
     {
-        private readonly ObservableCollection<ClefFilterView> _filterValues;
+        private readonly ObservableCollection<ClefFilterValueViewModel> _filterValues;
         private readonly ObservableCollection<FilterValue> _filter;
         private string _searchFilter;
         private bool _visible;
-
-
-        public class ClearSearchFilterCommand : ICommand
-        {
-            private readonly ClefFilterViewModel _vm;
-
-            public ClearSearchFilterCommand(ClefFilterViewModel vm)
-            {
-                _vm = vm;
-                PropertyChangedEventManager.AddHandler(_vm, (s, e) => { CanExecuteChanged?.Invoke(this, EventArgs.Empty); }, nameof(vm.SearchFilter));
-            }
-
-            public event EventHandler? CanExecuteChanged;
-
-            public bool CanExecute(object? parameter)
-            {
-                return _vm.SearchFilter != string.Empty;
-            }
-
-            public void Execute(object? parameter)
-            {
-                _vm.SearchFilter = string.Empty;
-            }
-        }
 
         public ClefFilterViewModel(string name, Filter filter, bool visible)
         {
@@ -61,7 +37,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             _filterValues.Clear();
             foreach (FilterValue filterValue in _filter)
             {
-                _filterValues.Add(new ClefFilterView(this, filterValue));
+                _filterValues.Add(new ClefFilterValueViewModel(this, filterValue));
             }
         }
 
@@ -71,7 +47,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
             {
                 for (int i = _filterValues.Count; i < _filter.Count; ++i)
                 {
-                    _filterValues.Add(new ClefFilterView(this, _filter[i]));
+                    _filterValues.Add(new ClefFilterValueViewModel(this, _filter[i]));
                 }
             }
             else
@@ -91,7 +67,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
 
         public string Name { get; set; }
 
-        public ObservableCollection<ClefFilterView> FilterValues => _filterValues;
+        public ObservableCollection<ClefFilterValueViewModel> FilterValues => _filterValues;
         public bool Visible
         {
             get => _visible;

@@ -14,13 +14,12 @@
     <UserControl.Resources>
         <System:Boolean x:Key="FalseValue">False</System:Boolean>
         <System:Boolean x:Key="TrueValue">True</System:Boolean>
-        <CollectionViewSource x:Key="FilterValuesSorted" Source="{Binding FilterValues}" >
+        <CollectionViewSource x:Key="FilterValuesSorted" Source="{Binding FilterValues}" Filter="FilterCollectionViewFilter" >
             <CollectionViewSource.SortDescriptions>
                 <scm:SortDescription PropertyName="FilterValue.Value" />
             </CollectionViewSource.SortDescriptions>
         </CollectionViewSource>
     </UserControl.Resources>
-
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -34,7 +33,7 @@
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="0" Grid.Column="0"
             FontWeight="Bold" Text="{Binding Name}" />
-        <TextBox Grid.Row="0" Grid.Column="1"
+        <TextBox Grid.Row="0" Grid.Column="1" TextChanged="RefreshFilterValuesSorted"
                  Text="{Binding SearchFilter, UpdateSourceTrigger=PropertyChanged}" helper:TextBoxHelper.Placeholder="Search"/>
         <Button Grid.Row="0" Grid.Column="2"
                 Content="{StaticResource icon_deleteFilter}" Command="{Binding ClearSearchFilter}" />
@@ -64,7 +63,7 @@
             </ListBox.ItemContainerStyle>
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Grid Visibility="{Binding Visible, Converter={StaticResource BooleanVisibilityCollapsedConverter}}" >
+                    <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />

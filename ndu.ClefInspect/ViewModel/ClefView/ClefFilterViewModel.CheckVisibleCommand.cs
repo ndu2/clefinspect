@@ -43,7 +43,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
 
             public void Execute(object? parameter)
             {
-                foreach (ClefFilterView fv in _vm.FilterValues)
+                foreach (ClefFilterValueViewModel fv in _vm.FilterValues)
                 {
                     if (_only || fv.Visible)
                     {
