@@ -162,12 +162,59 @@ namespace ndu.ClefInspect.ViewModel.MainView
         }
 
         private string[]? _selectedFiles = null;
+        private string[]? _selectedFilesBackup = null;
         public void SetSelectedFilesSorted(string[] fileNames)
         {
             string[] sorted = new string[fileNames.Length];
             Array.Copy(fileNames, sorted, sorted.Length);
             Array.Sort(sorted);
             SelectedFiles = sorted;
+        }
+        public void CancelReorderSelectedFiles()
+        {
+            SelectedFiles = _selectedFilesBackup;
+            _selectedFilesBackup = null;
+        }
+
+        public void ReorderSelectedFilesConfirm()
+        {
+            _selectedFilesBackup = null;
+        }
+        public bool StartReorderSelectedFilesStart()
+        {
+            _selectedFilesBackup = null;
+            if (SelectedFiles != null)
+            {
+                _selectedFilesBackup = new string[SelectedFiles.Length];
+                Array.Copy(SelectedFiles, _selectedFilesBackup, SelectedFiles.Length);
+            }
+            return _selectedFilesBackup?.Length > 0;
+        }
+
+
+        public void ReorderSelectedFiles(string file, string toPosition, bool after)
+        {
+            if(SelectedFiles == null || _selectedFilesBackup?.Length != SelectedFiles.Length)
+            {
+                return;
+            }
+            List<string> reordered = new(SelectedFiles.Length);
+            for (int i = 0; i < SelectedFiles.Length; i++)
+            {
+                if (!after && SelectedFiles[i] == toPosition)
+                {
+                    reordered.Add(file);
+                }
+                if (SelectedFiles[i] != file)
+                {
+                    reordered.Add(SelectedFiles[i]);
+                }
+                if (after && SelectedFiles[i] == toPosition)
+                {
+                    reordered.Add(file);
+                }
+            }
+            SelectedFiles = reordered.ToArray();
         }
         public string[]? SelectedFiles
         {
