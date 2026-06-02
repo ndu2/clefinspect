@@ -9,14 +9,12 @@ namespace ndu.ClefInspect.ViewModel
     public class MainViewSettings
     {
         private readonly Configuration _configuration;
-        private readonly HashSet<string> _sessionFilesSet;
         private static readonly IFormatProvider local = CultureInfo.CurrentCulture.DateTimeFormat;
         private static readonly string utc = CultureInfo.InvariantCulture.DateTimeFormat.UniversalSortableDateTimePattern;
         public MainViewSettings()
         {
             // load defaults
             _configuration = new Configuration();
-            _sessionFilesSet = new(_configuration.Session.Files);
             RecentFiles = _configuration.Session.Files;
             PinPresets = _configuration.PinPresets.AsReadOnly();
             HideEventIds = _configuration.EventSettings.HideEventIds.AsReadOnly();
@@ -30,20 +28,20 @@ namespace ndu.ClefInspect.ViewModel
         {
             List<string> names = fileNames.Select(fn => fn.FullName).ToList();
             string recentEntry = String.Join(Fsep, names);
-            if (_sessionFilesSet.Add(recentEntry))
-            {
-                _configuration.Session.Files.Add(recentEntry);
-            }
+            // Remove (if available) and insert at 0 to re-order the recent files list.
+            // Both are slow (log(n)), but as there are not much entries in the array, this poses no problem.
+            _configuration.Session.Files.Remove(recentEntry);
+            _configuration.Session.Files.Insert(0, recentEntry);
             while (_configuration.Session.Files.Count >= _configuration.Session.MaxFiles)
             {
-                _configuration.Session.Files.RemoveAt(0);
+                _configuration.Session.Files.RemoveAt(_configuration.Session.Files.Count - 1);
             }
             Persist();
         }
+
         public void ClearRecentFiles()
         {
             _configuration.Session.Files.Clear();
-            _sessionFilesSet.Clear();
             Persist();
         }
         public ObservableCollection<string> RecentFiles { get; }
