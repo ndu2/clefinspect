@@ -159,7 +159,7 @@ namespace ndu.ClefInspect.ViewModel.ClefView
         {
             DataColumnEnabledChanged?.Invoke();
         }
-        public enum UserAction { Copy, CopyClef, Pin, Unpin, Hide, HideAllFromSelected, Show, ToggleIgnoreFilter, ToggleIgnorePinned, ToggleShowHiddenEvents, ToggleFilterAll };
+        public enum UserAction { Copy, CopyClef, Pin, Unpin, Hide, HideAllFromSelected, Show, ToggleIgnoreFilter, ToggleIgnorePinned, ToggleShowHiddenEvents, ToggleFilterAll, FocusFilter, FocusSearch };
         public delegate void UserActionEvent(UserAction userAction, object? parameter);
         public event UserActionEvent? UserActionHandler;
         public void DoUserAction(UserAction userAction, object? parameter)

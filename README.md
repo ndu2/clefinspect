@@ -52,6 +52,8 @@ Use timestamp field to navigate to a event for a given time (enter a timestamp +
  - `Ctrl+V`: Paste from clipboard
  - `Ctrl+W`: Close the active tab
  - `Ctrl+Tab`: Switch the active tab
+ - `Ctrl+F`: Focus text filter (use `Enter` to apply)
+ - `Ctrl+S`: Focus text search (use `Enter` to search down, `Shift+Enter` to search up)
  - `F5`: Toggle filtering
  - `F6`: Toggle display of pinned events
  - `F7`: Toggle display of hidden events

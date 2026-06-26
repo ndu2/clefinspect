@@ -217,8 +217,9 @@ namespace ndu.ClefInspect.View
         {
             if (e.Key == Key.Enter)
             {
+                bool up = Keyboard.Modifiers == ModifierKeys.Shift;
                 TextSearch.GetBindingExpression(TextBox.TextProperty).UpdateSource();
-                (DataContext as ClefViewModel)?.Search.Execute(ClefViewModel.SearchDirection.Down);
+                (DataContext as ClefViewModel)?.Search.Execute(up ? ClefViewModel.SearchDirection.Up : ClefViewModel.SearchDirection.Down);
             }
         }
         private void ButtonTextSearchUp_Click(object sender, RoutedEventArgs e)
@@ -263,6 +264,8 @@ namespace ndu.ClefInspect.View
                 case ClefViewModel.UserAction.ToggleIgnorePinned: ToggleShowPinned(); break;
                 case ClefViewModel.UserAction.ToggleShowHiddenEvents: ToggleShowHiddenEvents(); break;
                 case ClefViewModel.UserAction.ToggleFilterAll: ToggleFilterAll(); break;
+                case ClefViewModel.UserAction.FocusFilter: TextFilter.Focus(); break;
+                case ClefViewModel.UserAction.FocusSearch: TextSearch.Focus(); break;
             }
         }
 

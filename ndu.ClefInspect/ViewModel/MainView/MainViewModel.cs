@@ -43,6 +43,8 @@ namespace ndu.ClefInspect.ViewModel.MainView
             ToggleIgnorePinned = new UserActionCommand(this, ClefView.ClefViewModel.UserAction.ToggleIgnorePinned);
             ToggleShowHiddenEvents = new UserActionCommand(this, ClefView.ClefViewModel.UserAction.ToggleShowHiddenEvents);
             ToggleFilterAll = new UserActionCommand(this, ClefView.ClefViewModel.UserAction.ToggleFilterAll);
+            FocusFilter = new UserActionCommand(this, ClefView.ClefViewModel.UserAction.FocusFilter);
+            FocusSearch = new UserActionCommand(this, ClefView.ClefViewModel.UserAction.FocusSearch);
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -70,6 +72,8 @@ namespace ndu.ClefInspect.ViewModel.MainView
         public UserActionCommand ToggleIgnorePinned { get; }
         public UserActionCommand ToggleShowHiddenEvents { get; }
         public UserActionCommand ToggleFilterAll { get; }
+        public UserActionCommand FocusFilter { get; }
+        public UserActionCommand FocusSearch { get; }
         public ICommand Exit { get; set; }
 
         private ClefTab? _activeTab;

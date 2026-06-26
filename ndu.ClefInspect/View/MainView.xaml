@@ -27,6 +27,8 @@
         <KeyBinding Command="{Binding ToggleShowHiddenEvents}" Gesture="F7" />
         <KeyBinding Command="{Binding ToggleFilterAll}" Gesture="F8" />
         <KeyBinding Command="{Binding ResetView}" Gesture="F9" />
+        <KeyBinding Command="{Binding FocusFilter}" Gesture="CTRL+F" />
+        <KeyBinding Command="{Binding FocusSearch}" Gesture="CTRL+S" />
     </Window.InputBindings>
     <Window.Resources>
         <DataTemplate x:Key="tabControlHeaderTemplate" DataType="{x:Type viewmodel:ClefTab}">
