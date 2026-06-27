@@ -1,31 +1,16 @@
 ﻿using ndu.ClefInspect.Model;
-using System.ComponentModel;
 
 namespace ndu.ClefInspect.ViewModel.ClefView
 {
     public partial class ClefFilterViewModel
     {
-        public class ClefFilterValueViewModel : INotifyPropertyChanged
+        public class ClefFilterValueViewModel(ClefFilterViewModel vm, FilterValue filterValue)
         {
-            private bool _visible;
-            private readonly ClefFilterViewModel _vm;
-
-            public ClefFilterValueViewModel(ClefFilterViewModel vm, FilterValue filterValue)
-            {
-                _vm = vm;
-                FilterValue = filterValue;
-            }
-
-            public event PropertyChangedEventHandler? PropertyChanged;
-
-
-            public FilterValue FilterValue { get; }
+            public FilterValue FilterValue { get; } = filterValue;
             public bool Visible
             {
-                get => FilterValue.Value.Contains(_vm.SearchFilter, StringComparison.InvariantCultureIgnoreCase);
+                get => FilterValue.Value.Contains(vm.SearchFilter, StringComparison.InvariantCultureIgnoreCase);
             }
-
         }
-
     }
 }
