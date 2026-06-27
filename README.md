@@ -11,7 +11,7 @@ Currently runs on Windows with .NET 10.0 only. Distributed as a zip archive.
  * Displays CLEF events.
  * Show columns based on the properties available in your logfiles.
  * Filter events (text and properties) and pin (always display) individual events.
- * Auto Pin based on Pin Presets (see [Configuration](#configuration)).
+ * Auto Pin based on Pin Presets (see [Configuration](#configuration-optional)).
  * Hide individual events, hide all events of a type (Event id)
  * Scroll to events by timestamp and search
  * Switch between local and UTC timestamps.
