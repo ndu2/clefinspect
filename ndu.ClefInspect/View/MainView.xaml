@@ -121,7 +121,7 @@
                 </MenuItem>
             </MenuItem>
             <MenuItem Header="_View">
-                <MenuItem Header="Enable Filter" IsCheckable="True" IsChecked="{Binding ActiveTab.ClefViewModel.Settings.ShowFiltered}" InputGestureText="F5"
+                <MenuItem Header="Show Filtered" IsCheckable="True" IsChecked="{Binding ActiveTab.ClefViewModel.Settings.ShowFiltered}" InputGestureText="F5"
                            IsEnabled="{Binding ActiveTab, Converter={StaticResource NullBoolFalseConverter}, FallbackValue=false}"/>
                 <MenuItem Header="Show Pinned Entries" IsCheckable="True" IsChecked="{Binding ActiveTab.ClefViewModel.Settings.ShowPinned}" InputGestureText="F6"
                            IsEnabled="{Binding ActiveTab, Converter={StaticResource NullBoolFalseConverter}, FallbackValue=false}"/>
